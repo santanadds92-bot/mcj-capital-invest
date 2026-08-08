@@ -48,8 +48,32 @@ header.main .container{display:flex;align-items:center;justify-content:space-bet
 nav.primary ul{display:flex;gap:38px;}
 nav.primary a{font-size:.85rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);transition:color .2s;}
 nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
-.menu-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
+.menu-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:6px;}
 .menu-toggle span{width:26px;height:2px;background:var(--gold);}
+
+/* Drawer de menu mobile — abre da esquerda para a direita */
+.drawer-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:150;
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
+}
+.drawer-overlay.open{opacity:1;pointer-events:auto;}
+.mobile-drawer{
+  position:fixed;top:0;left:0;bottom:0;width:82%;max-width:340px;
+  background:#0b0b0c;border-right:1px solid var(--border);
+  z-index:200;
+  transform:translateX(-100%);
+  transition:transform .35s ease;
+  padding:70px 32px 40px;
+  overflow-y:auto;
+}
+.mobile-drawer.open{transform:translateX(0);}
+.drawer-close{
+  position:absolute;top:22px;left:24px;background:none;border:none;color:var(--gold-light);
+  font-size:1.8rem;line-height:1;cursor:pointer;padding:4px;
+}
+.drawer-nav{display:flex;flex-direction:column;gap:28px;}
+.drawer-nav a{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:500;color:var(--text);}
+.drawer-nav a:hover, .drawer-nav a.active{color:var(--gold-light);}
 
 /* Hero */
 .hero{
@@ -64,6 +88,18 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .hero h1{font-size:3.4rem;font-weight:600;max-width:720px;color:var(--text);margin-bottom:16px;}
 .hero h1 em{font-style:italic;color:var(--gold);}
 .hero p.lead{max-width:520px;color:var(--text-muted);font-size:1.05rem;margin-bottom:40px;}
+
+/* Marca centralizada exibida sobre a imagem do hero — só no mobile */
+.hero-brand-mobile{
+  display:none;
+  text-align:center;
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.6rem;
+  letter-spacing:1px;
+  color:var(--text);
+  margin-bottom:28px;
+}
+.hero-brand-mobile span{color:var(--gold);font-style:italic;}
 
 /* Page header (property / inner pages) */
 .page-header{
@@ -178,7 +214,7 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .feature-card h3{font-size:1.4rem;margin-bottom:12px;font-weight:600;}
 .feature-card p{color:var(--text-muted);font-size:.9rem;}
 
-/* Carousels (destaques / similares) */
+/* Carousels (similares — scroll horizontal simples) */
 .destaques-wrap{position:relative;}
 .carousel-track{display:flex;gap:28px;overflow-x:auto;scroll-behavior:smooth;padding-bottom:8px;scrollbar-width:none;}
 .carousel-track::-webkit-scrollbar{display:none;}
@@ -189,6 +225,19 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
   cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:.2s;
 }
 .car-btn:hover{background:var(--gold);color:#141210;}
+
+/* Carrossel "Imóveis em Destaque" da home — mesmo efeito de pilha/profundidade
+   (Swiper coverflow) usado na galeria da página do imóvel. */
+.destaques-swiper{width:100%;padding:20px 0 50px;}
+.destaques-swiper .swiper-slide{
+  width:min(78vw, 360px);
+  max-width:360px;
+  opacity:.4;
+  filter:blur(1px) saturate(.75);
+  transition:opacity .4s ease, filter .4s ease;
+}
+.destaques-swiper .swiper-slide-active{opacity:1;filter:none;}
+.destaques-swiper .property-card{height:100%;}
 
 /* Sofisticação band */
 .quote-band{
@@ -336,6 +385,10 @@ footer{background:#050505;border-top:1px solid var(--border);padding:80px 0 30px
 .footer-grid ul a{color:var(--text-muted);font-size:.88rem;transition:color .2s;}
 .footer-grid ul a:hover{color:var(--gold-light);}
 .footer-about .logo{margin-bottom:16px;}
+.footer-logo-slot{
+  height:44px;margin-bottom:16px;display:flex;align-items:center;
+}
+.footer-logo-slot img{max-height:100%;width:auto;}
 .footer-about p{color:var(--text-muted);font-size:.88rem;max-width:280px;margin-bottom:20px;}
 .newsletter{display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;max-width:280px;}
 .newsletter input{flex:1;background:transparent;border:none;padding:12px 14px;color:var(--text);font-size:.82rem;}
@@ -363,10 +416,31 @@ footer{background:#050505;border-top:1px solid var(--border);padding:80px 0 30px
   .property-grid, .features{grid-template-columns:1fr 1fr;}
   .footer-grid{grid-template-columns:1fr 1fr;}
   nav.primary{display:none;}
-  .menu-toggle{display:flex;}
+  .menu-toggle{display:flex;order:-1;}
   .detail-grid{grid-template-columns:1fr;}
   .contact-card{position:static;}
   .gallery{grid-template-columns:1fr;}
+}
+@media (max-width:768px){
+  /* Cabeçalho mobile: hambúrguer à esquerda, sem logo escrita (poluição visual) */
+  .topbar{display:none;}
+  header.main .container{justify-content:flex-start;gap:16px;}
+  header.main .logo{display:none;}
+
+  /* Marca central sobre a imagem do hero, substituindo a logo do header */
+  .hero-brand-mobile{display:block;}
+  .hero{padding-top:10px;}
+  .hero h1, .hero p.lead{text-align:center;margin-left:auto;margin-right:auto;}
+  .hero-eyebrow{text-align:center;}
+
+  /* Formulário de busca: um campo por linha, ocupando 100% da largura */
+  .search-grid{grid-template-columns:1fr !important;}
+  .price-range{grid-column:span 1 !important;}
+
+  /* Cards de imóvel maiores e com valor mais destacado */
+  .property-photo{height:230px;}
+  .property-price{font-size:1.3rem;}
+  .property-body h3{font-size:1.35rem;}
 }
 @media (max-width:640px){
   .hero h1{font-size:2.3rem;}
@@ -377,4 +451,5 @@ footer{background:#050505;border-top:1px solid var(--border);padding:80px 0 30px
   .topbar .left{gap:12px;font-size:.7rem;}
   .price-block{gap:30px;}
   .form-row{grid-template-columns:1fr;}
+  .footer-logo-slot{margin:0 auto 16px;}
 }

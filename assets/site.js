@@ -1,21 +1,27 @@
 // Shared behavior across all MCJ Capital Invest pages
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Mobile menu toggle
+  // Drawer de menu mobile (abre da esquerda para a direita)
   const menuToggle = document.getElementById('menuToggle');
-  const nav = document.querySelector('nav.primary');
-  if (menuToggle && nav) {
-    menuToggle.addEventListener('click', () => {
-      const isOpen = nav.style.display === 'flex';
-      nav.style.display = isOpen ? 'none' : 'flex';
-      nav.style.flexDirection = 'column';
-      nav.style.position = 'absolute';
-      nav.style.top = '88px';
-      nav.style.left = '0';
-      nav.style.right = '0';
-      nav.style.background = '#0b0b0c';
-      nav.style.padding = '20px 24px';
-      nav.style.borderBottom = '1px solid var(--border)';
-    });
+  const drawer = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('drawerOverlay');
+  const drawerClose = document.getElementById('drawerClose');
+
+  function openDrawer() {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  if (menuToggle && drawer && overlay) {
+    menuToggle.addEventListener('click', openDrawer);
+    drawerClose?.addEventListener('click', closeDrawer);
+    overlay.addEventListener('click', closeDrawer);
+    drawer.querySelectorAll('a').forEach(link => link.addEventListener('click', closeDrawer));
   }
 });
