@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel Administrativo | MCJ Capital Invest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/admin.css">
+</head>
+<body class="admin-body">
+
+  <div class="admin-topbar">
+    <div class="container">
+      <a href="index.html" class="logo">MCJ <span>CAPITAL</span> INVEST</a>
+      <div class="admin-user" id="adminUserBar" style="display:none;">
+        <span>Logado como <strong id="userEmail"></strong></span>
+        <button class="btn-sm" id="logoutBtn">Sair</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tela de login -->
+  <div class="login-wrap" id="loginWrap">
+    <div class="login-card">
+      <h1 class="serif">Painel Administrativo</h1>
+      <p class="sub">Acesso restrito — MCJ Capital Invest</p>
+      <div class="login-error" id="loginError"></div>
+      <form id="loginForm">
+        <div class="field" style="margin-bottom:16px;">
+          <label>E-mail</label>
+          <input type="email" id="loginEmail" required autocomplete="username">
+        </div>
+        <div class="field" style="margin-bottom:24px;">
+          <label>Senha</label>
+          <input type="password" id="loginPassword" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-gold">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Painel (visível após login) -->
+  <main class="admin-main" id="adminMain" style="display:none;">
+    <div class="container">
+      <div class="admin-header-row">
+        <div>
+          <h1 class="serif">Meus Imóveis</h1>
+          <p>Cadastre, edite e gerencie os imóveis exibidos no site.</p>
+        </div>
+      </div>
+
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" id="tabList">Todos os Imóveis</button>
+        <button class="admin-tab-btn" id="tabNew">+ Novo Imóvel</button>
+      </div>
+
+      <!-- Lista -->
+      <section class="admin-panel active" id="panelList">
+        <table class="imoveis-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Título</th>
+              <th>Finalidade</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="imoveisTableBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyState" style="display:none;">
+          Nenhum imóvel cadastrado ainda. Clique em <strong>+ Novo Imóvel</strong> para começar.
+        </div>
+      </section>
+
+      <!-- Formulário -->
+      <section class="admin-panel" id="panelForm">
+        <form class="admin-form" id="imovelForm">
+          <h3 class="serif" id="formTitle" style="margin-bottom:24px;">Novo Imóvel</h3>
+
+          <div class="form-grid">
+            <div>
+              <label>Código do Imóvel *</label>
+              <input type="text" name="codigo" required placeholder="ex: 0020">
+            </div>
+            <div class="span-2">
+              <label>Título *</label>
+              <input type="text" name="titulo" required placeholder="ex: Cobertura Alto Padrão no Jardins">
+            </div>
+
+            <div>
+              <label>Finalidade</label>
+              <select name="finalidade">
+                <option value="comprar">Comprar</option>
+                <option value="alugar">Alugar</option>
+              </select>
+            </div>
+            <div>
+              <label>Tipo de Imóvel</label>
+              <select name="tipo">
+                <option>Apartamento</option>
+                <option>Casa</option>
+                <option>Cobertura</option>
+                <option>Comercial</option>
+                <option>Terreno</option>
+              </select>
+            </div>
+            <div>
+              <label>Status</label>
+              <select name="status">
+                <option value="ativo">Ativo (visível no site)</option>
+                <option value="inativo">Inativo (oculto)</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Bairro</label>
+              <input type="text" name="bairro" placeholder="ex: Jardins">
+            </div>
+            <div>
+              <label>Cidade</label>
+              <input type="text" name="cidade" placeholder="ex: São Paulo - SP">
+            </div>
+            <div>
+              <label>Endereço completo (para o mapa)</label>
+              <input type="text" name="endereco" placeholder="ex: Av. Paulista, 1159, São Paulo - SP">
+            </div>
+
+            <div>
+              <label>Quartos</label>
+              <input type="number" name="quartos" min="0" value="0">
+            </div>
+            <div>
+              <label>Banheiros</label>
+              <input type="number" name="banheiros" min="0" value="0">
+            </div>
+            <div>
+              <label>Suítes</label>
+              <input type="number" name="suites" min="0" value="0">
+            </div>
+            <div>
+              <label>Vagas de Garagem</label>
+              <input type="number" name="vagas" min="0" value="0">
+            </div>
+            <div>
+              <label>Área (m²)</label>
+              <input type="number" name="area" min="0" step="0.01">
+            </div>
+            <div>
+              <label class="checkbox-row" style="margin-top:14px;">
+                <input type="checkbox" name="destaque"> Marcar como destaque na home
+              </label>
+            </div>
+
+            <div>
+              <label>Valor do Imóvel (R$)</label>
+              <input type="number" name="valor" min="0" step="0.01">
+            </div>
+            <div>
+              <label>Valor do Condomínio (R$)</label>
+              <input type="number" name="valor_condominio" min="0" step="0.01">
+            </div>
+            <div>
+              <label>Link do Vídeo (YouTube ou Vimeo)</label>
+              <input type="url" name="video_url" placeholder="https://youtu.be/...">
+            </div>
+
+            <div class="span-3">
+              <label>Descrição do Imóvel</label>
+              <textarea name="descricao" placeholder="Descreva os detalhes, diferenciais e acabamentos do imóvel..."></textarea>
+            </div>
+          </div>
+
+          <label>Fotos do Imóvel</label>
+          <div class="upload-zone" id="uploadZone">
+            Clique aqui ou arraste as fotos para enviar<br>
+            <span style="font-size:.75rem;opacity:.7;">JPG ou PNG — pode selecionar várias de uma vez</span>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden>
+          <div class="upload-progress" id="uploadProgress"></div>
+          <div class="photo-preview-grid" id="photoPreviewGrid"></div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-ghost" id="cancelEditBtn">Cancelar</button>
+            <button type="submit" class="btn-gold" style="width:auto;">Salvar Imóvel</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module" src="assets/admin.js"></script>
+</body>
+</html>

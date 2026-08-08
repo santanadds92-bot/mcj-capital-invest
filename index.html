@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCJ Capital Invest | Imóveis de Alto Padrão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="container">
+      <div class="left">
+        <span>&#9993; marciocjorge@terra.com.br</span>
+        <span>&#128205; Av. Paulista, 1159 · Conj. 1005 · Bela Vista · São Paulo - SP</span>
+      </div>
+      <div class="right">
+        <a href="#anunciar">Anuncie Seu Imóvel</a>
+        <a href="#contato">Área do Cliente</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="main">
+    <div class="container">
+      <a href="#" class="logo">MCJ <span>CAPITAL</span> INVEST<small>NEGÓCIOS IMOBILIÁRIOS DE ALTO PADRÃO</small></a>
+      <nav class="primary">
+        <ul>
+          <li><a href="#quem-somos" class="active">Quem somos</a></li>
+          <li><a href="#imoveis">Comprar</a></li>
+          <li><a href="#imoveis">Alugar</a></li>
+          <li><a href="#anunciar">Anunciar</a></li>
+          <li><a href="#contato">Fale Conosco</a></li>
+        </ul>
+      </nav>
+      <button class="menu-toggle" id="menuToggle"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <span class="hero-eyebrow">Imóveis de Alto Padrão</span>
+      <h1>Abrimos as <em>melhores portas</em> para você</h1>
+      <p class="lead">A elegância se encontra com a exclusividade em cada propriedade. Um portfólio selecionado para clientes exigentes.</p>
+
+      <div class="search-panel">
+        <div class="search-grid">
+          <div class="field">
+            <label>Finalidade</label>
+            <select><option>Selecionar...</option><option>Comprar</option><option>Alugar</option></select>
+          </div>
+          <div class="field">
+            <label>Tipo de Imóvel</label>
+            <select><option>Selecionar...</option><option>Casa</option><option>Apartamento</option><option>Comercial</option><option>Cobertura</option></select>
+          </div>
+          <div class="field">
+            <label>Bairro / Região</label>
+            <select><option>Selecionar...</option><option>Jardins</option><option>Alphaville</option><option>Riviera de São Lourenço</option><option>Vila Augusta</option></select>
+          </div>
+          <div class="field">
+            <label>Quartos</label>
+            <select><option>Selecionar...</option><option>1+</option><option>2+</option><option>3+</option><option>4+</option></select>
+          </div>
+          <div class="field price-range">
+            <label>Filtrar por Preço</label>
+            <input type="range" min="0" max="30000000" value="15000000">
+            <div class="price-values"><span>R$ 0,00</span><span>R$ 30.000.000,00</span></div>
+          </div>
+          <div class="field">
+            <label>Código do Imóvel</label>
+            <input type="text" placeholder="Insira o código">
+          </div>
+        </div>
+        <div class="search-footer">
+          <button class="btn-gold">Filtrar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="imoveis">
+    <div class="container">
+      <div class="gold-rule"></div>
+      <h2 class="section-title">Conheça Nossos Imóveis</h2>
+      <p class="section-sub">Cada imóvel é uma obra prima, cuidadosamente selecionada para refletir qualidade e estilo.</p>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="comprar">Comprar</button>
+        <button class="tab-btn" data-tab="alugar">Alugar</button>
+      </div>
+
+      <div class="property-grid" id="propertyGrid">
+
+        <article class="property-card example-card" data-op="comprar">
+          <div class="property-photo"><span class="badge">Venda</span><span class="badge op">Destaque</span>
+            <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+          </div>
+          <div class="property-body">
+            <h3>Mansão Alto Padrão na Riviera</h3>
+            <p class="loc">Riviera de São Lourenço · 770m²</p>
+            <div class="property-meta"><span>&#128716; 7 Suítes</span><span>&#128663; Elevador</span></div>
+            <div class="property-price">R$ 30.000.000,00</div>
+          </div>
+        </article>
+
+        <article class="property-card example-card" data-op="comprar">
+          <div class="property-photo">
+            <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+          </div>
+          <div class="property-body">
+            <h3>Casa Alto Padrão em Alphaville</h3>
+            <p class="loc">Alphaville Residencial I · 700m²</p>
+            <div class="property-meta"><span>&#128716; 5 Suítes</span><span>&#127946; Piscina</span></div>
+            <div class="property-price">R$ 25.000.000,00</div>
+          </div>
+        </article>
+
+        <article class="property-card example-card" data-op="comprar">
+          <div class="property-photo"><span class="badge">Venda</span>
+            <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+          </div>
+          <div class="property-body">
+            <h3>Apartamento Ultra Luxo no Jardins</h3>
+            <p class="loc">Jardins · 900m² · até 8 vagas</p>
+            <div class="property-meta"><span>&#128716; Suíte Master</span><span>&#128188; Acab. em Mármore</span></div>
+            <div class="property-price">R$ 19.000.000,00</div>
+          </div>
+        </article>
+
+        <article class="property-card example-card" data-op="alugar">
+          <div class="property-photo"><span class="badge op">Locação</span>
+            <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+          </div>
+          <div class="property-body">
+            <h3>Fly Mall Santana</h3>
+            <p class="loc">Av. Braz Leme · 5.017m² de área comercial</p>
+            <div class="property-meta"><span>&#128663; 52 Vagas</span><span>&#127970; Localização Estratégica</span></div>
+            <div class="property-price">Consulte valores</div>
+          </div>
+        </article>
+
+        <article class="property-card example-card" data-op="alugar">
+          <div class="property-photo hidden-init"><span class="badge op">Locação</span>
+            <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+          </div>
+          <div class="property-body">
+            <h3>Imóvel Comercial Premium na Penha</h3>
+            <p class="loc">Localização Estratégica · 412m²</p>
+            <div class="property-meta"><span>&#127970; Alto Potencial Corporativo</span></div>
+            <div class="property-price">R$ 125.000,00</div>
+          </div>
+        </article>
+
+        <article class="property-card example-card" data-op="alugar">
+          <div class="property-photo"><span class="badge op">Locação</span>
+            <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+          </div>
+          <div class="property-body">
+            <h3>Prédio Comercial na Rua Henrique Schaumann</h3>
+            <p class="loc">1.803m² · 8 andares</p>
+            <div class="property-meta"><span>&#127970; Localização Estratégica</span></div>
+            <div class="property-price">R$ 93.000,00</div>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="center-btn">
+        <button class="btn-outline">Ver Todos os Imóveis →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="features">
+        <div class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l9 4.5v9L12 20l-9-4.5v-9L12 2z"/><path d="M9 12l2 2 4-4"/></svg>
+          <h3>Curadoria Exclusiva</h3>
+          <p>Selecionamos cada propriedade com rigor, garantindo padrão, localização e potencial de valorização.</p>
+        </div>
+        <div class="feature-card accent">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+          <h3>Compre com Segurança</h3>
+          <p>Assessoria completa em cada etapa da negociação, do primeiro contato à assinatura do contrato.</p>
+        </div>
+        <div class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+          <h3>Anuncie Seu Imóvel</h3>
+          <p>Conecte-se a uma carteira de clientes exigentes e conte com nossa equipe para maximizar seu negócio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="gold-rule"></div>
+      <h2 class="section-title">Imóveis em Destaque</h2>
+      <p class="section-sub">Espaços refinados, pensados para quem busca sofisticação e exclusividade.</p>
+
+      <div class="destaques-wrap">
+        <div class="carousel-track" id="carouselTrack">
+          <article class="property-card example-card">
+            <div class="property-photo"><span class="badge">Destaque</span>
+              <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+            </div>
+            <div class="property-body">
+              <h3>Cobertura na Vila Augusta</h3>
+              <p class="loc">143m² · 4 Dormitórios, 3 Vagas, SPA e Cinema Privativo</p>
+              <div class="property-price">R$ 1.580.000,00</div>
+            </div>
+          </article>
+          <article class="property-card">
+            <div class="property-photo"><span class="badge">Destaque</span>
+              <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+            </div>
+            <div class="property-body">
+              <h3>Casa em Aldeia da Serra</h3>
+              <p class="loc">316m² · 4 Suítes, Adega Toscana, Spa e Arquitetura Autoral</p>
+              <div class="property-price">R$ 4.500.000,00</div>
+            </div>
+          </article>
+          <article class="property-card">
+            <div class="property-photo"><span class="badge">Destaque</span>
+              <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+            </div>
+            <div class="property-body">
+              <h3>Apartamento no Alto de Pinheiros</h3>
+              <p class="loc">Vista Permanente e Privilegiada</p>
+              <div class="property-price">R$ 5.000.000,00</div>
+            </div>
+          </article>
+          <article class="property-card">
+            <div class="property-photo"><span class="badge">Destaque</span>
+              <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+            </div>
+            <div class="property-body">
+              <h3>Apartamento em Pitangueiras</h3>
+              <p class="loc">Guarujá · 160m² · Portaria Fechada</p>
+              <div class="property-price">R$ 2.200.000,00</div>
+            </div>
+          </article>
+        </div>
+        <div class="carousel-nav">
+          <button class="car-btn" id="carPrev">&#8592;</button>
+          <button class="car-btn" id="carNext">&#8594;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote-band" id="quem-somos">
+    <div class="container">
+      <p>Uma imobiliária que mescla sofisticação e modernidade, oferecendo um portfólio selecionado para clientes exigentes.</p>
+      <a href="#imoveis">Compre agora →</a>
+    </div>
+  </section>
+
+  <footer id="contato">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a href="#" class="logo">MCJ <span>CAPITAL</span> INVEST</a>
+          <p>Abrimos as melhores portas para você. Imóveis de alto padrão com curadoria exclusiva.</p>
+          <div class="newsletter">
+            <input type="email" placeholder="Receba imóveis exclusivos">
+            <button>→</button>
+          </div>
+        </div>
+        <div>
+          <h4>Menu</h4>
+          <ul>
+            <li><a href="#quem-somos">Quem somos</a></li>
+            <li><a href="#imoveis">Comprar</a></li>
+            <li><a href="#imoveis">Alugar</a></li>
+            <li><a href="#anunciar">Anunciar</a></li>
+            <li><a href="#contato">Fale Conosco</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Imóveis</h4>
+          <ul>
+            <li><a href="#imoveis">Lançamentos</a></li>
+            <li><a href="#imoveis">Alugar</a></li>
+            <li><a href="#imoveis">Comprar</a></li>
+            <li><a href="#anunciar">Anunciar Seu Imóvel</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Atendimento ao Cliente</h4>
+          <ul>
+            <li style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px;">Nossa equipe de suporte está aqui para ajudar com qualquer dúvida sobre contratos, locações, vistorias ou suporte ao cliente.</li>
+            <li><strong>E-mail:</strong> marciocjorge@terra.com.br</li>
+            <li><strong>Horário de Atendimento:</strong> Segunda a Sexta-feira, das 09h às 18h (BRT)</li>
+            <li><strong>Endereço:</strong> Av. Paulista, 1159 · Conj. 1005<br>Bela Vista · São Paulo - SP · CEP 01311-200</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 MCJ CAPITAL INVEST, All rights reserved.</span>
+        <a href="#">Termos e políticas</a>
+      </div>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/5534933333333" target="_blank" rel="noopener" class="whatsapp-float" aria-label="WhatsApp">
+    <svg viewBox="0 0 32 32" width="26" height="26" fill="#fff"><path d="M16.02 3C9.4 3 4 8.38 4 15c0 2.36.7 4.55 1.9 6.4L4 29l7.8-1.85A11.9 11.9 0 0 0 16.02 27C22.65 27 28 21.62 28 15S22.65 3 16.02 3zm0 21.7c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.63 1.1 1.1-4.5-.25-.4A9.63 9.63 0 0 1 5 15c0-6.07 5-11 11.02-11S27 8.93 27 15s-4.98 9.7-10.98 9.7zm5.98-7.3c-.33-.16-1.94-.96-2.24-1.07-.3-.11-.52-.16-.74.16-.22.33-.85 1.07-1.04 1.29-.19.22-.38.24-.71.08-.33-.16-1.4-.51-2.66-1.63-.98-.87-1.65-1.95-1.84-2.27-.19-.33-.02-.5.14-.66.15-.15.33-.38.5-.57.16-.19.22-.33.33-.55.11-.22.05-.41-.03-.57-.08-.16-.74-1.78-1.01-2.44-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.33-1.14 1.11-1.14 2.71 0 1.6 1.17 3.15 1.33 3.37.16.22 2.3 3.51 5.57 4.92.78.34 1.38.54 1.86.69.78.25 1.49.21 2.05.13.63-.1 1.94-.79 2.21-1.56.27-.77.27-1.43.19-1.56-.08-.14-.3-.22-.63-.38z"/></svg>
+  </a>
+
+<script src="assets/site.js"></script>
+<script type="module">
+  import { fetchImoveis, propertyCardHTML } from './assets/supabase-client.js';
+
+  async function loadRealImoveis() {
+    const [todosImoveis, destaques] = await Promise.all([
+      fetchImoveis({}),
+      fetchImoveis({ destaque: true, limit: 8 }),
+    ]);
+
+    if (todosImoveis.length > 0) {
+      const grid = document.getElementById('propertyGrid');
+      grid.querySelectorAll('.example-card').forEach(el => el.remove());
+      grid.insertAdjacentHTML('beforeend', todosImoveis.map(propertyCardHTML).join(''));
+      // reaplica o filtro Comprar/Alugar ativo no momento
+      const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'comprar';
+      document.querySelectorAll('#propertyGrid .property-card').forEach(card => {
+        card.style.display = (card.dataset.op === activeTab) ? '' : 'none';
+      });
+    }
+
+    if (destaques.length > 0) {
+      const track = document.getElementById('carouselTrack');
+      track.querySelectorAll('.example-card').forEach(el => el.remove());
+      track.insertAdjacentHTML('beforeend', destaques.map(propertyCardHTML).join(''));
+    }
+  }
+
+  loadRealImoveis();
+</script>
+<script>
+  // Comprar / Alugar tabs (consulta os cards no momento do clique, pois a lista
+  // pode ser trocada dinamicamente pelos dados reais vindos do Supabase)
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('#propertyGrid .property-card').forEach(card => {
+        card.style.display = (card.dataset.op === tab) ? '' : 'none';
+      });
+    });
+  });
+
+  // Carousel
+  const track = document.getElementById('carouselTrack');
+  const cardWidth = 368;
+  document.getElementById('carNext').addEventListener('click', () => track.scrollBy({left: cardWidth, behavior: 'smooth'}));
+  document.getElementById('carPrev').addEventListener('click', () => track.scrollBy({left: -cardWidth, behavior: 'smooth'}));
+
+  // Price range live display
+  const range = document.querySelector('.price-range input[type="range"]');
+  const priceMaxLabel = document.querySelector('.price-values span:last-child');
+  if(range){
+    range.addEventListener('input', () => {
+      const val = Number(range.value).toLocaleString('pt-BR', {minimumFractionDigits:2});
+      priceMaxLabel.textContent = 'R$ ' + val;
+    });
+  }
+</script>
+</body>
+</html>
