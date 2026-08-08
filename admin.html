@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/admin.css">
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 </head>
 <body class="admin-body">
 
@@ -171,7 +172,25 @@
 
             <div class="span-3">
               <label>Descrição do Imóvel</label>
-              <textarea name="descricao" placeholder="Descreva os detalhes, diferenciais e acabamentos do imóvel..."></textarea>
+              <div class="editor-toolbar">
+                <button type="button" data-cmd="formatBlock" data-value="H2" title="Título">H2</button>
+                <button type="button" data-cmd="formatBlock" data-value="H3" title="Subtítulo">H3</button>
+                <button type="button" data-cmd="formatBlock" data-value="P" title="Parágrafo normal">¶</button>
+                <button type="button" data-cmd="bold" title="Negrito"><strong>N</strong></button>
+                <button type="button" data-cmd="italic" title="Itálico"><em>I</em></button>
+                <button type="button" data-cmd="insertUnorderedList" title="Lista com marcadores">• Lista</button>
+                <button type="button" data-cmd="insertHorizontalRule" title="Linha divisória">— Divisória</button>
+                <button type="button" data-cmd="removeFormat" title="Limpar formatação">Limpar</button>
+              </div>
+              <div
+                class="descricao-imovel editor-input"
+                id="descricaoEditor"
+                contenteditable="true"
+                data-placeholder="Descreva os detalhes, diferenciais e acabamentos do imóvel. Use a barra acima para títulos, negrito, listas e divisórias — a formatação aparece no site exatamente como aqui.">
+              </div>
+              <p style="font-size:.72rem;color:var(--text-muted);margin-top:8px;">
+                Dica: você também pode colar um texto já formatado (ex: copiado do Word ou de outro site) que a formatação é preservada.
+              </p>
             </div>
           </div>
 

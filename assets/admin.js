@@ -1,4 +1,4 @@
-import { supabase, FOTOS_BUCKET, formatBRL } from './supabase-client.js';
+import { supabase, FOTOS_BUCKET, formatBRL, descricaoToHTML, sanitizeDescricao } from './supabase-client.js';
 
 // ---------- Elementos ----------
 const loginWrap = document.getElementById('loginWrap');
@@ -26,6 +26,17 @@ const toast = document.getElementById('toast');
 
 let editingId = null;
 let currentPhotos = []; // URLs já salvas no storage para o imóvel em edição/criação
+
+// ---------- Editor de descrição (contenteditable + toolbar) ----------
+const descricaoEditor = document.getElementById('descricaoEditor');
+document.querySelectorAll('.editor-toolbar button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    descricaoEditor.focus();
+    const cmd = btn.dataset.cmd;
+    const value = btn.dataset.value || null;
+    document.execCommand(cmd, false, value);
+  });
+});
 
 // ---------- Auth ----------
 async function checkSession() {
@@ -161,7 +172,7 @@ function editImovel(id, list) {
   imovelForm.valor.value = im.valor || '';
   imovelForm.valor_condominio.value = im.valor_condominio || '';
   imovelForm.video_url.value = im.video_url || '';
-  imovelForm.descricao.value = im.descricao || '';
+  descricaoEditor.innerHTML = descricaoToHTML(im.descricao || '');
   imovelForm.destaque.checked = !!im.destaque;
   imovelForm.status.value = im.status || 'ativo';
 
@@ -176,6 +187,7 @@ function resetForm() {
   editingId = null;
   formTitle.textContent = 'Novo Imóvel';
   imovelForm.reset();
+  descricaoEditor.innerHTML = '';
   currentPhotos = [];
   renderPhotoPreviews();
 }
@@ -200,7 +212,7 @@ imovelForm.addEventListener('submit', async (e) => {
     valor: fd.get('valor') ? Number(fd.get('valor')) : null,
     valor_condominio: fd.get('valor_condominio') ? Number(fd.get('valor_condominio')) : null,
     video_url: fd.get('video_url'),
-    descricao: fd.get('descricao'),
+    descricao: sanitizeDescricao(descricaoEditor.innerHTML.trim()),
     destaque: fd.get('destaque') === 'on',
     status: fd.get('status'),
     fotos: currentPhotos,

@@ -78,6 +78,36 @@ export async function fetchImovelByCodigo(codigo) {
   return data;
 }
 
+// ---------- Descrição: converte texto puro antigo em HTML, e sanitiza o HTML antes de exibir ----------
+// Registros antigos podem ter sido salvos como texto puro (sem tags). Se detectarmos
+// que já é HTML (do editor rico do admin), retornamos como está; senão, quebramos
+// parágrafos por linha em branco e mantemos quebras simples como <br>.
+export function descricaoToHTML(raw) {
+  if (!raw) return '';
+  const looksLikeHTML = /<\/?[a-z][\s\S]*>/i.test(raw);
+  if (looksLikeHTML) return raw;
+  return raw
+    .split(/\n{2,}/)
+    .map(block => `<p>${block.replace(/\n/g, '<br>')}</p>`)
+    .join('');
+}
+
+// Sanitiza o HTML da descrição antes de inserir no DOM (protege contra script/HTML malicioso).
+// Usa DOMPurify se estiver carregado na página (via CDN); caso contrário faz um fallback básico.
+export function sanitizeDescricao(html) {
+  if (typeof window !== 'undefined' && window.DOMPurify) {
+    return window.DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ['p', 'br', 'h2', 'h3', 'h4', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li', 'hr', 'span', 'a'],
+      ALLOWED_ATTR: ['href', 'target', 'rel'],
+    });
+  }
+  // fallback simples: remove tags de script/estilo/iframe e atributos on*
+  return html
+    .replace(/<(script|style|iframe)[\s\S]*?<\/\1>/gi, '')
+    .replace(/ on\w+="[^"]*"/gi, '')
+    .replace(/ on\w+='[^']*'/gi, '');
+}
+
 // ---------- Metadados (quartos, banheiros etc.) formatados para exibição ----------
 export function metaResumo(imovel) {
   const parts = [];

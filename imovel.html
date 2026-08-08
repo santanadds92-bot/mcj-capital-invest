@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 </head>
 <body>
 
@@ -81,7 +82,9 @@
           </div>
 
           <div class="detail-section-title">Descrição do Imóvel</div>
-          <p class="detail-description" id="detailDescription">3 quartos com box em vidro, sala, banheiro social com box em vidro, cozinha americana, estacionamento p/ 03 carros. Aprox. 80m². Texto de exemplo — substitua pela descrição real do imóvel ao cadastrá-lo.</p>
+          <div class="detail-description descricao-imovel" id="detailDescription">
+            <p>3 quartos com box em vidro, sala, banheiro social com box em vidro, cozinha americana, estacionamento p/ 03 carros. Aprox. 80m². Texto de exemplo — substitua pela descrição real do imóvel ao cadastrá-lo.</p>
+          </div>
 
           <div class="price-block">
             <div class="item">
@@ -280,7 +283,7 @@
   document.getElementById('simPrev').addEventListener('click', () => simTrack.scrollBy({left: -simCardWidth, behavior: 'smooth'}));
 </script>
 <script type="module">
-  import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML } from './assets/supabase-client.js';
+  import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML, descricaoToHTML, sanitizeDescricao } from './assets/supabase-client.js';
 
   const params = new URLSearchParams(window.location.search);
   const codigo = params.get('codigo');
@@ -305,7 +308,7 @@
     document.getElementById('detailPurpose').textContent = `Finalidade: ${imovel.finalidade === 'alugar' ? 'Alugar' : 'Comprar'}`;
     document.getElementById('detailTitle').textContent = imovel.titulo;
     document.getElementById('detailLocation').textContent = [imovel.bairro, imovel.cidade].filter(Boolean).join(', ');
-    document.getElementById('detailDescription').textContent = imovel.descricao || '';
+    document.getElementById('detailDescription').innerHTML = sanitizeDescricao(descricaoToHTML(imovel.descricao || ''));
     document.getElementById('priceValor').textContent = formatBRL(imovel.valor);
     document.getElementById('priceCondominio').textContent = formatBRL(imovel.valor_condominio);
     document.getElementById('codigoImovelInput').value = imovel.codigo;
