@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 </head>
 <body>
 
@@ -48,19 +49,19 @@
   <section class="section tight">
     <div class="container">
 
-      <!-- Galeria -->
-      <div class="gallery" id="gallery">
-        <div class="gallery-thumb example-thumb" data-idx="0">
-          <div class="ph-wrap">Foto 1 · exemplo</div>
+      <!-- Galeria: carrossel com efeito de profundidade (Swiper.js — coverflow) -->
+      <div class="gallery-swiper-wrap">
+        <div class="swiper property-swiper">
+          <div class="swiper-wrapper" id="gallerySwiperWrapper">
+            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 1 · exemplo</div></div></div>
+            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 2 · exemplo</div></div></div>
+            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 3 · exemplo</div></div></div>
+            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 4 · exemplo</div></div></div>
+            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 5 · exemplo</div></div></div>
+          </div>
         </div>
-        <div class="gallery-main" id="galleryMain">
-          <button class="gallery-nav-btn prev" id="galPrev">&#8592;</button>
-          <div class="ph-wrap">Foto principal · exemplo</div>
-          <button class="gallery-nav-btn next" id="galNext">&#8594;</button>
-        </div>
-        <div class="gallery-thumb example-thumb" data-idx="2">
-          <div class="ph-wrap">Foto 3 · exemplo</div>
-        </div>
+        <button class="gallery-nav-btn prev gallery-prev" aria-label="Foto anterior">&#8592;</button>
+        <button class="gallery-nav-btn next gallery-next" aria-label="Próxima foto">&#8594;</button>
       </div>
 
       <div class="detail-grid">
@@ -252,7 +253,26 @@
   </a>
 
 <script src="assets/site.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
+  // Carrossel da galeria (efeito coverflow / pilha com profundidade)
+  let gallerySwiper;
+  function initGallerySwiper() {
+    if (gallerySwiper) gallerySwiper.destroy(true, true);
+    gallerySwiper = new Swiper('.property-swiper', {
+      effect: 'coverflow',
+      grabCursor: true,
+      centeredSlides: true,
+      loop: true,
+      slidesPerView: 'auto',
+      coverflowEffect: { rotate: 0, stretch: 0, depth: 220, modifier: 1.2, slideShadows: false },
+      autoplay: { delay: 3200, disableOnInteraction: false },
+      navigation: { nextEl: '.gallery-next', prevEl: '.gallery-prev' },
+    });
+  }
+  window.initGallerySwiper = initGallerySwiper;
+  initGallerySwiper();
+
   // Similar properties carousel (funciona tanto para os cards de exemplo quanto para os reais)
   const simTrack = document.getElementById('similarTrack');
   const simCardWidth = 368;
@@ -265,58 +285,19 @@
   const params = new URLSearchParams(window.location.search);
   const codigo = params.get('codigo');
 
-  function wireStaticGalleryDemo() {
-    document.querySelectorAll('.gallery-thumb').forEach(thumb => {
-      thumb.addEventListener('click', () => {
-        const mainText = document.querySelector('#galleryMain .ph-wrap');
-        if (mainText) mainText.textContent = thumb.querySelector('.ph-wrap').textContent + ' (em destaque)';
-      });
-    });
-  }
-
   function renderGallery(fotos) {
-    const galleryEl = document.getElementById('gallery');
-    const galleryMain = document.getElementById('galleryMain');
-    let current = 0;
-
-    function paint() {
-      galleryMain.querySelectorAll('.ph-wrap').forEach(el => el.remove());
-      galleryMain.style.backgroundImage = `url('${fotos[current]}')`;
-      galleryMain.style.backgroundSize = 'cover';
-      galleryMain.style.backgroundPosition = 'center';
-    }
-
-    // reconstrói as miniaturas com base nas fotos reais
-    galleryEl.querySelectorAll('.gallery-thumb').forEach(el => el.remove());
-    fotos.forEach((url, idx) => {
-      if (idx === 0) return; // a primeira já é exibida como principal
-      const thumb = document.createElement('div');
-      thumb.className = 'gallery-thumb';
-      thumb.style.backgroundImage = `url('${url}')`;
-      thumb.style.backgroundSize = 'cover';
-      thumb.style.backgroundPosition = 'center';
-      thumb.addEventListener('click', () => { current = idx; paint(); });
-      if (idx <= 2) galleryEl.insertBefore(thumb, galleryMain.nextSibling);
-      else galleryEl.appendChild(thumb);
-    });
-
-    document.getElementById('galPrev').addEventListener('click', () => { current = (current - 1 + fotos.length) % fotos.length; paint(); });
-    document.getElementById('galNext').addEventListener('click', () => { current = (current + 1) % fotos.length; paint(); });
-
-    paint();
+    const wrapper = document.getElementById('gallerySwiperWrapper');
+    wrapper.innerHTML = fotos.map(url => `
+      <div class="swiper-slide"><div class="slide-img" style="background-image:url('${url}');"></div></div>
+    `).join('');
+    window.initGallerySwiper();
   }
 
   async function loadImovelReal() {
-    if (!codigo) {
-      wireStaticGalleryDemo();
-      return;
-    }
+    if (!codigo) return;
 
     const imovel = await fetchImovelByCodigo(codigo);
-    if (!imovel) {
-      wireStaticGalleryDemo();
-      return;
-    }
+    if (!imovel) return;
 
     document.title = `${imovel.titulo} | MCJ Capital Invest`;
     document.getElementById('breadcrumbTitle').textContent = imovel.titulo;
@@ -353,8 +334,6 @@
     // Galeria
     if (Array.isArray(imovel.fotos) && imovel.fotos.length > 0) {
       renderGallery(imovel.fotos);
-    } else {
-      wireStaticGalleryDemo();
     }
 
     // Imóveis similares (mesma finalidade, excluindo o atual)
