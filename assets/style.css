@@ -60,28 +60,6 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .menu-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:6px;}
 .menu-toggle span{width:26px;height:2px;background:var(--gold);}
 
-/* Header transparente sobreposto ao hero (usado só na Home) — o menu fica
-   numa faixa fina no topo e a marca "MCJ Capital Invest" logo abaixo, em
-   uma única linha, diretamente sobre a imagem — sem barra sólida e sem
-   sobreposição entre menu e marca (duas linhas empilhadas, não lado a lado). */
-header.main.transparent{
-  position:absolute;top:42px;left:0;right:0;
-  background:transparent;border-bottom:none;backdrop-filter:none;
-  z-index:60;padding-top:18px;
-}
-header.main.transparent .container{
-  display:flex;justify-content:flex-end;align-items:center;
-  height:auto;padding-top:0;padding-bottom:0;
-}
-header.main.transparent .menu-toggle{grid-column:auto;}
-header.main.transparent nav.primary{grid-column:auto;justify-self:auto;}
-.mcj-wordmark{
-  display:block;width:100%;text-align:center;
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(3.4rem,8.5vw,6.8rem);font-weight:400;letter-spacing:0;line-height:1;
-  color:var(--text);text-shadow:0 2px 24px rgba(0,0,0,.6);
-  margin-top:28px;
-}
 
 /* Drawer de menu mobile — abre da esquerda para a direita */
 .drawer-overlay{
@@ -116,7 +94,7 @@ header.main.transparent nav.primary{grid-column:auto;justify-self:auto;}
   background:linear-gradient(180deg, rgba(6,6,6,.55) 0%, rgba(6,6,6,.35) 35%, rgba(6,6,6,.85) 100%), url('hero-living-room.jpg') center/cover no-repeat;
 }
 .hero .container{
-  width:100%;padding-top:260px;padding-bottom:60px;
+  width:100%;padding-top:40px;padding-bottom:60px;
   display:flex;flex-direction:column;align-items:center;text-align:center;
 }
 .hero-intro{display:flex;flex-direction:column;align-items:center;}
@@ -560,7 +538,6 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
   .footer-grid{grid-template-columns:1fr 1fr;}
   nav.primary{display:none;}
   .menu-toggle{display:flex;}
-  header.main.transparent .container{justify-content:flex-start;}
   .detail-grid{grid-template-columns:1fr;}
   .contact-card{position:static;}
   .gallery{grid-template-columns:1fr;}
@@ -569,9 +546,6 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
   /* Cabeçalho mobile: hambúrguer à esquerda, logo em imagem centralizada e maior */
   .topbar{display:none;}
   .logo-img{height:50px;}
-  header.main.transparent{top:0;}
-  header.main.transparent .container{justify-content:flex-start;}
-  .mcj-wordmark{font-size:clamp(2.1rem,9.5vw,3rem);font-weight:400;letter-spacing:0;margin-top:16px;padding:0 12px;}
 
   /* Setas dos carrosséis um pouco menores e mais próximas da borda no mobile */
   .car-btn{width:38px;height:38px;font-size:1rem;}
@@ -581,14 +555,14 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
      marca, ocupando toda a tela); 2ª dobra = filtro de busca, em bloco à
      parte, revelado ao rolar — sem a imagem atrás. */
   .hero{
-    min-height:100dvh; /* o header agora flutua sobre o hero (não ocupa espaço no fluxo) */
-    height:100dvh;
+    min-height:calc(100dvh - 72px); /* 72px ≈ altura do header sticky no mobile */
+    height:calc(100dvh - 72px);
     overflow:hidden;
     padding-top:0;
     align-items:center;
   }
   .hero .container{
-    padding-top:130px; /* espaço para o menu + marca "MCJ Capital Invest" sobrepostos no topo */
+    padding-top:0;
     padding-bottom:0;
     height:100%;
     justify-content:center;
