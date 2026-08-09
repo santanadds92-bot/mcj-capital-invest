@@ -78,9 +78,9 @@ header.main.transparent nav.primary{grid-column:auto;justify-self:auto;}
 .mcj-wordmark{
   display:block;width:100%;text-align:center;
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(2.4rem,4.6vw,3.6rem);font-weight:500;letter-spacing:1px;line-height:1;
-  color:var(--text);text-shadow:0 2px 20px rgba(0,0,0,.6);
-  margin-top:20px;
+  font-size:clamp(3.4rem,8.5vw,6.8rem);font-weight:400;letter-spacing:0;line-height:1;
+  color:var(--text);text-shadow:0 2px 24px rgba(0,0,0,.6);
+  margin-top:28px;
 }
 
 /* Drawer de menu mobile — abre da esquerda para a direita */
@@ -116,7 +116,7 @@ header.main.transparent nav.primary{grid-column:auto;justify-self:auto;}
   background:linear-gradient(180deg, rgba(6,6,6,.55) 0%, rgba(6,6,6,.35) 35%, rgba(6,6,6,.85) 100%), url('hero-living-room.jpg') center/cover no-repeat;
 }
 .hero .container{
-  width:100%;padding-top:210px;padding-bottom:60px;
+  width:100%;padding-top:260px;padding-bottom:60px;
   display:flex;flex-direction:column;align-items:center;text-align:center;
 }
 .hero-intro{display:flex;flex-direction:column;align-items:center;}
@@ -571,7 +571,7 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
   .logo-img{height:50px;}
   header.main.transparent{top:0;}
   header.main.transparent .container{justify-content:flex-start;}
-  .mcj-wordmark{font-size:1.7rem;letter-spacing:1px;margin-top:14px;}
+  .mcj-wordmark{font-size:clamp(2.1rem,9.5vw,3rem);font-weight:400;letter-spacing:0;margin-top:16px;padding:0 12px;}
 
   /* Setas dos carrosséis um pouco menores e mais próximas da borda no mobile */
   .car-btn{width:38px;height:38px;font-size:1rem;}
@@ -588,7 +588,7 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
     align-items:center;
   }
   .hero .container{
-    padding-top:110px; /* espaço para o menu + marca "MCJ Capital Invest" sobrepostos no topo */
+    padding-top:130px; /* espaço para o menu + marca "MCJ Capital Invest" sobrepostos no topo */
     padding-bottom:0;
     height:100%;
     justify-content:center;
