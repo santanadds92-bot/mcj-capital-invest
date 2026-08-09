@@ -467,7 +467,18 @@ function switchTab(tab) {
   }
 }
 
-// ---------- Listagem ----------
+// ---------- Listagem (ordenável, com edição inline e ações em massa) ----------
+const bulkActionsBar = document.getElementById('bulkActionsBar');
+const bulkSelectedCount = document.getElementById('bulkSelectedCount');
+const bulkAtivarBtn = document.getElementById('bulkAtivarBtn');
+const bulkArquivarBtn = document.getElementById('bulkArquivarBtn');
+const bulkExcluirBtn = document.getElementById('bulkExcluirBtn');
+const selectAllImoveis = document.getElementById('selectAllImoveis');
+
+let imoveisCache = [];
+let imoveisSort = { field: null, dir: 'asc' };
+const selectedIds = new Set();
+
 async function loadImoveis() {
   const { data, error } = await supabase
     .from('imoveis')
@@ -479,45 +490,195 @@ async function loadImoveis() {
     return;
   }
 
-  if (!data || data.length === 0) {
+  imoveisCache = data || [];
+  selectedIds.clear();
+  renderImoveisTable();
+}
+
+function sortedImoveis() {
+  const { field, dir } = imoveisSort;
+  if (!field) return imoveisCache;
+  const mult = dir === 'asc' ? 1 : -1;
+  return [...imoveisCache].sort((a, b) => {
+    let va = a[field], vb = b[field];
+    if (field === 'valor') { va = Number(va) || 0; vb = Number(vb) || 0; }
+    else { va = (va || '').toString().toLowerCase(); vb = (vb || '').toString().toLowerCase(); }
+    if (va < vb) return -1 * mult;
+    if (va > vb) return 1 * mult;
+    return 0;
+  });
+}
+
+function renderImoveisTable() {
+  const list = sortedImoveis();
+
+  if (list.length === 0) {
     imoveisTableBody.innerHTML = '';
     emptyState.style.display = 'block';
+    updateBulkBar();
     return;
   }
   emptyState.style.display = 'none';
 
-  imoveisTableBody.innerHTML = data.map(im => `
-    <tr>
-      <td>${im.codigo}</td>
-      <td>${im.titulo}</td>
-      <td>${im.finalidade === 'alugar' ? 'Alugar' : 'Comprar'}</td>
-      <td>${formatBRL(im.valor)}</td>
+  imoveisTableBody.innerHTML = list.map(im => `
+    <tr data-row="${im.id}">
+      <td class="col-check"><input type="checkbox" class="row-check" data-id="${im.id}" ${selectedIds.has(im.id) ? 'checked' : ''}></td>
+      <td class="col-codigo"><input type="text" class="inline-edit" data-id="${im.id}" data-field="codigo" value="${(im.codigo || '').replace(/"/g, '&quot;')}"></td>
+      <td class="col-titulo"><input type="text" class="inline-edit" data-id="${im.id}" data-field="titulo" value="${(im.titulo || '').replace(/"/g, '&quot;')}"></td>
+      <td class="col-finalidade">
+        <select class="inline-edit" data-id="${im.id}" data-field="finalidade">
+          <option value="comprar" ${im.finalidade !== 'alugar' ? 'selected' : ''}>Comprar</option>
+          <option value="alugar" ${im.finalidade === 'alugar' ? 'selected' : ''}>Alugar</option>
+        </select>
+      </td>
+      <td class="col-valor"><input type="number" step="0.01" class="inline-edit" data-id="${im.id}" data-field="valor" value="${im.valor ?? ''}"></td>
       <td><span class="status-pill ${im.status}">${im.status}</span></td>
       <td class="actions">
         <button class="btn-sm" data-edit="${im.id}">Editar</button>
-        <button class="btn-sm" data-delete="${im.id}">Excluir</button>
+        <button class="btn-sm" data-archive="${im.id}">Arquivar</button>
+        <button class="btn-sm btn-danger" data-delete="${im.id}">Excluir</button>
       </td>
     </tr>
   `).join('');
 
   imoveisTableBody.querySelectorAll('[data-edit]').forEach(btn => {
-    btn.addEventListener('click', () => editImovel(btn.dataset.edit, data));
+    btn.addEventListener('click', () => editImovel(btn.dataset.edit, imoveisCache));
   });
   imoveisTableBody.querySelectorAll('[data-delete]').forEach(btn => {
     btn.addEventListener('click', () => deleteImovel(btn.dataset.delete));
   });
+  imoveisTableBody.querySelectorAll('[data-archive]').forEach(btn => {
+    btn.addEventListener('click', () => archiveImoveis([btn.dataset.archive]));
+  });
+  imoveisTableBody.querySelectorAll('.inline-edit').forEach(el => {
+    const evt = el.tagName === 'SELECT' ? 'change' : 'blur';
+    el.addEventListener(evt, () => saveInlineField(el));
+    if (el.tagName !== 'SELECT') {
+      el.addEventListener('keydown', (e) => { if (e.key === 'Enter') el.blur(); });
+    }
+  });
+  imoveisTableBody.querySelectorAll('.row-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) selectedIds.add(cb.dataset.id);
+      else selectedIds.delete(cb.dataset.id);
+      updateBulkBar();
+    });
+  });
+
+  updateBulkBar();
+  updateSortHeaders();
 }
 
-async function deleteImovel(id) {
-  if (!confirm('Tem certeza que deseja excluir este imóvel? Essa ação não pode ser desfeita.')) return;
-  const { error } = await supabase.from('imoveis').delete().eq('id', id);
+// Clique nos cabeçalhos ordenáveis (crescente / decrescente alternando)
+document.querySelectorAll('.imoveis-table th.sortable').forEach(th => {
+  th.addEventListener('click', () => {
+    const field = th.dataset.sort;
+    if (imoveisSort.field === field) {
+      imoveisSort.dir = imoveisSort.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      imoveisSort = { field, dir: 'asc' };
+    }
+    renderImoveisTable();
+  });
+});
+
+function updateSortHeaders() {
+  document.querySelectorAll('.imoveis-table th.sortable').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (th.dataset.sort === imoveisSort.field) {
+      th.classList.add(imoveisSort.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+}
+
+// Edição inline (código, título, finalidade, valor) direto na tabela
+async function saveInlineField(el) {
+  const id = el.dataset.id;
+  const field = el.dataset.field;
+  let value = el.value;
+  if (field === 'valor') value = value === '' ? null : Number(value);
+  if (field === 'codigo' || field === 'titulo') value = value.trim();
+
+  const im = imoveisCache.find(i => i.id === id);
+  if (im && im[field] === value) return; // nada mudou
+
+  const { error } = await supabase.from('imoveis').update({ [field]: value }).eq('id', id);
+  if (error) {
+    showToast('Erro ao salvar: ' + error.message, true);
+    return;
+  }
+  if (im) im[field] = value;
+  el.classList.add('saved');
+  setTimeout(() => el.classList.remove('saved'), 900);
+}
+
+// Seleção em massa
+if (selectAllImoveis) {
+  selectAllImoveis.addEventListener('change', () => {
+    const list = sortedImoveis();
+    if (selectAllImoveis.checked) {
+      list.forEach(im => selectedIds.add(im.id));
+    } else {
+      selectedIds.clear();
+    }
+    renderImoveisTable();
+  });
+}
+
+function updateBulkBar() {
+  const count = selectedIds.size;
+  if (bulkActionsBar) bulkActionsBar.style.display = count > 0 ? 'flex' : 'none';
+  if (bulkSelectedCount) bulkSelectedCount.textContent = `${count} selecionado${count === 1 ? '' : 's'}`;
+  if (selectAllImoveis) {
+    const list = sortedImoveis();
+    selectAllImoveis.checked = list.length > 0 && list.every(im => selectedIds.has(im.id));
+  }
+}
+
+async function archiveImoveis(ids) {
+  const { error } = await supabase.from('imoveis').update({ status: 'arquivado' }).in('id', ids);
+  if (error) {
+    showToast('Erro ao arquivar: ' + error.message, true);
+    return;
+  }
+  showToast(ids.length > 1 ? 'Imóveis arquivados.' : 'Imóvel arquivado.');
+  ids.forEach(id => selectedIds.delete(id));
+  loadImoveis();
+}
+
+async function ativarImoveis(ids) {
+  const { error } = await supabase.from('imoveis').update({ status: 'ativo' }).in('id', ids);
+  if (error) {
+    showToast('Erro ao ativar: ' + error.message, true);
+    return;
+  }
+  showToast(ids.length > 1 ? 'Imóveis ativados.' : 'Imóvel ativado.');
+  ids.forEach(id => selectedIds.delete(id));
+  loadImoveis();
+}
+
+async function deleteImoveis(ids) {
+  const msg = ids.length > 1
+    ? `Tem certeza que deseja excluir ${ids.length} imóveis? Essa ação não pode ser desfeita.`
+    : 'Tem certeza que deseja excluir este imóvel? Essa ação não pode ser desfeita.';
+  if (!confirm(msg)) return;
+  const { error } = await supabase.from('imoveis').delete().in('id', ids);
   if (error) {
     showToast('Erro ao excluir: ' + error.message, true);
     return;
   }
-  showToast('Imóvel excluído.');
+  showToast(ids.length > 1 ? 'Imóveis excluídos.' : 'Imóvel excluído.');
+  ids.forEach(id => selectedIds.delete(id));
   loadImoveis();
 }
+
+async function deleteImovel(id) {
+  deleteImoveis([id]);
+}
+
+if (bulkAtivarBtn) bulkAtivarBtn.addEventListener('click', () => ativarImoveis([...selectedIds]));
+if (bulkArquivarBtn) bulkArquivarBtn.addEventListener('click', () => archiveImoveis([...selectedIds]));
+if (bulkExcluirBtn) bulkExcluirBtn.addEventListener('click', () => deleteImoveis([...selectedIds]));
 
 function fillFormWithImovel(im) {
   editingId = im.id;

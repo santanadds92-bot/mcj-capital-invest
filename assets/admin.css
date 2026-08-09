@@ -82,7 +82,40 @@
 }
 .status-pill.ativo{background:rgba(120,200,120,.15);color:#8fd68f;}
 .status-pill.inativo{background:rgba(200,200,200,.1);color:var(--text-muted);}
+.status-pill.pendente{background:rgba(230,198,135,.15);color:var(--gold-light);}
+.status-pill.arquivado{background:rgba(180,120,120,.15);color:#c98f8f;}
 .empty-state{padding:60px 20px;text-align:center;color:var(--text-muted);}
+
+/* Cabeçalhos ordenáveis (clique para alternar crescente/decrescente) */
+.imoveis-table th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
+.imoveis-table th.sortable:hover{color:var(--gold);}
+.sort-arrow{display:inline-block;width:10px;font-size:.7rem;}
+.imoveis-table th.sortable.sort-asc .sort-arrow::after{content:'\25B2';}
+.imoveis-table th.sortable.sort-desc .sort-arrow::after{content:'\25BC';}
+.imoveis-table th.col-check{width:36px;}
+.imoveis-table td.col-check{text-align:center;}
+
+/* Campos editáveis diretamente na linha da tabela */
+.inline-edit{
+  width:100%;background:transparent;border:1px solid transparent;color:var(--text);
+  padding:5px 6px;border-radius:4px;font-size:.85rem;font-family:'Poppins',sans-serif;
+  transition:border-color .15s, background .15s;
+}
+.inline-edit:hover{border-color:var(--border);}
+.inline-edit:focus{outline:none;border-color:var(--gold);background:#141210;}
+.inline-edit.saved{border-color:#8fd68f;}
+td.col-titulo .inline-edit{min-width:180px;}
+td.col-valor .inline-edit{min-width:110px;}
+
+/* Barra de ações em massa (aparece quando há itens selecionados) */
+.bulk-actions-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  background:var(--panel);border:1px solid var(--gold);border-radius:6px;
+  padding:12px 18px;margin-bottom:14px;font-size:.85rem;color:var(--gold-light);
+}
+.bulk-actions-buttons{display:flex;gap:8px;}
+.btn-danger{border-color:rgba(200,80,80,.5);color:#e08a8a;}
+.btn-danger:hover{border-color:#e08a8a;background:rgba(200,80,80,.12);}
 
 /* Caixa de configuração da chave da API Gemini */
 .ai-key-box{

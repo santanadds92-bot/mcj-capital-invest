@@ -73,32 +73,32 @@
         <div class="search-grid">
           <div class="field">
             <label>Finalidade</label>
-            <select><option>Selecionar...</option><option>Comprar</option><option>Alugar</option></select>
+            <select id="searchFinalidade"><option value="">Selecionar...</option><option value="comprar">Comprar</option><option value="alugar">Alugar</option></select>
           </div>
           <div class="field">
             <label>Tipo de Imóvel</label>
-            <select><option>Selecionar...</option><option>Casa</option><option>Apartamento</option><option>Comercial</option><option>Cobertura</option></select>
+            <select id="searchTipo"><option value="">Selecionar...</option><option>Casa</option><option>Apartamento</option><option>Comercial</option><option>Cobertura</option></select>
           </div>
           <div class="field">
             <label>Bairro / Região</label>
-            <select><option>Selecionar...</option><option>Jardins</option><option>Alphaville</option><option>Riviera de São Lourenço</option><option>Vila Augusta</option></select>
+            <select id="searchBairro"><option value="">Selecionar...</option><option>Jardins</option><option>Alphaville</option><option>Riviera de São Lourenço</option><option>Vila Augusta</option></select>
           </div>
           <div class="field">
             <label>Quartos</label>
-            <select><option>Selecionar...</option><option>1+</option><option>2+</option><option>3+</option><option>4+</option></select>
+            <select id="searchQuartos"><option value="">Selecionar...</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select>
           </div>
           <div class="field price-range">
             <label>Filtrar por Preço</label>
-            <input type="range" min="0" max="30000000" value="15000000">
-            <div class="price-values"><span>R$ 0,00</span><span>R$ 30.000.000,00</span></div>
+            <input type="range" id="searchPreco" min="0" max="30000000" value="30000000">
+            <div class="price-values"><span>R$ 0,00</span><span id="searchPrecoLabel">R$ 30.000.000,00</span></div>
           </div>
           <div class="field">
             <label>Código do Imóvel</label>
-            <input type="text" placeholder="Insira o código">
+            <input type="text" id="searchCodigo" placeholder="Insira o código">
           </div>
         </div>
         <div class="search-footer">
-          <button class="btn-gold">Filtrar</button>
+          <button class="btn-gold" id="searchFiltrarBtn">Filtrar</button>
         </div>
       </div>
     </div>
@@ -478,6 +478,30 @@
     range.addEventListener('input', () => {
       const val = Number(range.value).toLocaleString('pt-BR', {minimumFractionDigits:2});
       priceMaxLabel.textContent = 'R$ ' + val;
+    });
+  }
+
+  // Botão "Filtrar" do painel de busca — monta os parâmetros e leva o
+  // visitante para a página de Comprar ou Alugar já com os filtros aplicados.
+  const searchFiltrarBtn = document.getElementById('searchFiltrarBtn');
+  if (searchFiltrarBtn) {
+    searchFiltrarBtn.addEventListener('click', () => {
+      const finalidade = document.getElementById('searchFinalidade').value;
+      const tipo = document.getElementById('searchTipo').value;
+      const bairro = document.getElementById('searchBairro').value;
+      const quartos = document.getElementById('searchQuartos').value;
+      const precoInput = document.getElementById('searchPreco');
+      const codigo = document.getElementById('searchCodigo').value.trim();
+
+      const params = new URLSearchParams();
+      if (tipo) params.set('tipo', tipo);
+      if (bairro) params.set('bairro', bairro);
+      if (quartos) params.set('quartos', quartos);
+      if (precoInput && Number(precoInput.value) < Number(precoInput.max)) params.set('valor_max', precoInput.value);
+      if (codigo) params.set('codigo', codigo);
+
+      const destino = finalidade === 'alugar' ? 'alugar.html' : 'comprar.html';
+      window.location.href = `${destino}?${params.toString()}`;
     });
   }
 </script>

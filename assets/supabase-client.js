@@ -50,10 +50,15 @@ export function mapsEmbedUrl(query) {
 }
 
 // ---------- Busca lista de imóveis ativos (com filtro opcional de finalidade / destaque) ----------
-export async function fetchImoveis({ finalidade, destaque, limit } = {}) {
+export async function fetchImoveis({ finalidade, destaque, limit, tipo, bairro, quartosMin, valorMax, codigo } = {}) {
   let query = supabase.from('imoveis').select('*').eq('status', 'ativo').order('created_at', { ascending: false });
   if (finalidade) query = query.eq('finalidade', finalidade);
   if (destaque !== undefined) query = query.eq('destaque', destaque);
+  if (tipo) query = query.eq('tipo', tipo);
+  if (bairro) query = query.eq('bairro', bairro);
+  if (quartosMin) query = query.gte('quartos', quartosMin);
+  if (valorMax) query = query.lte('valor', valorMax);
+  if (codigo) query = query.ilike('codigo', `%${codigo}%`);
   if (limit) query = query.limit(limit);
   const { data, error } = await query;
   if (error) {

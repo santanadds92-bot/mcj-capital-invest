@@ -79,14 +79,23 @@
 
       <!-- Lista -->
       <section class="admin-panel active" id="panelList">
+        <div class="bulk-actions-bar" id="bulkActionsBar" style="display:none;">
+          <span id="bulkSelectedCount">0 selecionados</span>
+          <div class="bulk-actions-buttons">
+            <button type="button" class="btn-sm" id="bulkAtivarBtn">Ativar</button>
+            <button type="button" class="btn-sm" id="bulkArquivarBtn">Arquivar</button>
+            <button type="button" class="btn-sm btn-danger" id="bulkExcluirBtn">Excluir</button>
+          </div>
+        </div>
         <table class="imoveis-table">
           <thead>
             <tr>
-              <th>Código</th>
-              <th>Título</th>
-              <th>Finalidade</th>
-              <th>Valor</th>
-              <th>Status</th>
+              <th class="col-check"><input type="checkbox" id="selectAllImoveis"></th>
+              <th class="sortable" data-sort="codigo">Código <span class="sort-arrow"></span></th>
+              <th class="sortable" data-sort="titulo">Título <span class="sort-arrow"></span></th>
+              <th class="sortable" data-sort="finalidade">Finalidade <span class="sort-arrow"></span></th>
+              <th class="sortable" data-sort="valor">Valor <span class="sort-arrow"></span></th>
+              <th class="sortable" data-sort="status">Status <span class="sort-arrow"></span></th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -147,6 +156,7 @@
                 <option value="ativo">Ativo (visível no site)</option>
                 <option value="inativo">Inativo (oculto)</option>
                 <option value="pendente">Pendente (aguardando aprovação)</option>
+                <option value="arquivado">Arquivado</option>
               </select>
             </div>
 

@@ -167,12 +167,25 @@
 <script type="module">
   import { fetchImoveis, propertyCardHTML } from './assets/supabase-client.js';
 
+  const params = new URLSearchParams(window.location.search);
+
   async function loadImoveis() {
-    const imoveis = await fetchImoveis({ finalidade: 'comprar' });
+    const imoveis = await fetchImoveis({
+      finalidade: 'comprar',
+      tipo: params.get('tipo') || undefined,
+      bairro: params.get('bairro') || undefined,
+      quartosMin: params.get('quartos') || undefined,
+      valorMax: params.get('valor_max') || undefined,
+      codigo: params.get('codigo') || undefined,
+    });
     const grid = document.getElementById('propertyGrid');
+    const emptyList = document.getElementById('emptyList');
+    grid.querySelectorAll('.example-card').forEach(el => el.remove());
     if (imoveis.length > 0) {
-      grid.querySelectorAll('.example-card').forEach(el => el.remove());
       grid.insertAdjacentHTML('beforeend', imoveis.map(propertyCardHTML).join(''));
+    } else if (emptyList) {
+      emptyList.style.display = 'block';
+      emptyList.textContent = 'Nenhum imóvel encontrado com os filtros selecionados.';
     }
   }
   loadImoveis();
