@@ -53,11 +53,7 @@
     </nav>
   </div>
 
-  <section class="page-header">
-    <div class="container"></div>
-  </section>
-
-  <section class="section tight">
+  <section class="section tight" style="padding-top:56px;">
     <div class="container" style="max-width:1000px;">
       <div class="gold-rule"></div>
       <h1 class="section-title" style="text-align:left;">Anuncie Seu Imóvel</h1>
@@ -66,16 +62,6 @@
         assim que aprovado, ele aparece no site normalmente. O campo de telefone é obrigatório para que possamos
         alinhar os detalhes com você.
       </p>
-
-      <div class="ai-key-box">
-        <label for="geminiApiKey">Chave da API do Google Gemini (opcional, para o Preenchimento Automático por IA)</label>
-        <div class="ai-key-row">
-          <input type="password" id="geminiApiKey" placeholder="Cole sua chave aqui (ex: AIza...)">
-          <button type="button" class="btn-sm" id="saveApiKeyBtn">Salvar</button>
-          <span class="ai-key-status" id="apiKeyStatus"></span>
-        </div>
-        <p class="ai-key-hint">Sua chave fica salva somente neste navegador, nunca é enviada para a MCJ. Gere uma gratuita em <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>.</p>
-      </div>
 
       <div class="ai-autofill-box">
         <label for="rawPropertyData">Colar Informações Brutas do Imóvel</label>
@@ -259,29 +245,26 @@
   import { getGeminiKey, setGeminiKey, generateImovelFromText } from './assets/gemini-ai.js';
 
   // ---------- IA: Preenchimento automático (Google Gemini) ----------
-  const geminiApiKeyInput = document.getElementById('geminiApiKey');
-  const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
-  const apiKeyStatus = document.getElementById('apiKeyStatus');
+  // Não há campo visível de chave nesta tela pública — de propósito, para não
+  // expor algo técnico para quem só quer anunciar um imóvel. A chave continua
+  // sendo salva no localStorage do navegador da pessoa (nunca é enviada para a
+  // MCJ); se ainda não houver uma chave salva, pedimos uma única vez de forma
+  // discreta na primeira tentativa de uso do botão de IA.
   const rawPropertyData = document.getElementById('rawPropertyData');
   const generateAIBtn = document.getElementById('generateAIBtn');
   const anuncioFormEl = document.getElementById('anuncioForm');
 
-  function refreshApiKeyStatus() {
-    const key = getGeminiKey();
-    geminiApiKeyInput.value = key;
-    apiKeyStatus.textContent = key ? 'Chave salva ✓' : '';
-  }
-  refreshApiKeyStatus();
-
-  saveApiKeyBtn.addEventListener('click', () => {
-    const key = geminiApiKeyInput.value.trim();
-    if (!key) {
-      alert('Cole uma chave válida antes de salvar.');
-      return;
+  function ensureGeminiKey() {
+    let key = getGeminiKey();
+    if (key) return key;
+    key = prompt('Para usar o preenchimento automático por IA, cole aqui sua chave gratuita da API do Google Gemini (gerada em aistudio.google.com/apikey). Ela fica salva só neste navegador.');
+    if (key && key.trim()) {
+      key = key.trim();
+      setGeminiKey(key);
+      return key;
     }
-    setGeminiKey(key);
-    refreshApiKeyStatus();
-  });
+    return null;
+  }
 
   // Converte a descrição em HTML rico gerada pela IA em texto simples, já que
   // este formulário público usa um campo de texto comum (sem editor rico).
@@ -311,11 +294,8 @@
   }
 
   generateAIBtn.addEventListener('click', async () => {
-    const apiKey = getGeminiKey();
-    if (!apiKey) {
-      alert('Cole e salve sua chave da API Gemini primeiro (campo acima).');
-      return;
-    }
+    const apiKey = ensureGeminiKey();
+    if (!apiKey) return;
     const raw = rawPropertyData.value.trim();
     if (!raw) {
       alert('Cole as informações do imóvel no campo acima.');
