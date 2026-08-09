@@ -41,10 +41,34 @@ Analise o texto abaixo e retorne SOMENTE um objeto JSON válido (sem markdown, s
   "valor": number (valor de venda/aluguel, apenas números, sem "R$" ou pontos),
   "valor_condominio": number (apenas números, 0 se não informado),
   "iptu": number (valor do IPTU, apenas números, 0 se não informado),
-  "descricao": string em HTML rico, usando as tags <h3>, <p>, <strong>, <ul>, <li> e <hr> para organizar seções como "Sobre o Imóvel" e "Características" (em lista). Não inclua <html>, <head> ou <body>, apenas o conteúdo interno.
+  "descricao": string em HTML rico — siga ESTRITAMENTE as instruções de tom, estilo e estrutura descritas abaixo.
 }
 
-Se alguma informação não estiver no texto, use 0 para números e "" para textos — nunca invente dados que não estejam no texto original.
+============================================================
+INSTRUÇÕES OBRIGATÓRIAS PARA O CAMPO "descricao"
+============================================================
+
+Tom de voz: sofisticado, corporativo, persuasivo — texto de material comercial de uma imobiliária de imóveis de alto padrão/luxo. Nunca use tom informal, nunca copie o texto bruto literalmente: reescreva e enriqueça o conteúdo, mesmo que o texto original seja curto ou telegráfico. A descrição deve ser longa, completa e bem desenvolvida (nunca apenas 1 ou 2 frases soltas), preenchendo com linguagem própria do mercado imobiliário de alto padrão qualquer lacuna de informação que não tenha vindo no texto original (sem inventar números, endereços ou características factuais que não foram informados).
+
+Estrutura obrigatória, exatamente nesta ordem, usando <h3> para cada título de seção (com o texto do título exatamente como abaixo):
+
+1. <h3>Introdução</h3> seguido de um <p> com um parágrafo impactante de abertura, destacando metragem, localização e o potencial do imóvel (investimento, moradia, uso comercial etc.).
+
+2. <h3>Estrutura e Funcionalidade</h3> seguido de uma lista <ul><li>...</li></ul> detalhando o aproveitamento do espaço, divisão de ambientes/andares, layout e adaptabilidade do imóvel a diferentes usos.
+
+3. <h3>Diferenciais do Imóvel</h3> seguido de uma lista <ul><li>...</li></ul> destacando os pontos fortes, acabamentos, comodidades e visibilidade comercial ou residencial do imóvel.
+
+4. <h3>Localização Privilegiada</h3> seguido de um <p> com um parágrafo sobre a região, vias de acesso e conveniências do entorno (comércio, mobilidade, valorização da área).
+
+5. <h3>Informações Adicionais</h3> seguido de uma lista <ul><li>...</li></ul> resumindo, em itens curtos e objetivos: Localização, Área, Finalidade, Valor (e Condomínio/IPTU quando houver). Use exatamente os dados numéricos fornecidos no texto original nesse resumo — não invente valores.
+
+Regras adicionais:
+- Use <strong> para destacar números, metragens e termos-chave dentro dos parágrafos e itens de lista.
+- Separe a seção "Informações Adicionais" das demais com um <hr> logo antes do seu <h3>.
+- Não inclua <html>, <head>, <body> nem markdown (sem \`\`\`, sem "**"). Apenas HTML puro com as tags citadas: h3, p, strong, ul, li, hr.
+- Se alguma informação necessária para uma seção não existir no texto original, escreva a seção mesmo assim de forma genérica e elegante (sem inventar fatos específicos), nunca omita uma seção da estrutura.
+
+Se alguma informação não estiver no texto, use 0 para números e "" para textos nos outros campos do JSON (fora da descrição) — nunca invente dados factuais que não estejam no texto original.
 
 Texto bruto colado pelo usuário:
 """
@@ -69,7 +93,11 @@ export async function callGemini(apiKey, prompt) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: 'application/json', temperature: 0.4 },
+            generationConfig: {
+              responseMimeType: 'application/json',
+              temperature: 0.5,
+              maxOutputTokens: 4096, // dá espaço suficiente para a descrição longa e completa exigida no prompt
+            },
           }),
         }
       );
