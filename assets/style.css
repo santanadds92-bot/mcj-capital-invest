@@ -97,6 +97,28 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
   width:100%;padding-top:40px;padding-bottom:60px;
   display:flex;flex-direction:column;align-items:center;text-align:center;
 }
+
+/* Marca "MCJ Capital Invest" em Bodoni Moda, sobre a imagem do hero — entra
+   com uma animação de desfoque (blur) que foca suavemente ao carregar a
+   página, como uma assinatura editorial de alta costura. */
+.mcj-wordmark{
+  width:100%;text-align:center;
+  font-family:'Bodoni Moda', serif;
+  font-weight:400;font-style:normal;
+  font-size:clamp(3.2rem, 10vw, 8.5rem);
+  letter-spacing:-2px;line-height:.95;
+  color:#fff;
+  margin-bottom:26px;
+  text-shadow:0 4px 30px rgba(0,0,0,.5);
+  white-space:nowrap;
+  filter:blur(16px);opacity:0;
+  animation:mcjBlurIn 1.9s cubic-bezier(.2,.7,.3,1) forwards;
+  animation-delay:.15s;
+}
+@keyframes mcjBlurIn{
+  0%{filter:blur(20px);opacity:0;transform:scale(1.05);}
+  100%{filter:blur(0);opacity:1;transform:scale(1);}
+}
 .hero-intro{display:flex;flex-direction:column;align-items:center;}
 .hero-eyebrow{color:var(--gold-light);letter-spacing:4px;font-size:.75rem;text-transform:uppercase;margin-bottom:18px;display:block;}
 .hero h1{font-size:3.4rem;font-weight:600;max-width:720px;color:var(--text);margin-bottom:16px;margin-left:auto;margin-right:auto;}
@@ -546,6 +568,7 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
   /* Cabeçalho mobile: hambúrguer à esquerda, logo em imagem centralizada e maior */
   .topbar{display:none;}
   .logo-img{height:50px;}
+  .mcj-wordmark{font-size:clamp(2rem,10vw,3rem);letter-spacing:-1px;margin-bottom:16px;}
 
   /* Setas dos carrosséis um pouco menores e mais próximas da borda no mobile */
   .car-btn{width:38px;height:38px;font-size:1rem;}
