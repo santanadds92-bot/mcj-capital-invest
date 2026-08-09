@@ -377,13 +377,31 @@ importCancelBtn.addEventListener('click', () => {
   setImportStatus('');
 });
 
+// Garante que nenhum "codigo" se repita dentro do lote: o CSV da Shopify pode gerar
+// códigos colididos (ex: dois handles diferentes que, depois de normalizados, viram
+// o mesmo texto). Um UPSERT com o mesmo valor de conflito duas vezes no mesmo lote
+// falha no Postgres ("ON CONFLICT DO UPDATE command cannot affect row a second time"),
+// então aqui garantimos unicidade adicionando um sufixo -2, -3... quando necessário.
+function ensureUniqueCodigos(rows) {
+  const seen = new Map();
+  return rows.map((row) => {
+    const base = row.codigo;
+    const count = seen.get(base) || 0;
+    seen.set(base, count + 1);
+    if (count === 0) return row;
+    return { ...row, codigo: `${base}-${count + 1}` };
+  });
+}
+
 importConfirmBtn.addEventListener('click', async () => {
-  const rows = pendingImportItems
-    .filter(i => !i._excluded)
-    .map(({ _excluded, ...item }) => ({
-      ...item,
-      status: importActivateCheck.checked ? 'ativo' : 'inativo',
-    }));
+  const rows = ensureUniqueCodigos(
+    pendingImportItems
+      .filter(i => !i._excluded)
+      .map(({ _excluded, ...item }) => ({
+        ...item,
+        status: importActivateCheck.checked ? 'ativo' : 'inativo',
+      }))
+  );
 
   if (rows.length === 0) {
     showToast('Nenhum imóvel selecionado para importar.', true);
@@ -392,23 +410,38 @@ importConfirmBtn.addEventListener('click', async () => {
 
   importConfirmBtn.disabled = true;
   const originalLabel = importConfirmBtn.textContent;
-  importConfirmBtn.textContent = 'Importando...';
 
-  const { error } = await supabase.from('imoveis').upsert(rows, { onConflict: 'codigo' });
+  // Envia um de cada vez (em vez de um único .upsert(array)) para evitar qualquer
+  // conflito de chave duplicada dentro do mesmo lote e para não perder tudo caso
+  // um único imóvel tenha um dado inválido — os demais continuam sendo importados.
+  let success = 0;
+  const failures = [];
+  for (let i = 0; i < rows.length; i++) {
+    importConfirmBtn.textContent = `Importando ${i + 1}/${rows.length}...`;
+    const { error } = await supabase.from('imoveis').upsert(rows[i], { onConflict: 'codigo' });
+    if (error) {
+      failures.push(`${rows[i].codigo}: ${error.message}`);
+    } else {
+      success++;
+    }
+  }
 
   importConfirmBtn.disabled = false;
   importConfirmBtn.textContent = originalLabel;
 
-  if (error) {
-    showToast('Erro ao importar: ' + error.message, true);
-    return;
+  if (failures.length > 0) {
+    console.error('Falhas na importação:', failures);
+    showToast(`${success} imóvel(is) importado(s). ${failures.length} falharam — veja o console para detalhes.`, failures.length === rows.length);
+  } else {
+    showToast(`${success} imóvel(is) importado(s) com sucesso!`);
   }
 
-  showToast(`${rows.length} imóvel(is) importado(s) com sucesso!`);
-  pendingImportItems = [];
-  importPreview.style.display = 'none';
-  csvFileInput.value = '';
-  switchTab('list');
+  if (success > 0) {
+    pendingImportItems = [];
+    importPreview.style.display = 'none';
+    csvFileInput.value = '';
+    switchTab('list');
+  }
 });
 
 // ---------- Auth ----------
