@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 </head>
 <body>
@@ -63,19 +62,18 @@
   <section class="section tight">
     <div class="container">
 
-      <!-- Galeria: carrossel com efeito de profundidade (Swiper.js — coverflow) -->
-      <div class="gallery-swiper-wrap">
-        <div class="swiper property-swiper">
-          <div class="swiper-wrapper" id="gallerySwiperWrapper">
-            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 1 · exemplo</div></div></div>
-            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 2 · exemplo</div></div></div>
-            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 3 · exemplo</div></div></div>
-            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 4 · exemplo</div></div></div>
-            <div class="swiper-slide"><div class="slide-img"><div class="ph-wrap">Foto 5 · exemplo</div></div></div>
-          </div>
+      <!-- Galeria estável: foto principal + miniaturas + lightbox (sem bibliotecas pesadas) -->
+      <div class="pgallery">
+        <div class="pgallery-main" id="pgalleryMain" title="Clique para ampliar">
+          <img id="pgalleryMainImg" src="" alt="Foto do imóvel">
         </div>
-        <button class="gallery-nav-btn prev gallery-prev" aria-label="Foto anterior">&#8592;</button>
-        <button class="gallery-nav-btn next gallery-next" aria-label="Próxima foto">&#8594;</button>
+        <div class="pgallery-thumbs" id="pgalleryThumbs"></div>
+      </div>
+
+      <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose" aria-label="Fechar">&times;</button>
+        <div class="lightbox-main"><img id="lightboxImg" src="" alt="Foto ampliada do imóvel"></div>
+        <div class="lightbox-thumbs" id="lightboxThumbs"></div>
       </div>
 
       <div class="detail-grid">
@@ -269,26 +267,7 @@
   </a>
 
 <script src="assets/site.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-  // Carrossel da galeria (efeito coverflow / pilha com profundidade)
-  let gallerySwiper;
-  function initGallerySwiper() {
-    if (gallerySwiper) gallerySwiper.destroy(true, true);
-    gallerySwiper = new Swiper('.property-swiper', {
-      effect: 'coverflow',
-      grabCursor: true,
-      centeredSlides: true,
-      loop: true,
-      slidesPerView: 'auto',
-      coverflowEffect: { rotate: 0, stretch: 0, depth: 220, modifier: 1.2, slideShadows: false },
-      autoplay: { delay: 3200, disableOnInteraction: false },
-      navigation: { nextEl: '.gallery-next', prevEl: '.gallery-prev' },
-    });
-  }
-  window.initGallerySwiper = initGallerySwiper;
-  initGallerySwiper();
-
   // Similar properties carousel (funciona tanto para os cards de exemplo quanto para os reais)
   const simTrack = document.getElementById('similarTrack');
   const simCardWidth = 368;
@@ -296,18 +275,56 @@
   document.getElementById('simPrev').addEventListener('click', () => simTrack.scrollBy({left: -simCardWidth, behavior: 'smooth'}));
 </script>
 <script type="module">
-  import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML, descricaoToHTML, sanitizeDescricao, initCardPhotoSwipers } from './assets/supabase-client.js';
+  import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML, descricaoToHTML, sanitizeDescricao, placeholderPhoto } from './assets/supabase-client.js';
 
   const params = new URLSearchParams(window.location.search);
   const codigo = params.get('codigo');
 
-  function renderGallery(fotos) {
-    const wrapper = document.getElementById('gallerySwiperWrapper');
-    wrapper.innerHTML = fotos.map(url => `
-      <div class="swiper-slide"><div class="slide-img" style="background-image:url('${url}');"></div></div>
-    `).join('');
-    window.initGallerySwiper();
+  // ---------- Galeria estável: principal + miniaturas + lightbox ----------
+  const pgalleryMain = document.getElementById('pgalleryMain');
+  const pgalleryMainImg = document.getElementById('pgalleryMainImg');
+  const pgalleryThumbs = document.getElementById('pgalleryThumbs');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxThumbs = document.getElementById('lightboxThumbs');
+  const lightboxClose = document.getElementById('lightboxClose');
+
+  function renderGallery(photos) {
+    let current = 0;
+
+    function show(idx) {
+      current = idx;
+      pgalleryMainImg.src = photos[idx];
+      lightboxImg.src = photos[idx];
+      pgalleryThumbs.querySelectorAll('img').forEach((t, i) => t.classList.toggle('active', i === idx));
+      lightboxThumbs.querySelectorAll('img').forEach((t, i) => t.classList.toggle('active', i === idx));
+    }
+
+    const thumbsHTML = photos.map((url, i) => `<img src="${url}" data-idx="${i}" alt="Miniatura ${i + 1}">`).join('');
+    pgalleryThumbs.innerHTML = thumbsHTML;
+    lightboxThumbs.innerHTML = thumbsHTML;
+
+    pgalleryThumbs.querySelectorAll('img').forEach(t => t.addEventListener('click', () => show(Number(t.dataset.idx))));
+    lightboxThumbs.querySelectorAll('img').forEach(t => t.addEventListener('click', () => show(Number(t.dataset.idx))));
+
+    show(0);
   }
+
+  function openLightbox() {
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  pgalleryMain.addEventListener('click', openLightbox);
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+
+  // Galeria de exemplo enquanto não há ?codigo= na URL ou o imóvel não tem fotos reais
+  const fotosExemplo = [1, 2, 3, 4, 5].map(n => placeholderPhoto(`Foto ${n} · exemplo`));
+  renderGallery(fotosExemplo);
 
   async function loadImovelReal() {
     if (!codigo) return;
@@ -358,7 +375,6 @@
       const track = document.getElementById('similarTrack');
       track.querySelectorAll('.example-card').forEach(el => el.remove());
       track.insertAdjacentHTML('beforeend', similares.map(propertyCardHTML).join(''));
-      initCardPhotoSwipers(track);
     }
   }
 

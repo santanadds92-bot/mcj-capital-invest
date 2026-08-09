@@ -55,7 +55,6 @@
 
   <section class="hero">
     <div class="container">
-      <div class="hero-brand-mobile">MCJ <span>Capital</span> Invest</div>
       <span class="hero-eyebrow">Imóveis de Alto Padrão</span>
       <h1>Abrimos as <em>melhores portas</em> para você</h1>
       <p class="lead">A elegância se encontra com a exclusividade em cada propriedade. Um portfólio selecionado para clientes exigentes.</p>
@@ -358,7 +357,7 @@
   initDestaquesSwiper();
 </script>
 <script type="module">
-  import { fetchImoveis, propertyCardHTML, initCardPhotoSwipers } from './assets/supabase-client.js';
+  import { fetchImoveis, propertyCardHTML } from './assets/supabase-client.js';
 
   async function loadRealImoveis() {
     const [todosImoveis, destaques] = await Promise.all([
@@ -375,7 +374,6 @@
       document.querySelectorAll('#propertyGrid .property-card').forEach(card => {
         card.style.display = (card.dataset.op === activeTab) ? '' : 'none';
       });
-      initCardPhotoSwipers(grid);
     }
 
     if (destaques.length > 0) {
@@ -383,7 +381,6 @@
       track.querySelectorAll('.example-card').forEach(el => el.remove());
       track.insertAdjacentHTML('beforeend', destaques.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join(''));
       window.initDestaquesSwiper();
-      initCardPhotoSwipers(track);
     }
   }
 

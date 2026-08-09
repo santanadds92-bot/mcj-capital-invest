@@ -118,27 +118,17 @@ export function metaResumo(imovel) {
 }
 
 // ---------- Card HTML reutilizável (grade da home, destaques, similares) ----------
-// Quando o imóvel tem mais de uma foto, o card exibe um mini carrossel (Swiper coverflow)
-// que alterna as fotos automaticamente dentro do próprio card. Com 1 foto, mostra estática.
+// Foto de capa como <img> real (mais simples e estável que background-image/carrossel).
 export function propertyCardHTML(imovel) {
   const fotos = Array.isArray(imovel.fotos) ? imovel.fotos.filter(Boolean) : [];
+  const capa = fotos[0] || null;
   const meta = metaResumo(imovel).map(m => `<span>${m}</span>`).join('');
   const finalidadeLabel = imovel.finalidade === 'alugar' ? 'Alugar' : 'Comprar';
   const local = [imovel.bairro, imovel.cidade].filter(Boolean).join(' · ');
 
-  let mediaHTML;
-  if (fotos.length > 1) {
-    mediaHTML = `
-      <div class="swiper card-photo-swiper">
-        <div class="swiper-wrapper">
-          ${fotos.map(url => `<div class="swiper-slide" style="background-image:url('${url}');"></div>`).join('')}
-        </div>
-      </div>`;
-  } else if (fotos.length === 1) {
-    mediaHTML = `<div class="card-photo-single" style="background-image:url('${fotos[0]}');"></div>`;
-  } else {
-    mediaHTML = `<div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>`;
-  }
+  const mediaHTML = capa
+    ? `<img src="${capa}" alt="${imovel.titulo}" loading="lazy">`
+    : `<div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>`;
 
   return `
     <article class="property-card" data-op="${imovel.finalidade}">
@@ -159,19 +149,8 @@ export function propertyCardHTML(imovel) {
   `;
 }
 
-// Inicializa um Swiper (coverflow) dentro de cada card que tiver mais de uma foto.
-// Chame esta função depois de inserir cards vindos de propertyCardHTML no DOM.
-export function initCardPhotoSwipers(root = document) {
-  if (typeof window === 'undefined' || !window.Swiper) return;
-  root.querySelectorAll('.card-photo-swiper').forEach(el => {
-    if (el.swiper) return; // já inicializado
-    new window.Swiper(el, {
-      effect: 'coverflow',
-      loop: true,
-      allowTouchMove: false,
-      nested: true,
-      autoplay: { delay: 2600 + Math.round(Math.random() * 1200), disableOnInteraction: false },
-      coverflowEffect: { rotate: 0, stretch: 0, depth: 70, modifier: 1, slideShadows: true },
-    });
-  });
+// ---------- Placeholder de imagem (SVG em data-URI) para os exemplos da galeria ----------
+export function placeholderPhoto(label) {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='1000'><rect width='100%' height='100%' fill='#1b1a17'/><text x='50%' y='50%' fill='#a79d8c' font-size='34' font-family='sans-serif' text-anchor='middle' dominant-baseline='middle'>${label}</text></svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
