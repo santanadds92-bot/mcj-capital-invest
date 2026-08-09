@@ -114,18 +114,92 @@ export async function fetchImovelByCodigo(codigo) {
   return data;
 }
 
-// ---------- Descrição: converte texto puro antigo em HTML, e sanitiza o HTML antes de exibir ----------
-// Registros antigos podem ter sido salvos como texto puro (sem tags). Se detectarmos
-// que já é HTML (do editor rico do admin), retornamos como está; senão, quebramos
-// parágrafos por linha em branco e mantemos quebras simples como <br>.
+// ---------- Descrição: converte Markdown (ou texto puro) em HTML, e sanitiza antes de exibir ----------
+
+function escapeHTML(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Aplica formatação inline de Markdown: **negrito** -> <strong>. O texto já
+// vem escapado antes de chegar aqui, então é seguro inserir a tag.
+function inlineMarkdown(text) {
+  return escapeHTML(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+// Converte a descrição gerada pela IA (ou digitada manualmente) em HTML elegante:
+// - "### Título" ou "#### Título"  -> <h3>/<h4>
+// - "---" (linha só de traços)     -> <hr class="divider">
+// - "**palavra**"                  -> <strong>
+// - linhas começando com "•", "-" ou "*" -> <ul><li>
+// - linhas em branco separam parágrafos <p>
+export function markdownToHTML(raw) {
+  const lines = raw.replace(/\r\n/g, '\n').split('\n');
+  const htmlParts = [];
+  let paragraphBuffer = [];
+  let listBuffer = [];
+
+  function flushParagraph() {
+    if (paragraphBuffer.length) {
+      htmlParts.push(`<p>${inlineMarkdown(paragraphBuffer.join(' '))}</p>`);
+      paragraphBuffer = [];
+    }
+  }
+  function flushList() {
+    if (listBuffer.length) {
+      htmlParts.push(`<ul>${listBuffer.map(item => `<li>${inlineMarkdown(item)}</li>`).join('')}</ul>`);
+      listBuffer = [];
+    }
+  }
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+
+    if (!line) {
+      flushParagraph();
+      flushList();
+      continue;
+    }
+
+    const headingMatch = line.match(/^(#{2,4})\s+(.*)$/);
+    if (headingMatch) {
+      flushParagraph();
+      flushList();
+      const level = headingMatch[1].length >= 4 ? 4 : 3;
+      htmlParts.push(`<h${level}>${inlineMarkdown(headingMatch[2])}</h${level}>`);
+      continue;
+    }
+
+    if (/^-{3,}$/.test(line) || /^—{3,}$/.test(line)) {
+      flushParagraph();
+      flushList();
+      htmlParts.push('<hr class="divider">');
+      continue;
+    }
+
+    const bulletMatch = line.match(/^[•*-]\s+(.*)$/);
+    if (bulletMatch) {
+      flushParagraph();
+      listBuffer.push(bulletMatch[1]);
+      continue;
+    }
+
+    flushList();
+    paragraphBuffer.push(line);
+  }
+  flushParagraph();
+  flushList();
+
+  return htmlParts.join('');
+}
+
+// Registros antigos podem ter sido salvos como HTML puro (vindo do editor rico do
+// admin) — se detectarmos tags reais, mantemos como está. Caso contrário (texto
+// puro ou Markdown vindo da IA/formulário público), convertemos com markdownToHTML.
 export function descricaoToHTML(raw) {
   if (!raw) return '';
-  const looksLikeHTML = /<\/?[a-z][\s\S]*>/i.test(raw);
+  const looksLikeHTML = /<\/?(p|h[1-6]|ul|ol|li|strong|b|em|i|hr|br|span|a)[\s>]/i.test(raw);
   if (looksLikeHTML) return raw;
-  return raw
-    .split(/\n{2,}/)
-    .map(block => `<p>${block.replace(/\n/g, '<br>')}</p>`)
-    .join('');
+  return markdownToHTML(raw);
 }
 
 // Sanitiza o HTML da descrição antes de inserir no DOM (protege contra script/HTML malicioso).
@@ -134,7 +208,7 @@ export function sanitizeDescricao(html) {
   if (typeof window !== 'undefined' && window.DOMPurify) {
     return window.DOMPurify.sanitize(html, {
       ALLOWED_TAGS: ['p', 'br', 'h2', 'h3', 'h4', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li', 'hr', 'span', 'a'],
-      ALLOWED_ATTR: ['href', 'target', 'rel'],
+      ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
     });
   }
   // fallback simples: remove tags de script/estilo/iframe e atributos on*

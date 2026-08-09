@@ -390,6 +390,13 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
   border-top:1px solid rgba(255,255,255,.15);
   margin:32px 0;
 }
+/* Divisória elegante gerada a partir do "---" no Markdown da IA — linha curta
+   e dourada, centralizada, com respiro generoso entre as seções. */
+.descricao-imovel hr.divider{
+  border-top:1px solid rgba(201,164,99,.4);
+  width:70px;
+  margin:40px auto;
+}
 .descricao-imovel a{color:var(--gold-light);text-decoration:underline;text-underline-offset:3px;}
 .price-block{display:flex;gap:60px;margin-bottom:44px;flex-wrap:wrap;}
 .price-block .item h4{font-size:.78rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;font-weight:400;}

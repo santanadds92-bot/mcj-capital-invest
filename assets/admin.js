@@ -125,7 +125,9 @@ function applyAIResult(d) {
   if (d.valor) imovelForm.valor.value = d.valor;
   if (d.valor_condominio) imovelForm.valor_condominio.value = d.valor_condominio;
   if (d.iptu && imovelForm.iptu) imovelForm.iptu.value = d.iptu;
-  if (d.descricao) descricaoEditor.innerHTML = sanitizeDescricao(d.descricao);
+  // A IA agora retorna a descrição em Markdown (###, ---, **negrito**, • listas);
+  // descricaoToHTML() converte isso para o HTML que o editor rico exibe/edita.
+  if (d.descricao) descricaoEditor.innerHTML = sanitizeDescricao(descricaoToHTML(d.descricao));
 }
 
 generateAIBtn.addEventListener('click', generateWithAI);

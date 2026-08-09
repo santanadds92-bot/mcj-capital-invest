@@ -266,15 +266,6 @@
     return null;
   }
 
-  // Converte a descrição em HTML rico gerada pela IA em texto simples, já que
-  // este formulário público usa um campo de texto comum (sem editor rico).
-  function htmlToPlainText(html) {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    div.querySelectorAll('h3, p, li, hr').forEach(el => el.insertAdjacentText('afterend', '\n'));
-    return (div.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
-  }
-
   function applyAIResultToAnuncioForm(d) {
     if (d.titulo) anuncioFormEl.titulo.value = d.titulo;
     if (d.finalidade === 'comprar' || d.finalidade === 'alugar') anuncioFormEl.finalidade.value = d.finalidade;
@@ -290,7 +281,10 @@
     if (d.valor) anuncioFormEl.valor.value = d.valor;
     if (d.valor_condominio) anuncioFormEl.valor_condominio.value = d.valor_condominio;
     if (d.iptu) anuncioFormEl.iptu.value = d.iptu;
-    if (d.descricao) anuncioFormEl.descricao.value = htmlToPlainText(d.descricao);
+    // A IA retorna a descrição em Markdown (###, ---, **negrito**, • listas) — como
+    // este campo é um texto simples, o Markdown já fica legível como está; ele é
+    // convertido em HTML formatado depois, quando o anúncio é aprovado e exibido.
+    if (d.descricao) anuncioFormEl.descricao.value = d.descricao;
   }
 
   generateAIBtn.addEventListener('click', async () => {
