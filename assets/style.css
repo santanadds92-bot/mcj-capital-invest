@@ -60,6 +60,20 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .menu-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:6px;}
 .menu-toggle span{width:26px;height:2px;background:var(--gold);}
 
+/* Header transparente sobreposto ao hero (usado só na Home) — a marca "MCJ"
+   fica diretamente sobre a imagem, com o menu logo acima, sem barra sólida. */
+header.main.transparent{
+  position:absolute;top:42px;left:0;right:0;
+  background:transparent;border-bottom:none;backdrop-filter:none;
+  z-index:60;
+}
+.mcj-wordmark{
+  grid-column:2;justify-self:center;
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.6rem;font-weight:600;letter-spacing:6px;line-height:1;
+  color:var(--text);text-shadow:0 2px 20px rgba(0,0,0,.6);
+}
+
 /* Drawer de menu mobile — abre da esquerda para a direita */
 .drawer-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:150;
@@ -93,7 +107,7 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
   background:linear-gradient(180deg, rgba(6,6,6,.55) 0%, rgba(6,6,6,.35) 35%, rgba(6,6,6,.85) 100%), url('hero-living-room.jpg') center/cover no-repeat;
 }
 .hero .container{
-  width:100%;padding-top:40px;padding-bottom:60px;
+  width:100%;padding-top:160px;padding-bottom:60px;
   display:flex;flex-direction:column;align-items:center;text-align:center;
 }
 .hero-intro{display:flex;flex-direction:column;align-items:center;}
@@ -229,10 +243,8 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 }
 .property-price{
   font-size:1.2rem;font-weight:700;color:#E6C687;font-family:'Cormorant Garamond',serif;
-  letter-spacing:.3px;
+  letter-spacing:.3px;margin-top:6px;display:block;
 }
-.property-card[data-op="alugar"] .property-price,
-[data-op="alugar"] .property-price{color:#38BDF8;}
 .hidden{display:none !important;}
 
 .center-btn{text-align:center;margin-top:50px;}
@@ -547,6 +559,8 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
   /* Cabeçalho mobile: hambúrguer à esquerda, logo em imagem centralizada e maior */
   .topbar{display:none;}
   .logo-img{height:50px;}
+  header.main.transparent{top:0;}
+  .mcj-wordmark{font-size:1.9rem;letter-spacing:4px;}
 
   /* Setas dos carrosséis um pouco menores e mais próximas da borda no mobile */
   .car-btn{width:38px;height:38px;font-size:1rem;}
@@ -556,14 +570,14 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
      marca, ocupando toda a tela); 2ª dobra = filtro de busca, em bloco à
      parte, revelado ao rolar — sem a imagem atrás. */
   .hero{
-    min-height:calc(100dvh - 72px); /* 72px ≈ altura do header sticky no mobile */
-    height:calc(100dvh - 72px);
+    min-height:100dvh; /* o header agora flutua sobre o hero (não ocupa espaço no fluxo) */
+    height:100dvh;
     overflow:hidden;
     padding-top:0;
     align-items:center;
   }
   .hero .container{
-    padding-top:0;
+    padding-top:90px; /* espaço para o menu + marca "MCJ" sobrepostos no topo */
     padding-bottom:0;
     height:100%;
     justify-content:center;
