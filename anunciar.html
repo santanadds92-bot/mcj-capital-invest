@@ -59,8 +59,8 @@
       <h1 class="section-title" style="text-align:left;">Anuncie Seu Imóvel</h1>
       <p style="color:var(--text-muted);margin-bottom:36px;max-width:640px;">
         Preencha os dados do seu imóvel abaixo. Nossa equipe vai revisar as informações antes da publicação —
-        assim que aprovado, ele aparece no site normalmente. O campo de telefone é obrigatório para que possamos
-        alinhar os detalhes com você.
+        assim que aprovado, ele aparece no site normalmente. Apenas o telefone/WhatsApp é obrigatório, para que
+        possamos alinhar os detalhes com você — os demais campos são opcionais.
       </p>
 
       <div class="ai-autofill-box">
@@ -76,8 +76,8 @@
             <label style="margin-bottom:0;color:var(--text);font-size:.85rem;letter-spacing:1px;">Seus Dados de Contato</label>
           </div>
           <div>
-            <label>Seu Nome *</label>
-            <input type="text" name="proprietario_nome" required placeholder="Nome completo">
+            <label>Seu Nome</label>
+            <input type="text" name="proprietario_nome" placeholder="Nome completo">
           </div>
           <div>
             <label>Telefone / WhatsApp *</label>
@@ -93,12 +93,12 @@
           </div>
 
           <div class="span-2">
-            <label>Título do Anúncio *</label>
-            <input type="text" name="titulo" required placeholder="ex: Cobertura Alto Padrão no Jardins">
+            <label>Título do Anúncio</label>
+            <input type="text" name="titulo" placeholder="ex: Cobertura Alto Padrão no Jardins">
           </div>
           <div>
-            <label>Finalidade *</label>
-            <select name="finalidade" required>
+            <label>Finalidade</label>
+            <select name="finalidade">
               <option value="comprar">Vender</option>
               <option value="alugar">Alugar</option>
             </select>
@@ -373,16 +373,34 @@
         uploadProgress.style.display = 'none';
       }
 
+      // Campos de texto opcionais: manda null em vez de string vazia quando o
+      // visitante não preencheu, para não depender de valor padrão do banco.
+      const orNull = (name) => {
+        const v = (fd.get(name) || '').toString().trim();
+        return v ? v : null;
+      };
+
+      const tituloDigitado = orNull('titulo');
+      const bairroDigitado = orNull('bairro');
+      const tipoSelecionado = fd.get('tipo') || 'Apartamento';
+      const finalidadeSelecionada = fd.get('finalidade') || 'comprar';
+
+      // Título é obrigatório no banco (não pode ficar em branco); se o visitante
+      // não preencheu, geramos um título provisório a partir do que temos —
+      // você pode ajustar isso na revisão, antes de aprovar o anúncio.
+      const tituloFinal = tituloDigitado
+        || `${tipoSelecionado} para ${finalidadeSelecionada === 'alugar' ? 'alugar' : 'vender'}${bairroDigitado ? ' em ' + bairroDigitado : ''} (revisar título)`;
+
       const payload = {
-        proprietario_nome: fd.get('proprietario_nome').trim(),
+        proprietario_nome: orNull('proprietario_nome'),
         proprietario_telefone: fd.get('proprietario_telefone').trim(),
-        proprietario_email: fd.get('proprietario_email')?.trim() || null,
-        titulo: fd.get('titulo').trim(),
-        finalidade: fd.get('finalidade'),
-        tipo: fd.get('tipo'),
-        bairro: fd.get('bairro'),
-        cidade: fd.get('cidade'),
-        endereco: fd.get('endereco'),
+        proprietario_email: orNull('proprietario_email'),
+        titulo: tituloFinal,
+        finalidade: finalidadeSelecionada,
+        tipo: tipoSelecionado,
+        bairro: bairroDigitado,
+        cidade: orNull('cidade'),
+        endereco: orNull('endereco'),
         quartos: Number(fd.get('quartos')) || 0,
         banheiros: Number(fd.get('banheiros')) || 0,
         suites: Number(fd.get('suites')) || 0,
@@ -391,7 +409,7 @@
         valor: fd.get('valor') ? Number(fd.get('valor')) : null,
         valor_condominio: fd.get('valor_condominio') ? Number(fd.get('valor_condominio')) : null,
         iptu: fd.get('iptu') ? Number(fd.get('iptu')) : null,
-        descricao: (fd.get('descricao') || '').trim(),
+        descricao: orNull('descricao'),
         video_url: '',
         fotos,
       };
@@ -401,7 +419,10 @@
       anuncioForm.style.display = 'none';
       successBox.style.display = 'block';
     } catch (err) {
-      alert('Não foi possível enviar seu imóvel agora. Tente novamente em instantes. (' + err.message + ')');
+      const msg = /column/i.test(err.message)
+        ? 'O site ainda não está totalmente configurado para receber anúncios (faltou rodar uma atualização no banco de dados). Avise o administrador do site.'
+        : 'Não foi possível enviar seu imóvel agora. Tente novamente em instantes. (' + err.message + ')';
+      alert(msg);
       submitBtn.disabled = false;
       submitBtn.textContent = 'Enviar para Aprovação';
     }
