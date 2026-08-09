@@ -184,10 +184,14 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 /* Property grid */
 .property-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
 .property-card{
-  background:var(--panel);border:1px solid var(--border);border-radius:6px;overflow:hidden;
-  transition:transform .25s, box-shadow .25s;
+  background:var(--panel);border:1px solid rgba(212,175,55,.2);border-radius:12px;overflow:hidden;
+  transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
-.property-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,.45);}
+.property-card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(212,175,55,.5);
+  box-shadow:0 20px 45px rgba(0,0,0,.5), 0 0 26px rgba(212,175,55,.1);
+}
 .property-card > a{display:block;color:inherit;}
 .property-photo{
   position:relative;height:240px;overflow:hidden;
@@ -204,41 +208,85 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
   display:block;
 }
 .badge{
-  position:absolute;top:14px;left:14px;background:var(--gold);color:#141210;
-  font-size:.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  padding:5px 12px;border-radius:2px;z-index:3;
+  position:absolute;top:14px;left:14px;
+  background:linear-gradient(135deg,#f0d9a8,#c9a463);color:#141210;
+  font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:6px 14px;border-radius:20px;z-index:3;
+  box-shadow:0 6px 16px rgba(0,0,0,.35);
 }
-.badge.op{left:auto;right:14px;background:rgba(0,0,0,.55);color:var(--gold-light);border:1px solid var(--border);}
+.badge.op{
+  left:auto;right:14px;
+  background:rgba(8,8,8,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  color:#E6C687;border:1px solid rgba(212,175,55,.4);
+}
 .property-body{padding:22px;}
 .property-body h3{font-size:1.25rem;font-weight:600;margin-bottom:4px;}
 .property-body .loc{font-size:.78rem;color:var(--gold-light);margin-bottom:14px;letter-spacing:.5px;}
-.property-meta{display:flex;gap:16px;font-size:.78rem;color:var(--text-muted);margin-bottom:16px;flex-wrap:wrap;}
-.property-price{font-size:1.15rem;font-weight:600;color:var(--gold-light);font-family:'Cormorant Garamond',serif;}
+.property-meta{
+  display:flex;gap:14px;font-size:.78rem;color:var(--text-muted);
+  margin-bottom:16px;flex-wrap:wrap;
+  padding-top:12px;border-top:1px solid rgba(255,255,255,.07);
+}
+.property-price{
+  font-size:1.2rem;font-weight:700;color:#E6C687;font-family:'Cormorant Garamond',serif;
+  letter-spacing:.3px;
+}
+.property-card[data-op="alugar"] .property-price,
+[data-op="alugar"] .property-price{color:#38BDF8;}
 .hidden{display:none !important;}
 
 .center-btn{text-align:center;margin-top:50px;}
 
-/* Feature cards */
+/* Feature cards — glassmorphism sutil, elevação e brilho no hover */
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
 .feature-card{
-  background:var(--panel);border:1px solid var(--border);padding:44px 32px;border-radius:6px;text-align:center;
+  background:rgba(255,255,255,.03);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(212,175,55,.16);padding:44px 32px;border-radius:14px;text-align:center;
+  transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease, background .35s ease;
 }
-.feature-card.accent{background:linear-gradient(160deg,#2a2113,#1b1a17);border-color:var(--gold);}
-.feature-icon{width:56px;height:56px;margin:0 auto 22px;color:var(--gold);}
+.feature-card:hover{
+  transform:translateY(-8px);
+  border-color:rgba(212,175,55,.45);
+  background:rgba(255,255,255,.05);
+  box-shadow:0 24px 48px rgba(0,0,0,.4), 0 0 30px rgba(212,175,55,.08);
+}
+.feature-card.accent{background:linear-gradient(160deg, rgba(201,164,99,.14), rgba(255,255,255,.03));border-color:rgba(212,175,55,.3);}
+.feature-icon{
+  width:56px;height:56px;margin:0 auto 22px;color:#E6C687;
+  filter:drop-shadow(0 0 10px rgba(230,198,135,.3));
+  transition:filter .35s ease, transform .35s ease;
+}
+.feature-card:hover .feature-icon{filter:drop-shadow(0 0 18px rgba(230,198,135,.55));transform:translateY(-3px) scale(1.06);}
 .feature-card h3{font-size:1.4rem;margin-bottom:12px;font-weight:600;}
 .feature-card p{color:var(--text-muted);font-size:.9rem;}
 
-/* Carousels (similares — scroll horizontal simples) */
+/* Carousels — setas de navegação flutuantes, sobrepostas nas laterais do carrossel
+   (usado nos 3 carrosséis coverflow: Conheça Nossos Imóveis, Imóveis em Destaque
+   e Imóveis Similares). */
 .destaques-wrap{position:relative;}
 .carousel-track{display:flex;gap:28px;overflow-x:auto;scroll-behavior:smooth;padding-bottom:8px;scrollbar-width:none;}
 .carousel-track::-webkit-scrollbar{display:none;}
 .carousel-track .property-card{min-width:340px;}
-.carousel-nav{display:flex;justify-content:center;gap:14px;margin-top:30px;}
-.car-btn{
-  width:42px;height:42px;border-radius:50%;border:1px solid var(--gold);background:transparent;color:var(--gold-light);
-  cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:.2s;
+.carousel-nav{
+  position:absolute;top:50%;left:0;right:0;
+  transform:translateY(-50%);
+  display:flex;justify-content:space-between;
+  padding:0 6px;
+  pointer-events:none;
+  z-index:10;
 }
-.car-btn:hover{background:var(--gold);color:#141210;}
+.car-btn{
+  pointer-events:auto;
+  width:48px;height:48px;border-radius:50%;
+  border:1px solid rgba(212,175,55,.4);
+  background:rgba(10,9,8,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:#E6C687;cursor:pointer;font-size:1.15rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .25s ease, background .25s ease, color .25s ease, box-shadow .25s ease;
+  box-shadow:0 10px 26px rgba(0,0,0,.4);
+}
+.car-btn:hover{background:#E6C687;color:#141210;border-color:#E6C687;transform:scale(1.08);}
 
 /* Carrossel "Imóveis em Destaque" da home — mesmo efeito de pilha/profundidade
    (Swiper coverflow) usado na galeria da página do imóvel. */
@@ -266,6 +314,19 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 }
 .imoveis-swiper .swiper-slide-active{opacity:1;filter:none;}
 .imoveis-swiper .property-card{height:100%;}
+
+/* Carrossel "Imóveis Similares" da página de detalhe do imóvel — mesmo
+   tratamento 3D/coverflow das demais vitrines do site. */
+.similares-swiper{width:100%;padding:20px 0 50px;}
+.similares-swiper .swiper-slide{
+  width:min(78vw, 360px);
+  max-width:360px;
+  opacity:.4;
+  filter:blur(1px) saturate(.75);
+  transition:opacity .4s ease, filter .4s ease;
+}
+.similares-swiper .swiper-slide-active{opacity:1;filter:none;}
+.similares-swiper .property-card{height:100%;}
 
 /* Sofisticação band */
 .quote-band{
@@ -430,25 +491,33 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .contact-card .btn-gold{margin-bottom:12px;}
 
-/* Footer */
-footer{background:#050505;border-top:1px solid var(--border);padding:80px 0 30px;}
-.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1.3fr;gap:40px;margin-bottom:60px;}
-.footer-grid h4{font-size:.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-bottom:20px;}
-.footer-grid ul li{margin-bottom:12px;}
-.footer-grid ul a{color:var(--text-muted);font-size:.88rem;transition:color .2s;}
+/* Footer — mais enxuto, colunas alinhadas, com ícones de redes sociais */
+footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px;}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.3fr;gap:36px;margin-bottom:36px;}
+.footer-grid h4{font-size:.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-bottom:18px;}
+.footer-grid ul li{margin-bottom:11px;}
+.footer-grid ul a{color:var(--text-muted);font-size:.86rem;transition:color .2s;}
 .footer-grid ul a:hover{color:var(--gold-light);}
-.footer-about .logo{margin-bottom:16px;}
+.footer-about .logo{margin-bottom:14px;}
 .footer-logo-slot{
-  height:64px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;width:100%;
+  height:56px;margin-bottom:16px;display:flex;align-items:center;justify-content:center;width:100%;
 }
 .footer-logo-slot img{max-height:100%;width:auto;}
-.footer-about p{color:var(--text-muted);font-size:.88rem;max-width:280px;margin-bottom:20px;}
+.footer-about p{color:var(--text-muted);font-size:.86rem;max-width:280px;margin-bottom:18px;}
 .newsletter{display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden;max-width:280px;}
-.newsletter input{flex:1;background:transparent;border:none;padding:12px 14px;color:var(--text);font-size:.82rem;}
+.newsletter input{flex:1;background:transparent;border:none;padding:11px 14px;color:var(--text);font-size:.82rem;}
 .newsletter input:focus{outline:none;}
 .newsletter button{background:var(--gold);border:none;color:#141210;padding:0 18px;cursor:pointer;font-weight:700;}
+.footer-social{display:flex;gap:10px;margin-top:16px;}
+.footer-social a{
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid rgba(212,175,55,.3);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold-light);transition:.25s;
+}
+.footer-social a:hover{background:var(--gold);color:#141210;border-color:var(--gold);transform:translateY(-3px);}
 .footer-bottom{
-  border-top:1px solid var(--border);padding-top:26px;
+  border-top:1px solid var(--border);padding-top:22px;
   display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
   font-size:.78rem;color:var(--text-muted);
 }
@@ -478,6 +547,10 @@ footer{background:#050505;border-top:1px solid var(--border);padding:80px 0 30px
   /* Cabeçalho mobile: hambúrguer à esquerda, logo em imagem centralizada e maior */
   .topbar{display:none;}
   .logo-img{height:50px;}
+
+  /* Setas dos carrosséis um pouco menores e mais próximas da borda no mobile */
+  .car-btn{width:38px;height:38px;font-size:1rem;}
+  .carousel-nav{padding:0 2px;}
 
   /* Hero mobile: 1ª dobra = capa imersiva (imagem + logo/menu + mensagem de
      marca, ocupando toda a tela); 2ª dobra = filtro de busca, em bloco à

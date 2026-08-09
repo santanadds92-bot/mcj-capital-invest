@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 </head>
 <body>
@@ -166,40 +167,48 @@
       <h2 class="section-title">Imóveis Similares</h2>
 
       <div class="destaques-wrap">
-        <div class="carousel-track" id="similarTrack">
-          <article class="property-card example-card">
-            <div class="property-photo"><span class="badge">Comprar</span>
-              <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+        <div class="swiper similares-swiper">
+          <div class="swiper-wrapper" id="similarTrack">
+            <div class="swiper-slide example-card">
+              <article class="property-card" data-op="comprar">
+                <div class="property-photo"><span class="badge">Comprar</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Apartamento à Venda Bairro Fundinho</h3>
+                  <p class="loc">Bairro Fundinho · 80m²</p>
+                  <div class="property-meta"><span>&#128716; 1 Quarto</span><span>&#128703; 1 Banheiro</span></div>
+                  <div class="property-price">R$ 130.000,00</div>
+                </div>
+              </article>
             </div>
-            <div class="property-body">
-              <h3>Apartamento à Venda Bairro Fundinho</h3>
-              <p class="loc">Bairro Fundinho · 80m²</p>
-              <div class="property-meta"><span>&#128716; 1 Quarto</span><span>&#128703; 1 Banheiro</span></div>
-              <div class="property-price">R$ 130.000,00</div>
+            <div class="swiper-slide example-card">
+              <article class="property-card" data-op="alugar">
+                <div class="property-photo"><span class="badge op">Destaque</span><span class="badge">Alugar</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Apartamento para Alugar Centro</h3>
+                  <p class="loc">Bairro Centro · 80m²</p>
+                  <div class="property-meta"><span>&#128716; 1 Quarto</span><span>&#128703; 1 Banheiro</span></div>
+                  <div class="property-price">R$ 650,00</div>
+                </div>
+              </article>
             </div>
-          </article>
-          <article class="property-card example-card">
-            <div class="property-photo"><span class="badge op">Destaque</span><span class="badge">Alugar</span>
-              <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+            <div class="swiper-slide example-card">
+              <article class="property-card" data-op="alugar">
+                <div class="property-photo"><span class="badge">Alugar</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Casa em Condomínio Bairro Fundinho</h3>
+                  <p class="loc">Bairro Fundinho · 180m²</p>
+                  <div class="property-meta"><span>&#128716; 3 Quartos</span><span>&#128703; 4 Banheiros</span></div>
+                  <div class="property-price">R$ 4.000,00</div>
+                </div>
+              </article>
             </div>
-            <div class="property-body">
-              <h3>Apartamento para Alugar Centro</h3>
-              <p class="loc">Bairro Centro · 80m²</p>
-              <div class="property-meta"><span>&#128716; 1 Quarto</span><span>&#128703; 1 Banheiro</span></div>
-              <div class="property-price">R$ 650,00</div>
-            </div>
-          </article>
-          <article class="property-card example-card">
-            <div class="property-photo"><span class="badge">Alugar</span>
-              <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
-            </div>
-            <div class="property-body">
-              <h3>Casa em Condomínio Bairro Fundinho</h3>
-              <p class="loc">Bairro Fundinho · 180m²</p>
-              <div class="property-meta"><span>&#128716; 3 Quartos</span><span>&#128703; 4 Banheiros</span></div>
-              <div class="property-price">R$ 4.000,00</div>
-            </div>
-          </article>
+          </div>
         </div>
         <div class="carousel-nav">
           <button class="car-btn" id="simPrev">&#8592;</button>
@@ -251,6 +260,12 @@
             <li><strong>Horário de Atendimento:</strong> Segunda a Sexta-feira, das 09h às 18h (BRT)</li>
             <li><strong>Endereço:</strong> Av. Paulista, 1159 · Conj. 1005<br>Bela Vista · São Paulo - SP · CEP 01311-200</li>
           </ul>
+          <div class="footer-social">
+            <a href="https://wa.me/5511999990542" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12.02 2C6.5 2 2 6.48 2 12c0 1.77.46 3.45 1.28 4.9L2 22l5.25-1.38A9.96 9.96 0 0 0 12.02 22C17.52 22 22 17.52 22 12S17.52 2 12.02 2zm0 18.2c-1.6 0-3.13-.43-4.46-1.24l-.32-.19-3.13.82.84-3.05-.2-.31A8.17 8.17 0 0 1 3.8 12c0-4.54 3.7-8.2 8.22-8.2 4.53 0 8.2 3.66 8.2 8.2 0 4.53-3.68 8.2-8.2 8.2z"/></svg></a>
+            <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg></a>
+            <a href="mailto:marciocjorge@terra.com.br" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></a>
+            <a href="https://maps.google.com/?q=Av.+Paulista,+1159,+S%C3%A3o+Paulo" target="_blank" rel="noopener" aria-label="Localização"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></a>
+          </div>
         </div>
       </div>
       <div class="footer-bottom">
@@ -265,12 +280,29 @@
   </a>
 
 <script src="assets/site.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-  // Similar properties carousel (funciona tanto para os cards de exemplo quanto para os reais)
-  const simTrack = document.getElementById('similarTrack');
-  const simCardWidth = 368;
-  document.getElementById('simNext').addEventListener('click', () => simTrack.scrollBy({left: simCardWidth, behavior: 'smooth'}));
-  document.getElementById('simPrev').addEventListener('click', () => simTrack.scrollBy({left: -simCardWidth, behavior: 'smooth'}));
+  // Carrossel "Imóveis Similares" — mesmo efeito 3D/coverflow das outras
+  // vitrines do site, com 1 card em destaque no centro, prévia recuada dos
+  // vizinhos, autoplay contínuo (pausado ao passar o mouse) e navegação.
+  let similaresSwiper;
+  function initSimilaresSwiper() {
+    if (similaresSwiper) similaresSwiper.destroy(true, true);
+    const slideCount = document.querySelectorAll('#similarTrack .swiper-slide').length;
+    similaresSwiper = new Swiper('.similares-swiper', {
+      effect: 'coverflow',
+      grabCursor: true,
+      centeredSlides: true,
+      loop: slideCount > 2,
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
+      autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
+      navigation: { nextEl: '#simNext', prevEl: '#simPrev' },
+    });
+  }
+  window.initSimilaresSwiper = initSimilaresSwiper;
+  initSimilaresSwiper();
 </script>
 <script type="module">
   import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML, descricaoToHTML, sanitizeDescricao, placeholderPhoto } from './assets/supabase-client.js';
@@ -377,8 +409,8 @@
     const similares = (await fetchImoveis({ finalidade: imovel.finalidade, limit: 6 })).filter(i => i.codigo !== imovel.codigo).slice(0, 3);
     if (similares.length > 0) {
       const track = document.getElementById('similarTrack');
-      track.querySelectorAll('.example-card').forEach(el => el.remove());
-      track.insertAdjacentHTML('beforeend', similares.map(propertyCardHTML).join(''));
+      track.innerHTML = similares.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join('');
+      window.initSimilaresSwiper();
     }
   }
 
