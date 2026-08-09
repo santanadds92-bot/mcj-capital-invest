@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/admin.css">
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body class="admin-body">
 
@@ -66,6 +67,7 @@
       <div class="admin-tabs">
         <button class="admin-tab-btn active" id="tabList">Todos os Imóveis</button>
         <button class="admin-tab-btn" id="tabNew">+ Novo Imóvel</button>
+        <button class="admin-tab-btn" id="tabImport">Importar da Shopify (CSV)</button>
       </div>
 
       <!-- Lista -->
@@ -230,11 +232,46 @@
           </div>
         </form>
       </section>
+
+      <!-- Importação em massa via CSV exportado da Shopify -->
+      <section class="admin-panel" id="panelImport">
+        <div class="import-box">
+          <h3 class="serif" style="margin-bottom:10px;">Importar Imóveis da Shopify (CSV)</h3>
+          <p class="import-hint">
+            Exporte o catálogo de produtos da Shopify em CSV (Produtos → Exportar) e envie o arquivo aqui.
+            O sistema lê as colunas <strong>Title</strong>, <strong>Body (HTML)</strong>, <strong>Variant Price</strong> e
+            <strong>Image Src</strong> automaticamente, agrupando todas as fotos de cada produto. Quartos, suítes,
+            banheiros, vagas e área são detectados quando aparecem no título/descrição — revise antes de publicar.
+          </p>
+
+          <div class="upload-zone" id="csvUploadZone">
+            Clique aqui ou arraste o arquivo .csv da Shopify<br>
+            <span style="font-size:.75rem;opacity:.7;">Exportação padrão de produtos da Shopify (.csv)</span>
+          </div>
+          <input type="file" id="csvFileInput" accept=".csv,text/csv" hidden>
+
+          <div class="import-status" id="importStatus" style="display:none;"></div>
+
+          <div class="import-preview" id="importPreview" style="display:none;">
+            <div class="import-preview-header">
+              <span id="importCount"></span>
+              <label class="checkbox-row">
+                <input type="checkbox" id="importActivateCheck"> Publicar imediatamente (marcar como "Ativo")
+              </label>
+            </div>
+            <div class="import-preview-list" id="importPreviewList"></div>
+            <div class="form-actions">
+              <button type="button" class="btn-ghost" id="importCancelBtn">Cancelar</button>
+              <button type="button" class="btn-gold" id="importConfirmBtn" style="width:auto;">Importar Imóveis</button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 
   <div class="toast" id="toast"></div>
 
-  <script type="module" src="assets/admin.js?v=20260808b"></script>
+  <script type="module" src="assets/admin.js?v=20260808c"></script>
 </body>
 </html>

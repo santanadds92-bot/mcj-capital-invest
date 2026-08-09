@@ -10,8 +10,10 @@ const userEmailEl = document.getElementById('userEmail');
 
 const tabList = document.getElementById('tabList');
 const tabNew = document.getElementById('tabNew');
+const tabImport = document.getElementById('tabImport');
 const panelList = document.getElementById('panelList');
 const panelForm = document.getElementById('panelForm');
+const panelImport = document.getElementById('panelImport');
 const imoveisTableBody = document.getElementById('imoveisTableBody');
 const emptyState = document.getElementById('emptyState');
 
@@ -196,6 +198,219 @@ function applyAIResult(d) {
 generateAIBtn.addEventListener('click', generateWithAI);
 refreshApiKeyStatus();
 
+// ---------- Importação em massa via CSV da Shopify ----------
+const csvUploadZone = document.getElementById('csvUploadZone');
+const csvFileInput = document.getElementById('csvFileInput');
+const importStatus = document.getElementById('importStatus');
+const importPreview = document.getElementById('importPreview');
+const importCount = document.getElementById('importCount');
+const importActivateCheck = document.getElementById('importActivateCheck');
+const importPreviewList = document.getElementById('importPreviewList');
+const importCancelBtn = document.getElementById('importCancelBtn');
+const importConfirmBtn = document.getElementById('importConfirmBtn');
+
+let pendingImportItems = []; // imóveis extraídos do CSV, aguardando confirmação
+
+csvUploadZone.addEventListener('click', () => csvFileInput.click());
+csvUploadZone.addEventListener('dragover', (e) => { e.preventDefault(); csvUploadZone.style.borderColor = 'var(--gold)'; });
+csvUploadZone.addEventListener('dragleave', () => { csvUploadZone.style.borderColor = ''; });
+csvUploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  csvUploadZone.style.borderColor = '';
+  if (e.dataTransfer.files?.[0]) handleCsvFile(e.dataTransfer.files[0]);
+});
+csvFileInput.addEventListener('change', () => {
+  if (csvFileInput.files?.[0]) handleCsvFile(csvFileInput.files[0]);
+});
+
+function setImportStatus(msg, isError = false) {
+  importStatus.style.display = msg ? 'block' : 'none';
+  importStatus.textContent = msg;
+  importStatus.classList.toggle('error', isError);
+}
+
+function handleCsvFile(file) {
+  if (typeof Papa === 'undefined') {
+    showToast('Biblioteca de leitura de CSV não carregou. Recarregue a página e tente novamente.', true);
+    return;
+  }
+  setImportStatus('Lendo e processando o arquivo CSV...');
+  importPreview.style.display = 'none';
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: (results) => {
+      try {
+        pendingImportItems = buildImoveisFromShopifyRows(results.data);
+      } catch (err) {
+        setImportStatus('Erro ao processar o CSV: ' + err.message, true);
+        return;
+      }
+      if (pendingImportItems.length === 0) {
+        setImportStatus('Nenhum produto encontrado no CSV. Verifique se é a exportação padrão de produtos da Shopify.', true);
+        return;
+      }
+      setImportStatus('');
+      renderImportPreview();
+    },
+    error: (err) => {
+      setImportStatus('Erro ao ler o arquivo: ' + err.message, true);
+    },
+  });
+}
+
+// ---------- Mapeia as linhas do CSV da Shopify (agrupadas por "Handle") para o schema de imóveis ----------
+function buildImoveisFromShopifyRows(rows) {
+  const groups = new Map(); // Handle -> dados acumulados do produto
+
+  for (const row of rows) {
+    const handle = (row['Handle'] || '').trim();
+    if (!handle) continue;
+
+    if (!groups.has(handle)) {
+      groups.set(handle, { handle, titulo: '', bodyHtml: '', preco: '', sku: '', fotos: [] });
+    }
+    const g = groups.get(handle);
+
+    if (row['Title']?.trim()) g.titulo = row['Title'].trim();
+    if (row['Body (HTML)']?.trim()) g.bodyHtml = row['Body (HTML)'].trim();
+    if (row['Variant Price']?.trim()) g.preco = row['Variant Price'].trim();
+    if (row['Variant SKU']?.trim() && !g.sku) g.sku = row['Variant SKU'].trim();
+    const imgSrc = row['Image Src']?.trim();
+    if (imgSrc && !g.fotos.includes(imgSrc)) g.fotos.push(imgSrc);
+  }
+
+  const items = [];
+  let n = 1;
+  for (const g of groups.values()) {
+    if (!g.titulo) continue; // linha sem produto de verdade (ex: só imagem órfã)
+
+    const plainText = `${g.titulo} ${g.bodyHtml.replace(/<[^>]*>/g, ' ')}`;
+    const codigo = slugToCodigo(g.sku || g.handle || `IMP-${n}`);
+
+    items.push({
+      codigo,
+      titulo: g.titulo,
+      descricao: sanitizeDescricao(g.bodyHtml || ''),
+      finalidade: /alugu[ei]l|alugar|loca[çc][ãa]o/i.test(plainText) ? 'alugar' : 'comprar',
+      tipo: detectTipo(plainText),
+      bairro: detectBairro(g.titulo),
+      cidade: '',
+      endereco: '',
+      quartos: extractNumber(plainText, /(\d+)\s*(?:quartos?|dormit[oó]rios?|dorms?)/i),
+      banheiros: extractNumber(plainText, /(\d+)\s*banheiros?/i),
+      suites: extractNumber(plainText, /(\d+)\s*su[ií]tes?/i),
+      vagas: extractNumber(plainText, /(\d+)\s*vagas?/i),
+      area: extractNumber(plainText, /(\d+(?:[.,]\d+)?)\s*m(?:²|2)\b/i, true),
+      valor: g.preco ? Number(g.preco.replace(',', '.')) || null : null,
+      valor_condominio: null,
+      iptu: null,
+      video_url: '',
+      fotos: g.fotos,
+      destaque: false,
+      _excluded: false,
+    });
+    n++;
+  }
+  return items;
+}
+
+function slugToCodigo(str) {
+  return str.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || `IMP-${Date.now()}`;
+}
+
+function detectTipo(text) {
+  if (/cobertura/i.test(text)) return 'Cobertura';
+  if (/\bcasa\b|sobrado/i.test(text)) return 'Casa';
+  if (/terreno|lote\b/i.test(text)) return 'Terreno';
+  if (/comercial|sala comercial|loja\b|galp[aã]o/i.test(text)) return 'Comercial';
+  return 'Apartamento';
+}
+
+function detectBairro(title) {
+  const m = title.match(/\b(?:em|no|na)\s+([A-ZÀ-Ú][\wÀ-ú]+(?:\s[A-ZÀ-Ú][\wÀ-ú]+){0,2})/);
+  return m ? m[1].trim() : '';
+}
+
+function extractNumber(text, regex, isFloat = false) {
+  const m = text.match(regex);
+  if (!m) return isFloat ? null : 0;
+  const raw = m[1].replace(',', '.');
+  const num = isFloat ? parseFloat(raw) : parseInt(raw, 10);
+  return Number.isNaN(num) ? (isFloat ? null : 0) : num;
+}
+
+function renderImportPreview() {
+  const visibleItems = pendingImportItems.filter(i => !i._excluded);
+  importCount.textContent = `${visibleItems.length} imóvel(is) pronto(s) para importar`;
+
+  importPreviewList.innerHTML = pendingImportItems.map((item, idx) => `
+    <div class="import-item ${item._excluded ? 'excluded' : ''}" data-idx="${idx}">
+      <div class="import-item-photo">
+        ${item.fotos[0] ? `<img src="${item.fotos[0]}" alt="">` : '<span>Sem foto</span>'}
+      </div>
+      <div class="import-item-body">
+        <strong>${item.titulo}</strong>
+        <span>${item.codigo} · ${item.tipo} · ${item.fotos.length} foto(s)${item.bairro ? ' · ' + item.bairro : ''}</span>
+        <span>${formatBRL(item.valor)}</span>
+      </div>
+      <button type="button" class="btn-sm import-toggle" data-idx="${idx}">${item._excluded ? 'Incluir' : 'Remover'}</button>
+    </div>
+  `).join('');
+
+  importPreviewList.querySelectorAll('.import-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = Number(btn.dataset.idx);
+      pendingImportItems[idx]._excluded = !pendingImportItems[idx]._excluded;
+      renderImportPreview();
+    });
+  });
+
+  importPreview.style.display = 'block';
+}
+
+importCancelBtn.addEventListener('click', () => {
+  pendingImportItems = [];
+  importPreview.style.display = 'none';
+  csvFileInput.value = '';
+  setImportStatus('');
+});
+
+importConfirmBtn.addEventListener('click', async () => {
+  const rows = pendingImportItems
+    .filter(i => !i._excluded)
+    .map(({ _excluded, ...item }) => ({
+      ...item,
+      status: importActivateCheck.checked ? 'ativo' : 'inativo',
+    }));
+
+  if (rows.length === 0) {
+    showToast('Nenhum imóvel selecionado para importar.', true);
+    return;
+  }
+
+  importConfirmBtn.disabled = true;
+  const originalLabel = importConfirmBtn.textContent;
+  importConfirmBtn.textContent = 'Importando...';
+
+  const { error } = await supabase.from('imoveis').upsert(rows, { onConflict: 'codigo' });
+
+  importConfirmBtn.disabled = false;
+  importConfirmBtn.textContent = originalLabel;
+
+  if (error) {
+    showToast('Erro ao importar: ' + error.message, true);
+    return;
+  }
+
+  showToast(`${rows.length} imóvel(is) importado(s) com sucesso!`);
+  pendingImportItems = [];
+  importPreview.style.display = 'none';
+  csvFileInput.value = '';
+  switchTab('list');
+});
+
 // ---------- Auth ----------
 async function checkSession() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -242,13 +457,16 @@ logoutBtn.addEventListener('click', async () => {
 // ---------- Tabs ----------
 tabList.addEventListener('click', () => switchTab('list'));
 tabNew.addEventListener('click', () => switchTab('form'));
+tabImport.addEventListener('click', () => switchTab('import'));
 cancelEditBtn.addEventListener('click', () => switchTab('list'));
 
 function switchTab(tab) {
   tabList.classList.toggle('active', tab === 'list');
   tabNew.classList.toggle('active', tab === 'form');
+  tabImport.classList.toggle('active', tab === 'import');
   panelList.classList.toggle('active', tab === 'list');
   panelForm.classList.toggle('active', tab === 'form');
+  panelImport.classList.toggle('active', tab === 'import');
   if (tab === 'form' && !editingId) {
     resetForm();
   }
