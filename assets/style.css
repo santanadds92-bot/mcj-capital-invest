@@ -253,6 +253,20 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .destaques-swiper .swiper-slide-active{opacity:1;filter:none;}
 .destaques-swiper .property-card{height:100%;}
 
+/* Carrossel "Conheça Nossos Imóveis" — mesmo tratamento 3D/coverflow: 1 card em
+   destaque no centro, prévia recuada/translúcida dos vizinhos, autoplay contínuo
+   com pausa ao passar o mouse (configurado via Swiper no JS). */
+.imoveis-swiper{width:100%;padding:20px 0 50px;}
+.imoveis-swiper .swiper-slide{
+  width:min(78vw, 360px);
+  max-width:360px;
+  opacity:.4;
+  filter:blur(1px) saturate(.75);
+  transition:opacity .4s ease, filter .4s ease;
+}
+.imoveis-swiper .swiper-slide-active{opacity:1;filter:none;}
+.imoveis-swiper .property-card{height:100%;}
+
 /* Sofisticação band */
 .quote-band{
   padding:120px 0;text-align:center;

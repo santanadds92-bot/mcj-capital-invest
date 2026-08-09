@@ -67,6 +67,23 @@
         alinhar os detalhes com você.
       </p>
 
+      <div class="ai-key-box">
+        <label for="geminiApiKey">Chave da API do Google Gemini (opcional, para o Preenchimento Automático por IA)</label>
+        <div class="ai-key-row">
+          <input type="password" id="geminiApiKey" placeholder="Cole sua chave aqui (ex: AIza...)">
+          <button type="button" class="btn-sm" id="saveApiKeyBtn">Salvar</button>
+          <span class="ai-key-status" id="apiKeyStatus"></span>
+        </div>
+        <p class="ai-key-hint">Sua chave fica salva somente neste navegador, nunca é enviada para a MCJ. Gere uma gratuita em <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>.</p>
+      </div>
+
+      <div class="ai-autofill-box">
+        <label for="rawPropertyData">Colar Informações Brutas do Imóvel</label>
+        <textarea id="rawPropertyData" rows="4" placeholder='ex: "Vendo apto 180m no Jardins, 3 suítes, 2 vagas, R$ 2.500.000, cond 1800"'></textarea>
+        <button type="button" class="btn-gold" id="generateAIBtn" style="width:auto;">✨ Preencher Automaticamente com IA</button>
+        <p class="ai-hint">Cole um texto com as informações do imóvel e a IA preenche os campos abaixo para você. Revise tudo antes de enviar.</p>
+      </div>
+
       <form class="admin-form" id="anuncioForm">
         <div class="form-grid">
           <div class="span-3" style="padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:6px;">
@@ -239,6 +256,86 @@
 <script src="assets/site.js"></script>
 <script type="module">
   import { uploadFotos, submitImovelParaAprovacao } from './assets/supabase-client.js';
+  import { getGeminiKey, setGeminiKey, generateImovelFromText } from './assets/gemini-ai.js';
+
+  // ---------- IA: Preenchimento automático (Google Gemini) ----------
+  const geminiApiKeyInput = document.getElementById('geminiApiKey');
+  const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+  const apiKeyStatus = document.getElementById('apiKeyStatus');
+  const rawPropertyData = document.getElementById('rawPropertyData');
+  const generateAIBtn = document.getElementById('generateAIBtn');
+  const anuncioFormEl = document.getElementById('anuncioForm');
+
+  function refreshApiKeyStatus() {
+    const key = getGeminiKey();
+    geminiApiKeyInput.value = key;
+    apiKeyStatus.textContent = key ? 'Chave salva ✓' : '';
+  }
+  refreshApiKeyStatus();
+
+  saveApiKeyBtn.addEventListener('click', () => {
+    const key = geminiApiKeyInput.value.trim();
+    if (!key) {
+      alert('Cole uma chave válida antes de salvar.');
+      return;
+    }
+    setGeminiKey(key);
+    refreshApiKeyStatus();
+  });
+
+  // Converte a descrição em HTML rico gerada pela IA em texto simples, já que
+  // este formulário público usa um campo de texto comum (sem editor rico).
+  function htmlToPlainText(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    div.querySelectorAll('h3, p, li, hr').forEach(el => el.insertAdjacentText('afterend', '\n'));
+    return (div.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+  }
+
+  function applyAIResultToAnuncioForm(d) {
+    if (d.titulo) anuncioFormEl.titulo.value = d.titulo;
+    if (d.finalidade === 'comprar' || d.finalidade === 'alugar') anuncioFormEl.finalidade.value = d.finalidade;
+    if (d.tipo) anuncioFormEl.tipo.value = d.tipo;
+    if (d.bairro) anuncioFormEl.bairro.value = d.bairro;
+    if (d.cidade) anuncioFormEl.cidade.value = d.cidade;
+    if (d.endereco) anuncioFormEl.endereco.value = d.endereco;
+    if (d.quartos !== undefined && d.quartos !== null) anuncioFormEl.quartos.value = d.quartos;
+    if (d.banheiros !== undefined && d.banheiros !== null) anuncioFormEl.banheiros.value = d.banheiros;
+    if (d.suites !== undefined && d.suites !== null) anuncioFormEl.suites.value = d.suites;
+    if (d.vagas !== undefined && d.vagas !== null) anuncioFormEl.vagas.value = d.vagas;
+    if (d.area) anuncioFormEl.area.value = d.area;
+    if (d.valor) anuncioFormEl.valor.value = d.valor;
+    if (d.valor_condominio) anuncioFormEl.valor_condominio.value = d.valor_condominio;
+    if (d.iptu) anuncioFormEl.iptu.value = d.iptu;
+    if (d.descricao) anuncioFormEl.descricao.value = htmlToPlainText(d.descricao);
+  }
+
+  generateAIBtn.addEventListener('click', async () => {
+    const apiKey = getGeminiKey();
+    if (!apiKey) {
+      alert('Cole e salve sua chave da API Gemini primeiro (campo acima).');
+      return;
+    }
+    const raw = rawPropertyData.value.trim();
+    if (!raw) {
+      alert('Cole as informações do imóvel no campo acima.');
+      return;
+    }
+
+    generateAIBtn.disabled = true;
+    const originalLabel = generateAIBtn.textContent;
+    generateAIBtn.textContent = 'Gerando com IA...';
+
+    try {
+      const parsed = await generateImovelFromText(apiKey, raw);
+      applyAIResultToAnuncioForm(parsed);
+    } catch (err) {
+      alert('Erro ao gerar com IA: ' + err.message);
+    } finally {
+      generateAIBtn.disabled = false;
+      generateAIBtn.textContent = originalLabel;
+    }
+  });
 
   const uploadZone = document.getElementById('uploadZone');
   const fileInput = document.getElementById('fileInput');
