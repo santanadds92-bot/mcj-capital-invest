@@ -102,13 +102,13 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
    com uma animação de desfoque (blur) que foca suavemente ao carregar a
    página, como uma assinatura editorial de alta costura. */
 .mcj-wordmark{
+  position:absolute;top:40px;left:0;right:0;
   width:100%;text-align:center;
   font-family:'Bodoni Moda', serif;
   font-weight:400;font-style:normal;
   font-size:clamp(3.2rem, 10vw, 8.5rem);
   letter-spacing:-2px;line-height:.95;
   color:#fff;
-  margin-bottom:26px;
   text-shadow:0 4px 30px rgba(0,0,0,.5);
   white-space:nowrap;
   filter:blur(16px);opacity:0;
@@ -568,7 +568,7 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
   /* Cabeçalho mobile: hambúrguer à esquerda, logo em imagem centralizada e maior */
   .topbar{display:none;}
   .logo-img{height:50px;}
-  .mcj-wordmark{font-size:clamp(2rem,10vw,3rem);letter-spacing:-1px;margin-bottom:16px;}
+  .mcj-wordmark{font-size:clamp(2rem,10vw,3rem);letter-spacing:-1px;top:20px;}
 
   /* Setas dos carrosséis um pouco menores e mais próximas da borda no mobile */
   .car-btn{width:38px;height:38px;font-size:1rem;}
