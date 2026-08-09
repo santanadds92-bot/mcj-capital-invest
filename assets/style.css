@@ -568,7 +568,7 @@ footer{background:#050505;border-top:1px solid var(--border);padding:56px 0 24px
   /* Cabeçalho mobile: hambúrguer à esquerda, logo em imagem centralizada e maior */
   .topbar{display:none;}
   .logo-img{height:50px;}
-  .mcj-wordmark{font-size:clamp(2rem,10vw,3rem);letter-spacing:-1px;top:20px;}
+  .mcj-wordmark{font-size:clamp(2.5rem,12vw,3.6rem);letter-spacing:-1px;top:90px;}
 
   /* Setas dos carrosséis um pouco menores e mais próximas da borda no mobile */
   .car-btn{width:38px;height:38px;font-size:1rem;}
