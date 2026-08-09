@@ -16,6 +16,7 @@
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 </head>
 <body>
+<script>(function(){try{if(localStorage.getItem('mcj_theme')==='light')document.body.classList.add('light-mode');}catch(e){}})();</script>
 
   <div class="topbar">
     <div class="container">
@@ -25,6 +26,9 @@
       </div>
       <div class="right">
         <a href="anunciar.html">Anuncie Seu Imóvel</a>
+        <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema" title="Alternar tema">
+          <span class="theme-icon">☀️</span>
+        </button>
       </div>
     </div>
   </div>
@@ -284,6 +288,7 @@
   </a>
 
 <script src="assets/site.js"></script>
+<script type="module" src="assets/theme.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
   // Carrossel "Imóveis Similares" — mesmo efeito 3D/coverflow das outras

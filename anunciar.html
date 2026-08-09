@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="assets/admin.css">
 </head>
 <body>
+<script>(function(){try{if(localStorage.getItem('mcj_theme')==='light')document.body.classList.add('light-mode');}catch(e){}})();</script>
 
   <div class="topbar">
     <div class="container">
@@ -24,6 +25,9 @@
       </div>
       <div class="right">
         <a href="anunciar.html">Anuncie Seu Imóvel</a>
+        <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema" title="Alternar tema">
+          <span class="theme-icon">☀️</span>
+        </button>
       </div>
     </div>
   </div>
@@ -250,6 +254,7 @@
   </a>
 
 <script src="assets/site.js"></script>
+<script type="module" src="assets/theme.js"></script>
 <script type="module">
   import { uploadFotos, submitImovelParaAprovacao } from './assets/supabase-client.js';
   import { getGeminiKey, setGeminiKey, generateImovelFromText } from './assets/gemini-ai.js';
