@@ -100,6 +100,51 @@ ${raw}
 """`;
 }
 
+// Lista de modelos a tentar, em ordem de preferência. "gemini-flash-latest" é um
+// alias oficial do Google que sempre aponta para o modelo Flash estável mais
+// recente — evita que o recurso quebre de novo quando um modelo específico
+// (ex: gemini-1.5-flash, gemini-2.5-flash) for desativado no futuro. Os nomes
+// fixos abaixo entram como reserva, caso o alias falhe por algum motivo.
+const GEMINI_MODEL_CANDIDATES = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-3.6-flash'];
+
+async function callGemini(apiKey, prompt) {
+  let lastError;
+  for (const model of GEMINI_MODEL_CANDIDATES) {
+    try {
+      const resp = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.4 },
+          }),
+        }
+      );
+      const data = await resp.json();
+      if (!resp.ok) {
+        lastError = new Error(data.error?.message || `Erro na API do Gemini (modelo ${model})`);
+        // Se o erro for "modelo não encontrado/indisponível", tenta o próximo da lista.
+        const msg = (data.error?.message || '').toLowerCase();
+        if (msg.includes('not found') || msg.includes('not supported') || msg.includes('no longer available') || msg.includes('deprecated')) {
+          continue;
+        }
+        throw lastError; // outros erros (ex: chave inválida) não valem a pena tentar de novo
+      }
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) {
+        lastError = new Error('A IA não retornou nenhum conteúdo.');
+        continue;
+      }
+      return text;
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError || new Error('Nenhum modelo do Gemini respondeu.');
+}
+
 async function generateWithAI() {
   const apiKey = getGeminiKey();
   if (!apiKey) {
@@ -117,23 +162,7 @@ async function generateWithAI() {
   generateAIBtn.textContent = 'Gerando com IA...';
 
   try {
-    const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: buildAIPrompt(raw) }] }],
-          generationConfig: { responseMimeType: 'application/json', temperature: 0.4 },
-        }),
-      }
-    );
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.error?.message || 'Erro na API do Gemini');
-
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('A IA não retornou nenhum conteúdo.');
-
+    const text = await callGemini(apiKey, buildAIPrompt(raw));
     const parsed = JSON.parse(text);
     applyAIResult(parsed);
     showToast('Campos preenchidos automaticamente! Revise antes de salvar.');
