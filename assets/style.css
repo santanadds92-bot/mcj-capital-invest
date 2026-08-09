@@ -101,7 +101,12 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .hero h1{font-size:3.4rem;font-weight:600;max-width:720px;color:var(--text);margin-bottom:16px;margin-left:auto;margin-right:auto;}
 .hero h1 em{font-style:italic;color:var(--gold);}
 .hero p.lead{max-width:520px;color:var(--text-muted);font-size:1.05rem;margin-bottom:40px;margin-left:auto;margin-right:auto;}
-.hero .search-panel{width:100%;}
+
+/* Bloco do filtro de busca — seção própria, puxada para cima no desktop para
+   sobrepor a base da imagem do hero (efeito harmonioso já ajustado), mas
+   sem carregar a imagem de fundo: o painel permanece opaco/translúcido. */
+.search-section{position:relative;margin-top:-110px;z-index:5;padding-bottom:70px;}
+.search-section .search-panel{width:100%;}
 
 /* Page header (property / inner pages) */
 .page-header{
@@ -452,21 +457,23 @@ footer{background:#050505;border-top:1px solid var(--border);padding:80px 0 30px
   .topbar{display:none;}
   .logo-img{height:50px;}
 
-  /* Hero mobile: 1ª dobra = imagem + mensagem de marca (centralizada,
-     preenchendo a tela toda); 2ª dobra = filtro de busca, revelado ao rolar. */
+  /* Hero mobile: 1ª dobra = capa imersiva (imagem + logo/menu + mensagem de
+     marca, ocupando toda a tela); 2ª dobra = filtro de busca, em bloco à
+     parte, revelado ao rolar — sem a imagem atrás. */
   .hero{
-    min-height:auto;
-    height:auto;
-    overflow:visible;
-    padding-top:8px;
-    align-items:stretch;
+    min-height:calc(100dvh - 72px); /* 72px ≈ altura do header sticky no mobile */
+    height:calc(100dvh - 72px);
+    overflow:hidden;
+    padding-top:0;
+    align-items:center;
   }
   .hero .container{
     padding-top:0;
-    padding-bottom:40px;
+    padding-bottom:0;
+    height:100%;
+    justify-content:center;
   }
   .hero-intro{
-    min-height:calc(100dvh - 88px); /* 88px = altura do header sticky */
     justify-content:center;
   }
   .hero h1, .hero p.lead{text-align:center;margin-left:auto;margin-right:auto;}
@@ -474,8 +481,20 @@ footer{background:#050505;border-top:1px solid var(--border);padding:80px 0 30px
   .hero h1{font-size:1.8rem;margin-bottom:14px;line-height:1.3;}
   .hero p.lead{font-size:.9rem;margin-bottom:0;line-height:1.6;}
 
-  /* Formulário de busca compacto: um campo por linha, ocupando 100% da largura */
-  .search-panel{padding:16px;}
+  /* Filtro de busca: bloco separado, com fundo sólido próprio (sem imagem
+     atrás), imediatamente abaixo da capa imersiva. */
+  .search-section{
+    margin-top:0;
+    padding:28px 0 40px;
+    background:#141210;
+    border-top:1px solid var(--border);
+  }
+  .search-panel{
+    padding:16px;
+    background:#141210;
+    backdrop-filter:none;
+    box-shadow:none;
+  }
   .search-grid{grid-template-columns:1fr !important;gap:10px;margin-bottom:12px;}
   .price-range{grid-column:span 1 !important;}
   .field label{font-size:.62rem;margin-bottom:4px;}
