@@ -53,13 +53,7 @@
     </nav>
   </div>
 
-  <section class="page-header">
-    <div class="container">
-      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="index.html#imoveis">Imóveis</a> / <span id="breadcrumbTitle">Apartamento à Venda Bairro Fundinho</span></div>
-    </div>
-  </section>
-
-  <section class="section tight">
+  <section class="section tight" style="padding-top:130px;">
     <div class="container">
 
       <!-- Galeria estável: foto principal + miniaturas + lightbox (sem bibliotecas pesadas) -->
@@ -337,7 +331,6 @@
     if (!imovel) return;
 
     document.title = `${imovel.titulo} | MCJ Capital Invest`;
-    document.getElementById('breadcrumbTitle').textContent = imovel.titulo;
     document.getElementById('detailCode').textContent = `Código do Imóvel: ${imovel.codigo}`;
     document.getElementById('detailPurpose').textContent = `Finalidade: ${imovel.finalidade === 'alugar' ? 'Alugar' : 'Comprar'}`;
     document.getElementById('detailTitle').textContent = imovel.titulo;

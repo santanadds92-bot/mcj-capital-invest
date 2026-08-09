@@ -133,6 +133,7 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
   margin-bottom:22px;
 }
 .field label{display:block;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-light);margin-bottom:8px;}
+.search-panel .field label{text-align:center;}
 .field select, .field input, .field textarea{
   width:100%;background:#0f0f0e;border:1px solid var(--border);color:var(--text);
   padding:11px 12px;border-radius:4px;font-family:'Poppins',sans-serif;font-size:.85rem;
@@ -486,14 +487,17 @@ footer{background:#050505;border-top:1px solid var(--border);padding:80px 0 30px
   .search-section{
     margin-top:0;
     padding:28px 0 40px;
-    background:#141210;
-    border-top:1px solid var(--border);
+    background-color:#000000;
+    background-image:none;
+    border-top:none;
   }
   .search-panel{
     padding:16px;
-    background:#141210;
+    background:#000000;
+    background-image:none;
     backdrop-filter:none;
     box-shadow:none;
+    border-color:#1a1a1a;
   }
   .search-grid{grid-template-columns:1fr !important;gap:10px;margin-bottom:12px;}
   .price-range{grid-column:span 1 !important;}
