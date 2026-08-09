@@ -493,11 +493,11 @@ footer{background:#050505;border-top:1px solid var(--border);padding:80px 0 30px
   }
   .search-panel{
     padding:16px;
-    background:#000000;
+    background:rgba(20,20,20,.85);
     background-image:none;
     backdrop-filter:none;
     box-shadow:none;
-    border-color:#1a1a1a;
+    border:1px solid var(--border);
   }
   .search-grid{grid-template-columns:1fr !important;gap:10px;margin-bottom:12px;}
   .price-range{grid-column:span 1 !important;}
