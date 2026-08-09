@@ -118,19 +118,35 @@ export function metaResumo(imovel) {
 }
 
 // ---------- Card HTML reutilizável (grade da home, destaques, similares) ----------
+// Quando o imóvel tem mais de uma foto, o card exibe um mini carrossel (Swiper coverflow)
+// que alterna as fotos automaticamente dentro do próprio card. Com 1 foto, mostra estática.
 export function propertyCardHTML(imovel) {
-  const capa = Array.isArray(imovel.fotos) && imovel.fotos.length > 0 ? imovel.fotos[0] : null;
+  const fotos = Array.isArray(imovel.fotos) ? imovel.fotos.filter(Boolean) : [];
   const meta = metaResumo(imovel).map(m => `<span>${m}</span>`).join('');
   const finalidadeLabel = imovel.finalidade === 'alugar' ? 'Alugar' : 'Comprar';
   const local = [imovel.bairro, imovel.cidade].filter(Boolean).join(' · ');
 
+  let mediaHTML;
+  if (fotos.length > 1) {
+    mediaHTML = `
+      <div class="swiper card-photo-swiper">
+        <div class="swiper-wrapper">
+          ${fotos.map(url => `<div class="swiper-slide" style="background-image:url('${url}');"></div>`).join('')}
+        </div>
+      </div>`;
+  } else if (fotos.length === 1) {
+    mediaHTML = `<div class="card-photo-single" style="background-image:url('${fotos[0]}');"></div>`;
+  } else {
+    mediaHTML = `<div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>`;
+  }
+
   return `
     <article class="property-card" data-op="${imovel.finalidade}">
       <a href="imovel.html?codigo=${encodeURIComponent(imovel.codigo)}">
-        <div class="property-photo" ${capa ? `style="background-image:url('${capa}');background-size:cover;background-position:center;"` : ''}>
+        <div class="property-photo">
           <span class="badge">${finalidadeLabel}</span>
           ${imovel.destaque ? '<span class="badge op">Destaque</span>' : ''}
-          ${!capa ? `<div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>` : ''}
+          ${mediaHTML}
         </div>
         <div class="property-body">
           <h3>${imovel.titulo}</h3>
@@ -141,4 +157,21 @@ export function propertyCardHTML(imovel) {
       </a>
     </article>
   `;
+}
+
+// Inicializa um Swiper (coverflow) dentro de cada card que tiver mais de uma foto.
+// Chame esta função depois de inserir cards vindos de propertyCardHTML no DOM.
+export function initCardPhotoSwipers(root = document) {
+  if (typeof window === 'undefined' || !window.Swiper) return;
+  root.querySelectorAll('.card-photo-swiper').forEach(el => {
+    if (el.swiper) return; // já inicializado
+    new window.Swiper(el, {
+      effect: 'coverflow',
+      loop: true,
+      allowTouchMove: false,
+      nested: true,
+      autoplay: { delay: 2600 + Math.round(Math.random() * 1200), disableOnInteraction: false },
+      coverflowEffect: { rotate: 0, stretch: 0, depth: 70, modifier: 1, slideShadows: true },
+    });
+  });
 }

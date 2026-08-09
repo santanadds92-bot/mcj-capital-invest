@@ -26,7 +26,8 @@
 
   <header class="main">
     <div class="container">
-      <a href="#" class="logo">MCJ <span>CAPITAL</span> INVEST<small>NEGÓCIOS IMOBILIÁRIOS DE ALTO PADRÃO</small></a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+      <a href="#"><img src="assets/logo.png" alt="MCJ Capital Invest" class="logo-img"></a>
       <nav class="primary">
         <ul>
           <li><a href="#quem-somos" class="active">Quem somos</a></li>
@@ -36,7 +37,6 @@
           <li><a href="#contato">Fale Conosco</a></li>
         </ul>
       </nav>
-      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
     </div>
   </header>
 
@@ -358,7 +358,7 @@
   initDestaquesSwiper();
 </script>
 <script type="module">
-  import { fetchImoveis, propertyCardHTML } from './assets/supabase-client.js';
+  import { fetchImoveis, propertyCardHTML, initCardPhotoSwipers } from './assets/supabase-client.js';
 
   async function loadRealImoveis() {
     const [todosImoveis, destaques] = await Promise.all([
@@ -375,6 +375,7 @@
       document.querySelectorAll('#propertyGrid .property-card').forEach(card => {
         card.style.display = (card.dataset.op === activeTab) ? '' : 'none';
       });
+      initCardPhotoSwipers(grid);
     }
 
     if (destaques.length > 0) {
@@ -382,6 +383,7 @@
       track.querySelectorAll('.example-card').forEach(el => el.remove());
       track.insertAdjacentHTML('beforeend', destaques.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join(''));
       window.initDestaquesSwiper();
+      initCardPhotoSwipers(track);
     }
   }
 

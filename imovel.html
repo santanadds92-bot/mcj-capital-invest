@@ -27,7 +27,8 @@
 
   <header class="main">
     <div class="container">
-      <a href="index.html" class="logo">MCJ <span>CAPITAL</span> INVEST<small>NEGÓCIOS IMOBILIÁRIOS DE ALTO PADRÃO</small></a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+      <a href="index.html"><img src="assets/logo.png" alt="MCJ Capital Invest" class="logo-img"></a>
       <nav class="primary">
         <ul>
           <li><a href="index.html#quem-somos">Quem somos</a></li>
@@ -37,7 +38,6 @@
           <li><a href="index.html#contato">Fale Conosco</a></li>
         </ul>
       </nav>
-      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
     </div>
   </header>
 
@@ -296,7 +296,7 @@
   document.getElementById('simPrev').addEventListener('click', () => simTrack.scrollBy({left: -simCardWidth, behavior: 'smooth'}));
 </script>
 <script type="module">
-  import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML, descricaoToHTML, sanitizeDescricao } from './assets/supabase-client.js';
+  import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML, descricaoToHTML, sanitizeDescricao, initCardPhotoSwipers } from './assets/supabase-client.js';
 
   const params = new URLSearchParams(window.location.search);
   const codigo = params.get('codigo');
@@ -358,6 +358,7 @@
       const track = document.getElementById('similarTrack');
       track.querySelectorAll('.example-card').forEach(el => el.remove());
       track.insertAdjacentHTML('beforeend', similares.map(propertyCardHTML).join(''));
+      initCardPhotoSwipers(track);
     }
   }
 
