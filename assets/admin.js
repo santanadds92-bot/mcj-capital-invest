@@ -11,11 +11,21 @@ const userEmailEl = document.getElementById('userEmail');
 const tabList = document.getElementById('tabList');
 const tabNew = document.getElementById('tabNew');
 const tabImport = document.getElementById('tabImport');
+const tabPending = document.getElementById('tabPending');
+const tabMessages = document.getElementById('tabMessages');
 const panelList = document.getElementById('panelList');
 const panelForm = document.getElementById('panelForm');
 const panelImport = document.getElementById('panelImport');
+const panelPending = document.getElementById('panelPending');
+const panelMessages = document.getElementById('panelMessages');
 const imoveisTableBody = document.getElementById('imoveisTableBody');
 const emptyState = document.getElementById('emptyState');
+const pendingTableBody = document.getElementById('pendingTableBody');
+const pendingEmptyState = document.getElementById('pendingEmptyState');
+const pendingCount = document.getElementById('pendingCount');
+const messagesList = document.getElementById('messagesList');
+const messagesEmptyState = document.getElementById('messagesEmptyState');
+const messagesCount = document.getElementById('messagesCount');
 
 const imovelForm = document.getElementById('imovelForm');
 const formTitle = document.getElementById('formTitle');
@@ -25,6 +35,11 @@ const uploadZone = document.getElementById('uploadZone');
 const photoPreviewGrid = document.getElementById('photoPreviewGrid');
 const uploadProgress = document.getElementById('uploadProgress');
 const toast = document.getElementById('toast');
+const ownerInfoBox = document.getElementById('ownerInfoBox');
+const ownerInfoText = document.getElementById('ownerInfoText');
+const pendingActions = document.getElementById('pendingActions');
+const approveImovelBtn = document.getElementById('approveImovelBtn');
+const rejectImovelBtn = document.getElementById('rejectImovelBtn');
 
 const geminiApiKeyInput = document.getElementById('geminiApiKey');
 const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
@@ -33,6 +48,7 @@ const rawPropertyData = document.getElementById('rawPropertyData');
 const generateAIBtn = document.getElementById('generateAIBtn');
 
 let editingId = null;
+let editingReturnTab = 'list'; // para onde voltar depois de salvar/cancelar (list ou pending)
 let currentPhotos = []; // URLs já salvas no storage para o imóvel em edição/criação
 
 // ---------- Editor de descrição (contenteditable + toolbar) ----------
@@ -466,6 +482,17 @@ function showAdmin(email) {
   document.getElementById('adminUserBar').style.display = 'flex';
   userEmailEl.textContent = email;
   loadImoveis();
+  refreshBadgeCounts();
+}
+
+// Atualiza os números nas abas "Anúncios Pendentes" e "Mensagens" sem precisar entrar nelas
+async function refreshBadgeCounts() {
+  const [{ count: pending }, { count: messages }] = await Promise.all([
+    supabase.from('imoveis').select('id', { count: 'exact', head: true }).eq('status', 'pendente'),
+    supabase.from('mensagens_contato').select('id', { count: 'exact', head: true }),
+  ]);
+  updateBadge(pendingCount, pending || 0);
+  updateBadge(messagesCount, messages || 0);
 }
 
 loginForm.addEventListener('submit', async (e) => {
@@ -491,20 +518,33 @@ logoutBtn.addEventListener('click', async () => {
 tabList.addEventListener('click', () => switchTab('list'));
 tabNew.addEventListener('click', () => switchTab('form'));
 tabImport.addEventListener('click', () => switchTab('import'));
-cancelEditBtn.addEventListener('click', () => switchTab('list'));
+tabPending.addEventListener('click', () => switchTab('pending'));
+tabMessages.addEventListener('click', () => switchTab('messages'));
+cancelEditBtn.addEventListener('click', () => switchTab(editingReturnTab));
 
 function switchTab(tab) {
   tabList.classList.toggle('active', tab === 'list');
   tabNew.classList.toggle('active', tab === 'form');
   tabImport.classList.toggle('active', tab === 'import');
+  tabPending.classList.toggle('active', tab === 'pending');
+  tabMessages.classList.toggle('active', tab === 'messages');
   panelList.classList.toggle('active', tab === 'list');
   panelForm.classList.toggle('active', tab === 'form');
   panelImport.classList.toggle('active', tab === 'import');
+  panelPending.classList.toggle('active', tab === 'pending');
+  panelMessages.classList.toggle('active', tab === 'messages');
   if (tab === 'form' && !editingId) {
+    editingReturnTab = 'list';
     resetForm();
   }
   if (tab === 'list') {
     loadImoveis();
+  }
+  if (tab === 'pending') {
+    loadPendingImoveis();
+  }
+  if (tab === 'messages') {
+    loadMessages();
   }
 }
 
@@ -560,11 +600,8 @@ async function deleteImovel(id) {
   loadImoveis();
 }
 
-function editImovel(id, list) {
-  const im = list.find(i => i.id === id);
-  if (!im) return;
-  editingId = id;
-  formTitle.textContent = 'Editar Imóvel';
+function fillFormWithImovel(im) {
+  editingId = im.id;
 
   imovelForm.codigo.value = im.codigo || '';
   imovelForm.titulo.value = im.titulo || '';
@@ -588,19 +625,168 @@ function editImovel(id, list) {
 
   currentPhotos = Array.isArray(im.fotos) ? [...im.fotos] : [];
   renderPhotoPreviews();
+}
+
+function editImovel(id, list) {
+  const im = list.find(i => i.id === id);
+  if (!im) return;
+  formTitle.textContent = 'Editar Imóvel';
+  editingReturnTab = 'list';
+  ownerInfoBox.style.display = 'none';
+  pendingActions.style.display = 'none';
+  fillFormWithImovel(im);
+  switchTab('form');
+}
+
+function editPendingImovel(id, list) {
+  const im = list.find(i => i.id === id);
+  if (!im) return;
+  formTitle.textContent = 'Revisar Anúncio Pendente';
+  editingReturnTab = 'pending';
+  fillFormWithImovel(im);
+
+  const contatoPartes = [];
+  if (im.proprietario_nome) contatoPartes.push(im.proprietario_nome);
+  if (im.proprietario_telefone) contatoPartes.push(im.proprietario_telefone);
+  if (im.proprietario_email) contatoPartes.push(im.proprietario_email);
+  ownerInfoText.textContent = contatoPartes.length > 0 ? contatoPartes.join(' · ') : 'Nenhum dado de contato informado.';
+  ownerInfoBox.style.display = 'block';
+  pendingActions.style.display = 'flex';
 
   switchTab('form');
+}
+
+approveImovelBtn.addEventListener('click', async () => {
+  if (!editingId) return;
+  approveImovelBtn.disabled = true;
+  const { error } = await supabase.from('imoveis').update({ status: 'ativo' }).eq('id', editingId);
+  approveImovelBtn.disabled = false;
+  if (error) {
+    showToast('Erro ao aprovar: ' + error.message, true);
+    return;
+  }
+  showToast('Imóvel aprovado e publicado no site!');
+  editingId = null;
+  switchTab('pending');
+});
+
+rejectImovelBtn.addEventListener('click', async () => {
+  if (!editingId) return;
+  if (!confirm('Recusar e excluir este anúncio? Essa ação não pode ser desfeita.')) return;
+  const { error } = await supabase.from('imoveis').delete().eq('id', editingId);
+  if (error) {
+    showToast('Erro ao excluir: ' + error.message, true);
+    return;
+  }
+  showToast('Anúncio recusado e removido.');
+  editingId = null;
+  switchTab('pending');
+});
+
+// ---------- Anúncios pendentes (enviados pela página pública "Anunciar Seu Imóvel") ----------
+async function loadPendingImoveis() {
+  const { data, error } = await supabase
+    .from('imoveis')
+    .select('*')
+    .eq('status', 'pendente')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    showToast('Erro ao carregar anúncios pendentes: ' + error.message, true);
+    return;
+  }
+
+  updateBadge(pendingCount, data?.length || 0);
+
+  if (!data || data.length === 0) {
+    pendingTableBody.innerHTML = '';
+    pendingEmptyState.style.display = 'block';
+    return;
+  }
+  pendingEmptyState.style.display = 'none';
+
+  pendingTableBody.innerHTML = data.map(im => `
+    <tr>
+      <td>${im.titulo}</td>
+      <td>${im.finalidade === 'alugar' ? 'Alugar' : 'Comprar'}</td>
+      <td>${im.proprietario_nome || '—'}</td>
+      <td>${im.proprietario_telefone || '—'}</td>
+      <td class="actions">
+        <button class="btn-sm" data-view="${im.id}">Ver Ficha</button>
+      </td>
+    </tr>
+  `).join('');
+
+  pendingTableBody.querySelectorAll('[data-view]').forEach(btn => {
+    btn.addEventListener('click', () => editPendingImovel(btn.dataset.view, data));
+  });
+}
+
+// ---------- Mensagens recebidas pelo formulário "Fale Conosco" ----------
+async function loadMessages() {
+  const { data, error } = await supabase
+    .from('mensagens_contato')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    showToast('Erro ao carregar mensagens: ' + error.message, true);
+    return;
+  }
+
+  updateBadge(messagesCount, data?.length || 0);
+
+  if (!data || data.length === 0) {
+    messagesList.innerHTML = '';
+    messagesEmptyState.style.display = 'block';
+    return;
+  }
+  messagesEmptyState.style.display = 'none';
+
+  messagesList.innerHTML = data.map(msg => `
+    <div class="message-card">
+      <div class="message-card-header">
+        <strong>${msg.nome}</strong>
+        <span>${new Date(msg.created_at).toLocaleString('pt-BR')}</span>
+      </div>
+      <div class="message-card-contact">
+        ${msg.email ? `<span>${msg.email}</span>` : ''}
+        ${msg.telefone ? `<span>${msg.telefone}</span>` : ''}
+      </div>
+      <p>${msg.mensagem}</p>
+      <button class="btn-sm" data-delete-msg="${msg.id}">Excluir</button>
+    </div>
+  `).join('');
+
+  messagesList.querySelectorAll('[data-delete-msg]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Excluir esta mensagem?')) return;
+      const { error: delError } = await supabase.from('mensagens_contato').delete().eq('id', btn.dataset.deleteMsg);
+      if (delError) {
+        showToast('Erro ao excluir: ' + delError.message, true);
+        return;
+      }
+      loadMessages();
+    });
+  });
+}
+
+function updateBadge(el, count) {
+  el.textContent = count > 0 ? count : '';
 }
 
 // ---------- Formulário: criar/editar ----------
 function resetForm() {
   editingId = null;
+  editingReturnTab = 'list';
   formTitle.textContent = 'Novo Imóvel';
   imovelForm.reset();
   descricaoEditor.innerHTML = '';
   currentPhotos = [];
   renderPhotoPreviews();
   rawPropertyData.value = '';
+  ownerInfoBox.style.display = 'none';
+  pendingActions.style.display = 'none';
 }
 
 imovelForm.addEventListener('submit', async (e) => {
@@ -642,7 +828,8 @@ imovelForm.addEventListener('submit', async (e) => {
     return;
   }
   showToast('Imóvel salvo com sucesso!');
-  switchTab('list');
+  editingId = null;
+  switchTab(editingReturnTab);
 });
 
 // ---------- Upload de fotos ----------

@@ -63,6 +63,42 @@ export async function fetchImoveis({ finalidade, destaque, limit } = {}) {
   return data || [];
 }
 
+// ---------- Envia fotos para o bucket público (usado no admin e no formulário público de anúncio) ----------
+export async function uploadFotos(files) {
+  const urls = [];
+  for (const file of files) {
+    const ext = file.name.split('.').pop();
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage.from(FOTOS_BUCKET).upload(path, file, {
+      cacheControl: '3600',
+      upsert: false,
+    });
+    if (error) throw error;
+    const { data: pub } = supabase.storage.from(FOTOS_BUCKET).getPublicUrl(path);
+    urls.push(pub.publicUrl);
+  }
+  return urls;
+}
+
+// ---------- Envia um imóvel público para aprovação (fica com status "pendente", invisível na busca) ----------
+export async function submitImovelParaAprovacao(payload) {
+  const codigo = `PEND-${Date.now().toString(36).toUpperCase()}`;
+  const { error } = await supabase.from('imoveis').insert({
+    ...payload,
+    codigo,
+    status: 'pendente',
+    destaque: false,
+  });
+  if (error) throw error;
+  return codigo;
+}
+
+// ---------- Envia uma mensagem do formulário "Fale Conosco" ----------
+export async function submitMensagemContato({ nome, email, telefone, mensagem }) {
+  const { error } = await supabase.from('mensagens_contato').insert({ nome, email, telefone, mensagem });
+  if (error) throw error;
+}
+
 // ---------- Busca um imóvel específico pelo código ----------
 export async function fetchImovelByCodigo(codigo) {
   const { data, error } = await supabase

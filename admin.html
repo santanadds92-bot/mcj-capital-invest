@@ -68,6 +68,8 @@
         <button class="admin-tab-btn active" id="tabList">Todos os Imóveis</button>
         <button class="admin-tab-btn" id="tabNew">+ Novo Imóvel</button>
         <button class="admin-tab-btn" id="tabImport">Importar da Shopify (CSV)</button>
+        <button class="admin-tab-btn" id="tabPending">Anúncios Pendentes <span class="tab-count" id="pendingCount"></span></button>
+        <button class="admin-tab-btn" id="tabMessages">Mensagens <span class="tab-count" id="messagesCount"></span></button>
       </div>
 
       <!-- Lista -->
@@ -94,6 +96,11 @@
       <section class="admin-panel" id="panelForm">
         <form class="admin-form" id="imovelForm">
           <h3 class="serif" id="formTitle" style="margin-bottom:24px;">Novo Imóvel</h3>
+
+          <div class="owner-info-box" id="ownerInfoBox" style="display:none;">
+            <strong>Anúncio enviado pelo site — Dados de Contato do Proprietário</strong>
+            <span id="ownerInfoText"></span>
+          </div>
 
           <div class="ai-autofill-box">
             <label for="rawPropertyData">Colar Informações Brutas do Imóvel (WhatsApp)</label>
@@ -134,6 +141,7 @@
               <select name="status">
                 <option value="ativo">Ativo (visível no site)</option>
                 <option value="inativo">Inativo (oculto)</option>
+                <option value="pendente">Pendente (aguardando aprovação)</option>
               </select>
             </div>
 
@@ -226,11 +234,43 @@
           <div class="upload-progress" id="uploadProgress"></div>
           <div class="photo-preview-grid" id="photoPreviewGrid"></div>
 
+          <div class="form-actions" id="pendingActions" style="display:none;">
+            <button type="button" class="btn-ghost" id="rejectImovelBtn">Recusar / Excluir</button>
+            <button type="button" class="btn-gold" id="approveImovelBtn" style="width:auto;">Aprovar e Publicar</button>
+          </div>
+
           <div class="form-actions">
             <button type="button" class="btn-ghost" id="cancelEditBtn">Cancelar</button>
             <button type="submit" class="btn-gold" style="width:auto;">Salvar Imóvel</button>
           </div>
         </form>
+      </section>
+
+      <!-- Anúncios pendentes de aprovação (enviados pelo site público) -->
+      <section class="admin-panel" id="panelPending">
+        <table class="imoveis-table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Finalidade</th>
+              <th>Proprietário</th>
+              <th>Telefone</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="pendingTableBody"></tbody>
+        </table>
+        <div class="empty-state" id="pendingEmptyState" style="display:none;">
+          Nenhum anúncio pendente no momento. Assim que alguém enviar um imóvel pela página "Anunciar Seu Imóvel", ele aparece aqui.
+        </div>
+      </section>
+
+      <!-- Mensagens recebidas pelo formulário "Fale Conosco" -->
+      <section class="admin-panel" id="panelMessages">
+        <div class="messages-list" id="messagesList"></div>
+        <div class="empty-state" id="messagesEmptyState" style="display:none;">
+          Nenhuma mensagem recebida ainda.
+        </div>
       </section>
 
       <!-- Importação em massa via CSV exportado da Shopify -->
@@ -272,6 +312,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <script type="module" src="assets/admin.js?v=20260808c"></script>
+  <script type="module" src="assets/admin.js?v=20260808d"></script>
 </body>
 </html>
