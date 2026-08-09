@@ -60,6 +60,42 @@
 .status-pill.inativo{background:rgba(200,200,200,.1);color:var(--text-muted);}
 .empty-state{padding:60px 20px;text-align:center;color:var(--text-muted);}
 
+/* Caixa de configuração da chave da API Gemini */
+.ai-key-box{
+  background:var(--panel);border:1px solid var(--border);border-radius:6px;
+  padding:18px 22px;margin-bottom:28px;
+}
+.ai-key-box label{
+  display:block;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--gold-light);margin-bottom:10px;
+}
+.ai-key-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.ai-key-row input{
+  flex:1;min-width:220px;background:#0f0f0e;border:1px solid var(--border);color:var(--text);
+  padding:11px 12px;border-radius:4px;font-family:'Poppins',sans-serif;font-size:.85rem;
+}
+.ai-key-row input:focus{outline:none;border-color:var(--gold);}
+.ai-key-status{font-size:.78rem;color:#8fd68f;white-space:nowrap;}
+.ai-key-hint{font-size:.75rem;color:var(--text-muted);margin-top:10px;}
+.ai-key-hint a{color:var(--gold-light);}
+
+/* Caixa de preenchimento automático por IA dentro do formulário */
+.ai-autofill-box{
+  background:#141210;border:1px solid var(--gold);border-radius:6px;
+  padding:22px;margin-bottom:28px;
+}
+.ai-autofill-box label{
+  display:block;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--gold-light);margin-bottom:10px;
+}
+.ai-autofill-box textarea{
+  width:100%;background:#0f0f0e;border:1px solid var(--border);color:var(--text);
+  padding:12px 14px;border-radius:4px;font-family:'Poppins',sans-serif;font-size:.85rem;
+  resize:vertical;margin-bottom:14px;
+}
+.ai-autofill-box textarea:focus{outline:none;border-color:var(--gold);}
+.ai-hint{font-size:.75rem;color:var(--text-muted);margin-top:10px;}
+
 /* Form */
 .admin-form{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:32px;}
 .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:20px;}

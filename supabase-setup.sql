@@ -23,11 +23,16 @@ create table if not exists public.imoveis (
   descricao text,
   valor numeric,
   valor_condominio numeric,
+  iptu numeric,                                -- valor do IPTU
   video_url text,                             -- link do YouTube ou Vimeo
   fotos jsonb not null default '[]'::jsonb,   -- lista de URLs das fotos
   destaque boolean not null default false,
   status text not null default 'ativo'        -- 'ativo' ou 'inativo'
 );
+
+-- 1b) Se a tabela "imoveis" já existia antes (criada em uma execução anterior deste
+--     script) e você só quer adicionar a coluna nova de IPTU, rode apenas esta linha:
+-- alter table public.imoveis add column if not exists iptu numeric;
 
 -- 2) Segurança: habilita RLS (controle de acesso por linha)
 alter table public.imoveis enable row level security;

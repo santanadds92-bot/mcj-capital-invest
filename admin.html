@@ -53,6 +53,16 @@
         </div>
       </div>
 
+      <div class="ai-key-box">
+        <label for="geminiApiKey">Chave da API do Google Gemini (usada no Preenchimento Automático por IA)</label>
+        <div class="ai-key-row">
+          <input type="password" id="geminiApiKey" placeholder="Cole sua chave aqui (ex: AIza...)">
+          <button type="button" class="btn-sm" id="saveApiKeyBtn">Salvar</button>
+          <span class="ai-key-status" id="apiKeyStatus"></span>
+        </div>
+        <p class="ai-key-hint">Sua chave fica salva somente neste navegador. Gere uma gratuita em <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>.</p>
+      </div>
+
       <div class="admin-tabs">
         <button class="admin-tab-btn active" id="tabList">Todos os Imóveis</button>
         <button class="admin-tab-btn" id="tabNew">+ Novo Imóvel</button>
@@ -82,6 +92,13 @@
       <section class="admin-panel" id="panelForm">
         <form class="admin-form" id="imovelForm">
           <h3 class="serif" id="formTitle" style="margin-bottom:24px;">Novo Imóvel</h3>
+
+          <div class="ai-autofill-box">
+            <label for="rawPropertyData">Colar Informações Brutas do Imóvel (WhatsApp)</label>
+            <textarea id="rawPropertyData" rows="5" placeholder="Cole aqui o texto recebido por WhatsApp: endereço, valor, características, condomínio, IPTU etc."></textarea>
+            <button type="button" class="btn-gold" id="generateAIBtn" style="width:auto;">✨ Gerar Cadastro Automático com IA</button>
+            <p class="ai-hint">A IA preenche os campos abaixo automaticamente a partir do texto colado. Revise tudo antes de salvar.</p>
+          </div>
 
           <div class="form-grid">
             <div>
@@ -164,6 +181,10 @@
             <div>
               <label>Valor do Condomínio (R$)</label>
               <input type="number" name="valor_condominio" min="0" step="0.01">
+            </div>
+            <div>
+              <label>Valor do IPTU (R$)</label>
+              <input type="number" name="iptu" min="0" step="0.01">
             </div>
             <div>
               <label>Link do Vídeo (YouTube ou Vimeo)</label>

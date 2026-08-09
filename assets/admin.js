@@ -24,6 +24,12 @@ const photoPreviewGrid = document.getElementById('photoPreviewGrid');
 const uploadProgress = document.getElementById('uploadProgress');
 const toast = document.getElementById('toast');
 
+const geminiApiKeyInput = document.getElementById('geminiApiKey');
+const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+const apiKeyStatus = document.getElementById('apiKeyStatus');
+const rawPropertyData = document.getElementById('rawPropertyData');
+const generateAIBtn = document.getElementById('generateAIBtn');
+
 let editingId = null;
 let currentPhotos = []; // URLs já salvas no storage para o imóvel em edição/criação
 
@@ -37,6 +43,129 @@ document.querySelectorAll('.editor-toolbar button').forEach(btn => {
     document.execCommand(cmd, false, value);
   });
 });
+
+// ---------- IA: Preenchimento automático (Google Gemini 1.5 Flash) ----------
+const GEMINI_KEY_STORAGE = 'mcj_gemini_api_key';
+
+function getGeminiKey() {
+  return localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+}
+
+function refreshApiKeyStatus() {
+  const key = getGeminiKey();
+  geminiApiKeyInput.value = key;
+  apiKeyStatus.textContent = key ? 'Chave salva ✓' : '';
+}
+
+saveApiKeyBtn.addEventListener('click', () => {
+  const key = geminiApiKeyInput.value.trim();
+  if (!key) {
+    showToast('Cole uma chave válida antes de salvar.', true);
+    return;
+  }
+  localStorage.setItem(GEMINI_KEY_STORAGE, key);
+  refreshApiKeyStatus();
+  showToast('Chave da API salva neste navegador.');
+});
+
+function buildAIPrompt(raw) {
+  return `Você é um assistente que transforma anúncios informais de imóveis de alto padrão (geralmente copiados do WhatsApp) em dados estruturados para o site da imobiliária MCJ Capital Invest.
+
+Analise o texto abaixo e retorne SOMENTE um objeto JSON válido (sem markdown, sem crases, sem texto fora do JSON), com exatamente estas chaves:
+
+{
+  "codigo": string (código/referência do imóvel, se houver no texto; senão ""),
+  "titulo": string (título comercial atrativo, ex: "Apartamento Ultra Luxo no Jardins"),
+  "finalidade": "comprar" ou "alugar",
+  "tipo": um destes valores exatamente — "Apartamento", "Casa", "Cobertura", "Comercial" ou "Terreno",
+  "bairro": string,
+  "cidade": string (ex: "São Paulo - SP"),
+  "endereco": string (endereço completo se houver; senão bairro + cidade),
+  "quartos": number,
+  "banheiros": number,
+  "suites": number,
+  "vagas": number,
+  "area": number (em m², apenas o número),
+  "valor": number (valor de venda/aluguel, apenas números, sem "R$" ou pontos),
+  "valor_condominio": number (apenas números, 0 se não informado),
+  "iptu": number (valor do IPTU, apenas números, 0 se não informado),
+  "descricao": string em HTML rico, usando as tags <h3>, <p>, <strong>, <ul>, <li> e <hr> para organizar seções como "Sobre o Imóvel" e "Características" (em lista). Não inclua <html>, <head> ou <body>, apenas o conteúdo interno.
+}
+
+Se alguma informação não estiver no texto, use 0 para números e "" para textos — nunca invente dados que não estejam no texto original.
+
+Texto bruto colado pelo usuário:
+"""
+${raw}
+"""`;
+}
+
+async function generateWithAI() {
+  const apiKey = getGeminiKey();
+  if (!apiKey) {
+    showToast('Cole e salve sua chave da API Gemini primeiro.', true);
+    return;
+  }
+  const raw = rawPropertyData.value.trim();
+  if (!raw) {
+    showToast('Cole as informações do imóvel no campo acima.', true);
+    return;
+  }
+
+  generateAIBtn.disabled = true;
+  const originalLabel = generateAIBtn.textContent;
+  generateAIBtn.textContent = 'Gerando com IA...';
+
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: buildAIPrompt(raw) }] }],
+          generationConfig: { responseMimeType: 'application/json', temperature: 0.4 },
+        }),
+      }
+    );
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error?.message || 'Erro na API do Gemini');
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error('A IA não retornou nenhum conteúdo.');
+
+    const parsed = JSON.parse(text);
+    applyAIResult(parsed);
+    showToast('Campos preenchidos automaticamente! Revise antes de salvar.');
+  } catch (err) {
+    showToast('Erro ao gerar com IA: ' + err.message, true);
+  } finally {
+    generateAIBtn.disabled = false;
+    generateAIBtn.textContent = originalLabel;
+  }
+}
+
+function applyAIResult(d) {
+  if (d.codigo) imovelForm.codigo.value = d.codigo;
+  if (d.titulo) imovelForm.titulo.value = d.titulo;
+  if (d.finalidade === 'comprar' || d.finalidade === 'alugar') imovelForm.finalidade.value = d.finalidade;
+  if (d.tipo) imovelForm.tipo.value = d.tipo;
+  if (d.bairro) imovelForm.bairro.value = d.bairro;
+  if (d.cidade) imovelForm.cidade.value = d.cidade;
+  if (d.endereco) imovelForm.endereco.value = d.endereco;
+  if (d.quartos !== undefined && d.quartos !== null) imovelForm.quartos.value = d.quartos;
+  if (d.banheiros !== undefined && d.banheiros !== null) imovelForm.banheiros.value = d.banheiros;
+  if (d.suites !== undefined && d.suites !== null) imovelForm.suites.value = d.suites;
+  if (d.vagas !== undefined && d.vagas !== null) imovelForm.vagas.value = d.vagas;
+  if (d.area) imovelForm.area.value = d.area;
+  if (d.valor) imovelForm.valor.value = d.valor;
+  if (d.valor_condominio) imovelForm.valor_condominio.value = d.valor_condominio;
+  if (d.iptu && imovelForm.iptu) imovelForm.iptu.value = d.iptu;
+  if (d.descricao) descricaoEditor.innerHTML = sanitizeDescricao(d.descricao);
+}
+
+generateAIBtn.addEventListener('click', generateWithAI);
+refreshApiKeyStatus();
 
 // ---------- Auth ----------
 async function checkSession() {
@@ -171,6 +300,7 @@ function editImovel(id, list) {
   imovelForm.area.value = im.area || '';
   imovelForm.valor.value = im.valor || '';
   imovelForm.valor_condominio.value = im.valor_condominio || '';
+  imovelForm.iptu.value = im.iptu || '';
   imovelForm.video_url.value = im.video_url || '';
   descricaoEditor.innerHTML = descricaoToHTML(im.descricao || '');
   imovelForm.destaque.checked = !!im.destaque;
@@ -190,6 +320,7 @@ function resetForm() {
   descricaoEditor.innerHTML = '';
   currentPhotos = [];
   renderPhotoPreviews();
+  rawPropertyData.value = '';
 }
 
 imovelForm.addEventListener('submit', async (e) => {
@@ -211,6 +342,7 @@ imovelForm.addEventListener('submit', async (e) => {
     area: fd.get('area') ? Number(fd.get('area')) : null,
     valor: fd.get('valor') ? Number(fd.get('valor')) : null,
     valor_condominio: fd.get('valor_condominio') ? Number(fd.get('valor_condominio')) : null,
+    iptu: fd.get('iptu') ? Number(fd.get('iptu')) : null,
     video_url: fd.get('video_url'),
     descricao: sanitizeDescricao(descricaoEditor.innerHTML.trim()),
     destaque: fd.get('destaque') === 'on',
