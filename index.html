@@ -383,11 +383,13 @@
   let destaquesSwiper;
   function initDestaquesSwiper() {
     if (destaquesSwiper) destaquesSwiper.destroy(true, true);
+    const destaquesSlideCount = document.querySelectorAll('.destaques-swiper .swiper-slide').length;
     destaquesSwiper = new Swiper('.destaques-swiper', {
       effect: 'coverflow',
       grabCursor: true,
       centeredSlides: true,
-      loop: true,
+      loop: destaquesSlideCount > 1,
+      loopAdditionalSlides: destaquesSlideCount,
       slidesPerView: 'auto',
       spaceBetween: 20,
       coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
