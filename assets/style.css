@@ -765,6 +765,14 @@ footer{background:var(--footer-bg);border-top:1px solid var(--border);padding:56
 .mcj-chat-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--gold-light),var(--gold));color:#141210;border-bottom-right-radius:4px;font-weight:500;}
 .mcj-chat-msg.error{align-self:flex-start;background:rgba(165,50,42,.12);border:1px solid rgba(165,50,42,.35);color:#e5a39d;border-bottom-left-radius:4px;}
 .mcj-chat-msg a{color:inherit;text-decoration:underline;}
+.mcj-chat-msg a.mcj-chat-link-btn{
+  display:inline-block;margin-top:6px;text-decoration:none;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  color:#141210;font-weight:600;font-size:.78rem;
+  padding:6px 14px;border-radius:20px;
+}
+.mcj-chat-msg.user a.mcj-chat-link-btn{background:#141210;color:var(--gold-light);}
+.mcj-chat-msg a.mcj-chat-link-btn:hover{filter:brightness(1.08);}
 
 .mcj-chat-typing{align-self:flex-start;display:flex;gap:4px;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:4px;}
 .mcj-chat-typing span{width:6px;height:6px;border-radius:50%;background:var(--gold-light);opacity:.5;animation:mcjChatTyping 1.1s infinite;}

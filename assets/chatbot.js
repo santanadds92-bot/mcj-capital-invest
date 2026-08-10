@@ -31,7 +31,7 @@ const MODEL_CANDIDATES = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-1.5
 function buildSystemInstruction(catalogoResumo) {
   return `Você é o "Corretor Marcio Jorge", o assistente virtual da MCJ Capital Invest, uma imobiliária especializada em imóveis de alto padrão em São Paulo. Seu tom de voz é sofisticado, cordial, consultivo e discreto — como um corretor experiente que atende clientes exigentes, nunca informal ou apressado.
 
-Responda sempre em português do Brasil, em mensagens curtas e claras (isto é um chat, não um e-mail) — no máximo 3 a 5 frases por resposta, a menos que o cliente peça mais detalhes.
+Responda sempre em português do Brasil, em mensagens curtas e claras (isto é um chat, não um e-mail) — no máximo 3 a 5 frases por resposta, a menos que o cliente peça mais detalhes. Seja direto: nunca deixe uma frase pela metade, prefira uma resposta mais curta e completa a uma resposta longa que arrisque ficar cortada.
 
 Seu objetivo é ajudar visitantes a encontrar o imóvel certo (para comprar ou alugar), tirar dúvidas sobre bairros, condições de pagamento e agendar visitas.
 
@@ -41,8 +41,15 @@ Seu objetivo é ajudar visitantes a encontrar o imóvel certo (para comprar ou a
 • Contato: (11) 99999-0542 (WhatsApp) | marciocjorge@terra.com.br
 • Atuação: compra, venda e locação de imóveis de alto padrão (apartamentos, coberturas, casas e imóveis comerciais), principalmente em São Paulo.
 
-=== CATÁLOGO ATUAL (imóveis disponíveis agora — use para responder perguntas sobre opções específicas) ===
+=== CATÁLOGO ATUAL (imóveis disponíveis agora — use para responder perguntas sobre opções específicas; cada linha começa com o código do imóvel entre colchetes, ex: [MCJ-001]) ===
 ${catalogoResumo || 'Nenhum imóvel carregado no momento — oriente o cliente a falar com um corretor humano pelo WhatsApp para conhecer o catálogo atualizado.'}
+
+=== COMO INDICAR IMÓVEIS E LINKS (siga este formato à risca) ===
+Quando o cliente pedir um imóvel específico (ex: "apartamento pra comprar na Vila Augusta"), procure primeiro no CATÁLOGO ATUAL acima.
+• Se encontrar 1 ou poucos imóveis que combinam bem: cite o nome e um resumo curto de cada um, e logo depois inclua o link de cada um no formato exato "imovel.html?codigo=CODIGO" (troque CODIGO pelo código entre colchetes do imóvel, mantendo exatamente esse formato de texto puro, sem markdown, sem parênteses ao redor).
+• Se a busca for ampla (muitos resultados, ou o cliente só descreveu um bairro/tipo sem pedir um imóvel específico): não liste tudo, em vez disso inclua um link pra página de busca já filtrada, no formato "comprar.html?bairro=BAIRRO" (para compra) ou "alugar.html?bairro=BAIRRO" (para aluguel) — troque BAIRRO pelo nome do bairro mencionado (sem acentos ou espaços, use %20 se precisar). Os filtros aceitos nessas páginas são: bairro, tipo, quartos, valor_max, codigo.
+• Se não encontrar nada no catálogo que combine com o pedido, seja honesto: diga que não há esse imóvel disponível no momento e ofereça o link "comprar.html" ou "alugar.html" (sem filtro) para o cliente ver as opções atuais, ou direcione ao WhatsApp.
+Nunca invente um código de imóvel que não esteja no CATÁLOGO ATUAL.
 
 === DIRECIONAMENTO PARA O WHATSAPP ===
 Se o cliente quiser agendar uma visita, negociar condições, fazer uma proposta ou tiver uma dúvida muito específica sobre um imóvel (documentação, negociação de valor, disponibilidade exata), NÃO tente resolver isso sozinho: oriente-o a continuar com um corretor humano e inclua o link direto: ${WHATSAPP_LINK}
@@ -84,10 +91,19 @@ function linkify(text) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  return escaped.replace(/(https?:\/\/[^\s]+)/g, url => {
+  // Links absolutos (http/https) — vira <a> normal, abre em nova aba.
+  const withAbsoluteLinks = escaped.replace(/(https?:\/\/[^\s]+)/g, url => {
     const clean = url.replace(/[.,;!?)]+$/, '');
     return `<a href="${clean}" target="_blank" rel="noopener">${clean}</a>`;
   });
+  // Links relativos às páginas do próprio site (imovel.html?codigo=...,
+  // comprar.html?..., alugar.html?...) que o Gemini pode citar ao indicar
+  // um imóvel específico ou uma busca filtrada — viram botões clicáveis
+  // dentro da própria página, sem precisar do domínio completo.
+  return withAbsoluteLinks.replace(
+    /(?<!\/)\b((?:imovel|comprar|alugar)\.html(?:\?[^\s<]*)?)/g,
+    match => `<a href="${match}" class="mcj-chat-link-btn">${match.startsWith('imovel') ? 'Ver imóvel' : 'Ver opções →'}</a>`
+  );
 }
 
 // Monta um resumo curto do catálogo atual pra dar contexto real ao Gemini
@@ -121,7 +137,10 @@ async function callGeminiChat(history, systemInstruction) {
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: systemInstruction }] },
             contents: history,
-            generationConfig: { temperature: 0.6, maxOutputTokens: 512 },
+            // 1024 tokens dá bastante folga pra resposta completa (incluindo
+            // os links de imóveis) sem cortar a frase no meio — antes eram
+            // só 512, insuficiente pra respostas com contexto + link.
+            generationConfig: { temperature: 0.6, maxOutputTokens: 1024 },
           }),
         }
       );
@@ -134,10 +153,18 @@ async function callGeminiChat(history, systemInstruction) {
         }
         throw lastError;
       }
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const candidate = data.candidates?.[0];
+      // Junta o texto de todas as partes da resposta (não só a primeira) —
+      // o Gemini às vezes divide a resposta em mais de uma "part".
+      const text = (candidate?.content?.parts || []).map(p => p.text || '').join('').trim();
       if (!text) {
         lastError = new Error('A IA não retornou nenhum conteúdo.');
         continue;
+      }
+      // Se a resposta foi cortada por limite de tokens, avisa no console
+      // (não trava o chat, mas ajuda a diagnosticar se voltar a acontecer).
+      if (candidate?.finishReason === 'MAX_TOKENS') {
+        console.warn('Corretor Marcio Jorge: resposta pode ter sido cortada por limite de tokens.');
       }
       return text;
     } catch (err) {
