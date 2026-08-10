@@ -49,10 +49,28 @@ export function mapsEmbedUrl(query) {
   return `https://www.google.com/maps?q=${q}&output=embed`;
 }
 
+// ---------- Configurações do site (tabela site_config: chave/valor) ----------
+// Usado para guardar a chave da API do Gemini do "Corretor Atendente" —
+// assim ela é editável direto no Admin, sem precisar mexer em código nem
+// fazer commit/redeploy. Leitura pública (o widget de chat roda em páginas
+// sem login), escrita só autenticado — rode site-config-setup.sql uma vez
+// no Supabase antes de usar.
+export async function getSiteConfig(chave) {
+  const { data, error } = await supabase.from('site_config').select('valor').eq('chave', chave).maybeSingle();
+  if (error || !data) return '';
+  return data.valor || '';
+}
+
+export async function setSiteConfig(chave, valor) {
+  return supabase.from('site_config').upsert({ chave, valor }, { onConflict: 'chave' });
+}
+
 // ---------- Busca lista de imóveis ativos (com filtro opcional de finalidade / destaque) ----------
 export async function fetchImoveis({ finalidade, destaque, limit, tipo, bairro, quartosMin, valorMax, codigo } = {}) {
   let query = supabase.from('imoveis').select('*').eq('status', 'ativo').order('created_at', { ascending: false });
-  if (finalidade) query = query.eq('finalidade', finalidade);
+  // finalidade agora é um array (um imóvel pode ser pra Comprar e Alugar ao
+  // mesmo tempo) — .contains verifica se o valor pedido está na lista.
+  if (finalidade) query = query.contains('finalidade', [finalidade]);
   if (destaque !== undefined) query = query.eq('destaque', destaque);
   if (tipo) query = query.eq('tipo', tipo);
   if (bairro) query = query.eq('bairro', bairro);
@@ -234,22 +252,45 @@ export function metaResumo(imovel) {
 
 // ---------- Card HTML reutilizável (grade da home, destaques, similares) ----------
 // Foto de capa como <img> real (mais simples e estável que background-image/carrossel).
+// Normaliza o campo finalidade pra sempre trabalhar com array, aceitando
+// tanto o formato novo (text[]) quanto imóveis antigos que ainda estejam
+// como texto simples (antes de rodar a migração).
+export function finalidadesArray(imovel) {
+  if (Array.isArray(imovel.finalidade)) return imovel.finalidade.filter(Boolean);
+  if (imovel.finalidade) return [imovel.finalidade];
+  return ['comprar'];
+}
+
 export function propertyCardHTML(imovel) {
   const fotos = Array.isArray(imovel.fotos) ? imovel.fotos.filter(Boolean) : [];
   const capa = fotos[0] || null;
   const meta = metaResumo(imovel).map(m => `<span>${m}</span>`).join('');
-  const finalidadeLabel = imovel.finalidade === 'alugar' ? 'Alugar' : 'Comprar';
+  const finalidades = finalidadesArray(imovel);
+  const podeComprar = finalidades.includes('comprar');
+  const podeAlugar = finalidades.includes('alugar');
+  const badgesHTML = `<div class="badge-row">${finalidades.map(f => `<span class="badge">${f === 'alugar' ? 'Alugar' : 'Comprar'}</span>`).join('')}</div>`;
   const local = [imovel.bairro, imovel.cidade].filter(Boolean).join(' · ');
 
   const mediaHTML = capa
     ? `<img src="${capa}" alt="${imovel.titulo}" loading="lazy">`
     : `<div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>`;
 
+  // Se o imóvel serve pras duas finalidades, mostra os dois valores; senão
+  // mostra só o valor relevante (venda ou aluguel).
+  let priceHTML;
+  if (podeComprar && podeAlugar) {
+    priceHTML = `<div class="property-price">${formatBRL(imovel.valor)}</div><div class="property-price-rent">Aluguel: ${formatBRL(imovel.valor_aluguel)}/mês</div>`;
+  } else if (podeAlugar) {
+    priceHTML = `<div class="property-price">${formatBRL(imovel.valor_aluguel)}<span class="price-suffix">/mês</span></div>`;
+  } else {
+    priceHTML = `<div class="property-price">${formatBRL(imovel.valor)}</div>`;
+  }
+
   return `
-    <article class="property-card" data-op="${imovel.finalidade}">
+    <article class="property-card" data-op="${finalidades.join(' ')}">
       <a href="imovel.html?codigo=${encodeURIComponent(imovel.codigo)}">
         <div class="property-photo">
-          <span class="badge">${finalidadeLabel}</span>
+          ${badgesHTML}
           ${imovel.destaque ? '<span class="badge op">Destaque</span>' : ''}
           ${mediaHTML}
         </div>
@@ -257,7 +298,7 @@ export function propertyCardHTML(imovel) {
           <h3>${imovel.titulo}</h3>
           <p class="loc">${local}</p>
           <div class="property-meta">${meta}</div>
-          <div class="property-price">${formatBRL(imovel.valor)}</div>
+          ${priceHTML}
         </div>
       </a>
     </article>

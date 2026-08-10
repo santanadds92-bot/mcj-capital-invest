@@ -69,6 +69,16 @@
         <p class="ai-key-hint">Sua chave fica salva somente neste navegador. Gere uma gratuita em <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>.</p>
       </div>
 
+      <div class="ai-key-box">
+        <label for="chatGeminiApiKey">Chave da API do Google Gemini (usada pelo "Corretor Atendente" no site)</label>
+        <div class="ai-key-row">
+          <input type="password" id="chatGeminiApiKey" placeholder="Cole a chave aqui (ex: AIza...)">
+          <button type="button" class="btn-sm" id="saveChatApiKeyBtn">Salvar</button>
+          <span class="ai-key-status" id="chatApiKeyStatus"></span>
+        </div>
+        <p class="ai-key-hint">Diferente da chave acima, esta fica salva no banco de dados e vale para TODOS os visitantes que conversarem com o chat — não precisa mexer em código nem no GitHub. Recomendo gerar uma chave dedicada só para o chat em <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>.</p>
+      </div>
+
       <div class="admin-tabs">
         <button class="admin-tab-btn active" id="tabList">Todos os Imóveis</button>
         <button class="admin-tab-btn" id="tabNew">+ Novo Imóvel</button>
@@ -135,10 +145,10 @@
 
             <div>
               <label>Finalidade</label>
-              <select name="finalidade">
-                <option value="comprar">Comprar</option>
-                <option value="alugar">Alugar</option>
-              </select>
+              <div class="checkbox-row" style="gap:18px;">
+                <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="finalidade" value="comprar" checked> Comprar</label>
+                <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="finalidade" value="alugar"> Alugar</label>
+              </div>
             </div>
             <div>
               <label>Tipo de Imóvel</label>
@@ -200,8 +210,12 @@
             </div>
 
             <div>
-              <label>Valor do Imóvel (R$)</label>
+              <label>Valor do Imóvel — Venda (R$)</label>
               <input type="number" name="valor" min="0" step="0.01">
+            </div>
+            <div>
+              <label>Valor do Aluguel — Mensal (R$)</label>
+              <input type="number" name="valor_aluguel" min="0" step="0.01">
             </div>
             <div>
               <label>Valor do Condomínio (R$)</label>

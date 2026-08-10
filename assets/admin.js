@@ -1,5 +1,11 @@
-import { supabase, FOTOS_BUCKET, formatBRL, descricaoToHTML, sanitizeDescricao } from './supabase-client.js';
+import { supabase, FOTOS_BUCKET, formatBRL, descricaoToHTML, sanitizeDescricao, finalidadesArray, getSiteConfig, setSiteConfig } from './supabase-client.js';
 import { getGeminiKey, setGeminiKey, generateImovelFromText } from './gemini-ai.js';
+
+function finalidadeLabel(im) {
+  const f = finalidadesArray(im);
+  if (f.includes('comprar') && f.includes('alugar')) return 'Comprar + Alugar';
+  return f.includes('alugar') ? 'Alugar' : 'Comprar';
+}
 
 // ---------- Elementos ----------
 const loginWrap = document.getElementById('loginWrap');
@@ -109,10 +115,25 @@ async function generateWithAI() {
   }
 }
 
+// ---------- Finalidade (checkboxes Comprar/Alugar — um imóvel pode ter as duas) ----------
+function setFinalidadeCheckboxes(valores) {
+  const lista = Array.isArray(valores) ? valores : (valores ? [valores] : ['comprar']);
+  imovelForm.querySelectorAll('input[name="finalidade"]').forEach(cb => {
+    cb.checked = lista.includes(cb.value);
+  });
+  // nunca deixa sem nenhuma marcada
+  if (![...imovelForm.querySelectorAll('input[name="finalidade"]')].some(cb => cb.checked)) {
+    imovelForm.querySelector('input[name="finalidade"][value="comprar"]').checked = true;
+  }
+}
+function getFinalidadeCheckboxes() {
+  return [...imovelForm.querySelectorAll('input[name="finalidade"]:checked')].map(cb => cb.value);
+}
+
 function applyAIResult(d) {
   if (d.codigo) imovelForm.codigo.value = d.codigo;
   if (d.titulo) imovelForm.titulo.value = d.titulo;
-  if (d.finalidade === 'comprar' || d.finalidade === 'alugar') imovelForm.finalidade.value = d.finalidade;
+  if (d.finalidade) setFinalidadeCheckboxes(d.finalidade);
   if (d.tipo) imovelForm.tipo.value = d.tipo;
   if (d.bairro) imovelForm.bairro.value = d.bairro;
   if (d.cidade) imovelForm.cidade.value = d.cidade;
@@ -123,6 +144,7 @@ function applyAIResult(d) {
   if (d.vagas !== undefined && d.vagas !== null) imovelForm.vagas.value = d.vagas;
   if (d.area) imovelForm.area.value = d.area;
   if (d.valor) imovelForm.valor.value = d.valor;
+  if (d.valor_aluguel && imovelForm.valor_aluguel) imovelForm.valor_aluguel.value = d.valor_aluguel;
   if (d.valor_condominio) imovelForm.valor_condominio.value = d.valor_condominio;
   if (d.iptu && imovelForm.iptu) imovelForm.iptu.value = d.iptu;
   // A IA agora retorna a descrição em Markdown (###, ---, **negrito**, • listas);
@@ -132,6 +154,44 @@ function applyAIResult(d) {
 
 generateAIBtn.addEventListener('click', generateWithAI);
 refreshApiKeyStatus();
+
+// ---------- Chave do Gemini usada pelo chat público "Corretor Atendente" ----------
+// Ao contrário da chave acima (só neste navegador), esta fica salva na
+// tabela site_config do Supabase e é lida por assets/chatbot.js em
+// qualquer página pública, para qualquer visitante — sem precisar editar
+// código. Requer ter rodado site-config-setup.sql uma vez no projeto.
+const chatGeminiApiKeyInput = document.getElementById('chatGeminiApiKey');
+const saveChatApiKeyBtn = document.getElementById('saveChatApiKeyBtn');
+const chatApiKeyStatus = document.getElementById('chatApiKeyStatus');
+
+async function refreshChatApiKeyStatus() {
+  try {
+    const key = await getSiteConfig('chatbot_gemini_key');
+    chatGeminiApiKeyInput.value = key || '';
+    chatApiKeyStatus.textContent = key ? 'Chave salva ✓' : '';
+  } catch {
+    chatApiKeyStatus.textContent = '';
+  }
+}
+
+if (saveChatApiKeyBtn) {
+  saveChatApiKeyBtn.addEventListener('click', async () => {
+    const key = chatGeminiApiKeyInput.value.trim();
+    if (!key) {
+      showToast('Cole uma chave válida antes de salvar.', true);
+      return;
+    }
+    const { error } = await setSiteConfig('chatbot_gemini_key', key);
+    if (error) {
+      showToast('Erro ao salvar (rode site-config-setup.sql no Supabase se ainda não rodou): ' + error.message, true);
+      return;
+    }
+    chatApiKeyStatus.textContent = 'Chave salva ✓';
+    showToast('Chave do Corretor Atendente salva! Já vale para todos os visitantes do site.');
+  });
+}
+
+refreshChatApiKeyStatus();
 
 // ---------- Importação em massa via CSV da Shopify ----------
 const csvUploadZone = document.getElementById('csvUploadZone');
@@ -525,12 +585,7 @@ function renderImoveisTable() {
       <td class="col-check"><input type="checkbox" class="row-check" data-id="${im.id}" ${selectedIds.has(im.id) ? 'checked' : ''}></td>
       <td class="col-codigo"><input type="text" class="inline-edit" data-id="${im.id}" data-field="codigo" value="${(im.codigo || '').replace(/"/g, '&quot;')}"></td>
       <td class="col-titulo"><input type="text" class="inline-edit" data-id="${im.id}" data-field="titulo" value="${(im.titulo || '').replace(/"/g, '&quot;')}"></td>
-      <td class="col-finalidade">
-        <select class="inline-edit" data-id="${im.id}" data-field="finalidade">
-          <option value="comprar" ${im.finalidade !== 'alugar' ? 'selected' : ''}>Comprar</option>
-          <option value="alugar" ${im.finalidade === 'alugar' ? 'selected' : ''}>Alugar</option>
-        </select>
-      </td>
+      <td class="col-finalidade">${finalidadeLabel(im)}</td>
       <td class="col-valor"><input type="number" step="0.01" class="inline-edit" data-id="${im.id}" data-field="valor" value="${im.valor ?? ''}"></td>
       <td><span class="status-pill ${im.status}">${im.status}</span></td>
       <td class="actions">
@@ -685,7 +740,7 @@ function fillFormWithImovel(im) {
 
   imovelForm.codigo.value = im.codigo || '';
   imovelForm.titulo.value = im.titulo || '';
-  imovelForm.finalidade.value = im.finalidade || 'comprar';
+  setFinalidadeCheckboxes(finalidadesArray(im));
   imovelForm.tipo.value = im.tipo || '';
   imovelForm.bairro.value = im.bairro || '';
   imovelForm.cidade.value = im.cidade || '';
@@ -696,6 +751,7 @@ function fillFormWithImovel(im) {
   imovelForm.vagas.value = im.vagas || 0;
   imovelForm.area.value = im.area || '';
   imovelForm.valor.value = im.valor || '';
+  if (imovelForm.valor_aluguel) imovelForm.valor_aluguel.value = im.valor_aluguel || '';
   imovelForm.valor_condominio.value = im.valor_condominio || '';
   imovelForm.iptu.value = im.iptu || '';
   imovelForm.video_url.value = im.video_url || '';
@@ -788,7 +844,7 @@ async function loadPendingImoveis() {
   pendingTableBody.innerHTML = data.map(im => `
     <tr>
       <td>${im.titulo}</td>
-      <td>${im.finalidade === 'alugar' ? 'Alugar' : 'Comprar'}</td>
+      <td>${finalidadeLabel(im)}</td>
       <td>${im.proprietario_nome || '—'}</td>
       <td>${im.proprietario_telefone || '—'}</td>
       <td class="actions">
@@ -876,7 +932,7 @@ imovelForm.addEventListener('submit', async (e) => {
   const payload = {
     codigo: fd.get('codigo').trim(),
     titulo: fd.get('titulo').trim(),
-    finalidade: fd.get('finalidade'),
+    finalidade: getFinalidadeCheckboxes(),
     tipo: fd.get('tipo'),
     bairro: fd.get('bairro'),
     cidade: fd.get('cidade'),
@@ -887,6 +943,7 @@ imovelForm.addEventListener('submit', async (e) => {
     vagas: Number(fd.get('vagas')) || 0,
     area: fd.get('area') ? Number(fd.get('area')) : null,
     valor: fd.get('valor') ? Number(fd.get('valor')) : null,
+    valor_aluguel: fd.get('valor_aluguel') ? Number(fd.get('valor_aluguel')) : null,
     valor_condominio: fd.get('valor_condominio') ? Number(fd.get('valor_condominio')) : null,
     iptu: fd.get('iptu') ? Number(fd.get('iptu')) : null,
     video_url: fd.get('video_url'),

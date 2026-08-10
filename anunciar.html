@@ -254,6 +254,7 @@
   </a>
 
 <script src="assets/site.js"></script>
+<script type="module" src="assets/chatbot.js"></script>
 <script type="module" src="assets/theme.js"></script>
 <script type="module">
   import { uploadFotos, submitImovelParaAprovacao } from './assets/supabase-client.js';
@@ -405,7 +406,7 @@
         proprietario_telefone: fd.get('proprietario_telefone').trim(),
         proprietario_email: orNull('proprietario_email'),
         titulo: tituloFinal,
-        finalidade: finalidadeSelecionada,
+        finalidade: [finalidadeSelecionada],
         tipo: tipoSelecionado,
         bairro: bairroDigitado,
         cidade: orNull('cidade'),

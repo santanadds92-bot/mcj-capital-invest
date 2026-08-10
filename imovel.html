@@ -101,9 +101,13 @@
           </div>
 
           <div class="price-block">
-            <div class="item">
+            <div class="item" id="priceValorItem">
               <h4>Valor do Imóvel</h4>
               <div class="value" id="priceValor">R$ 130.000,00</div>
+            </div>
+            <div class="item" id="priceAluguelItem" style="display:none;">
+              <h4>Valor do Aluguel</h4>
+              <div class="value" id="priceAluguel">R$ 0,00/mês</div>
             </div>
             <div class="item">
               <h4>Valor do Condomínio</h4>
@@ -288,6 +292,7 @@
   </a>
 
 <script src="assets/site.js"></script>
+<script type="module" src="assets/chatbot.js"></script>
 <script type="module" src="assets/theme.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
@@ -298,11 +303,15 @@
   function initSimilaresSwiper() {
     if (similaresSwiper) similaresSwiper.destroy(true, true);
     const slideCount = document.querySelectorAll('#similarTrack .swiper-slide').length;
+    // Loop infinito sempre que houver mais de 1 imóvel — antes só ligava com
+    // mais de 2 slides, então com exatamente 2 imóveis similares o carrossel
+    // chegava no fim e parava em vez de voltar pro primeiro.
     similaresSwiper = new Swiper('.similares-swiper', {
       effect: 'coverflow',
       grabCursor: true,
       centeredSlides: true,
-      loop: slideCount > 2,
+      loop: slideCount > 1,
+      loopAdditionalSlides: slideCount,
       slidesPerView: 'auto',
       spaceBetween: 20,
       coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
@@ -314,7 +323,7 @@
   initSimilaresSwiper();
 </script>
 <script type="module">
-  import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML, descricaoToHTML, sanitizeDescricao, placeholderPhoto } from './assets/supabase-client.js';
+  import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML, descricaoToHTML, sanitizeDescricao, placeholderPhoto, finalidadesArray } from './assets/supabase-client.js';
 
   const params = new URLSearchParams(window.location.search);
   const codigo = params.get('codigo');
@@ -372,12 +381,26 @@
     if (!imovel) return;
 
     document.title = `${imovel.titulo} | MCJ Capital Invest`;
+    const finalidades = finalidadesArray(imovel);
+    const podeComprar = finalidades.includes('comprar');
+    const podeAlugar = finalidades.includes('alugar');
+    const finalidadeTexto = podeComprar && podeAlugar ? 'Comprar ou Alugar' : (podeAlugar ? 'Alugar' : 'Comprar');
+
     document.getElementById('detailCode').textContent = `Código do Imóvel: ${imovel.codigo}`;
-    document.getElementById('detailPurpose').textContent = `Finalidade: ${imovel.finalidade === 'alugar' ? 'Alugar' : 'Comprar'}`;
+    document.getElementById('detailPurpose').textContent = `Finalidade: ${finalidadeTexto}`;
     document.getElementById('detailTitle').textContent = imovel.titulo;
     document.getElementById('detailLocation').textContent = [imovel.bairro, imovel.cidade].filter(Boolean).join(', ');
     document.getElementById('detailDescription').innerHTML = sanitizeDescricao(descricaoToHTML(imovel.descricao || ''));
+
+    document.getElementById('priceValorItem').style.display = podeComprar ? '' : 'none';
     document.getElementById('priceValor').textContent = formatBRL(imovel.valor);
+    const aluguelItem = document.getElementById('priceAluguelItem');
+    if (podeAlugar) {
+      document.getElementById('priceAluguel').textContent = `${formatBRL(imovel.valor_aluguel)}/mês`;
+      aluguelItem.style.display = '';
+    } else {
+      aluguelItem.style.display = 'none';
+    }
     document.getElementById('priceCondominio').textContent = formatBRL(imovel.valor_condominio);
     const iptuItem = document.getElementById('priceIptuItem');
     if (imovel.iptu) {
@@ -415,7 +438,7 @@
     }
 
     // Imóveis similares (mesma finalidade, excluindo o atual)
-    const similares = (await fetchImoveis({ finalidade: imovel.finalidade, limit: 6 })).filter(i => i.codigo !== imovel.codigo).slice(0, 3);
+    const similares = (await fetchImoveis({ finalidade: finalidades[0], limit: 6 })).filter(i => i.codigo !== imovel.codigo).slice(0, 3);
     if (similares.length > 0) {
       const track = document.getElementById('similarTrack');
       track.innerHTML = similares.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join('');

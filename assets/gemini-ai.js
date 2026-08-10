@@ -28,7 +28,7 @@ Analise o texto abaixo e retorne SOMENTE um objeto JSON válido (sem markdown, s
 {
   "codigo": string (código/referência do imóvel, se houver no texto; senão ""),
   "titulo": string (título comercial atrativo, ex: "Apartamento Ultra Luxo no Jardins"),
-  "finalidade": "comprar" ou "alugar",
+  "finalidade": array com um ou os dois valores — ["comprar"], ["alugar"] ou ["comprar","alugar"] (o texto pode indicar as duas finalidades ao mesmo tempo, ex: "vende ou aluga"),
   "tipo": um destes valores exatamente — "Apartamento", "Casa", "Cobertura", "Comercial" ou "Terreno",
   "bairro": string,
   "cidade": string (ex: "São Paulo - SP"),
@@ -38,7 +38,8 @@ Analise o texto abaixo e retorne SOMENTE um objeto JSON válido (sem markdown, s
   "suites": number,
   "vagas": number,
   "area": number (em m², apenas o número),
-  "valor": number (valor de venda/aluguel, apenas números, sem "R$" ou pontos),
+  "valor": number (valor de VENDA, apenas números, sem "R$" ou pontos; 0 se o imóvel for só para alugar),
+  "valor_aluguel": number (valor do ALUGUEL mensal, apenas números; 0 se o imóvel for só para vender),
   "valor_condominio": number (apenas números, 0 se não informado),
   "iptu": number (valor do IPTU, apenas números, 0 se não informado),
   "descricao": string em MARKDOWN (não HTML) — siga ESTRITAMENTE as instruções de tom, estilo e estrutura descritas abaixo.
