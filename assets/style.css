@@ -361,17 +361,16 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 }
 .car-btn:hover{background:#E6C687;color:#141210;border-color:#E6C687;transform:scale(1.08);}
 
-/* Carrossel "Imóveis em Destaque" da home — mesmo efeito de pilha/profundidade
-   (Swiper coverflow) usado na galeria da página do imóvel. */
+/* Carrossel "Imóveis em Destaque" da home — grade com slidesPerView fixo por
+   breakpoint (sem centeredSlides), pra evitar o loop travar com poucos itens. */
 .destaques-swiper{width:100%;padding:20px 0 50px;}
+.destaques-swiper .swiper-wrapper{max-width:none;}
 .destaques-swiper .swiper-slide{
-  width:min(78vw, 360px);
-  max-width:360px;
-  opacity:.4;
-  filter:blur(1px) saturate(.75);
-  transition:opacity .4s ease, filter .4s ease;
+  height:auto;
+  box-sizing:border-box;
+  opacity:1;
+  filter:none;
 }
-.destaques-swiper .swiper-slide-active{opacity:1;filter:none;}
 .destaques-swiper .property-card{height:100%;}
 
 /* Carrossel "Conheça Nossos Imóveis" — mesmo tratamento 3D/coverflow: 1 card em
@@ -388,17 +387,17 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .imoveis-swiper .swiper-slide-active{opacity:1;filter:none;}
 .imoveis-swiper .property-card{height:100%;}
 
-/* Carrossel "Imóveis Similares" da página de detalhe do imóvel — mesmo
-   tratamento 3D/coverflow das demais vitrines do site. */
+/* Carrossel "Imóveis Similares" da página de detalhe do imóvel — grade com
+   slidesPerView fixo por breakpoint (sem centeredSlides), mesmo tratamento
+   do carrossel de Destaques. */
 .similares-swiper{width:100%;padding:20px 0 50px;}
+.similares-swiper .swiper-wrapper{max-width:none;}
 .similares-swiper .swiper-slide{
-  width:min(78vw, 360px);
-  max-width:360px;
-  opacity:.4;
-  filter:blur(1px) saturate(.75);
-  transition:opacity .4s ease, filter .4s ease;
+  height:auto;
+  box-sizing:border-box;
+  opacity:1;
+  filter:none;
 }
-.similares-swiper .swiper-slide-active{opacity:1;filter:none;}
 .similares-swiper .property-card{height:100%;}
 
 /* Sofisticação band */

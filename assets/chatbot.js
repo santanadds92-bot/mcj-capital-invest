@@ -1,5 +1,5 @@
 // =====================================================================
-// Corretor Atendente — assistente virtual da MCJ Capital Invest
+// Corretor Marcio Jorge — assistente virtual da MCJ Capital Invest
 // Widget de chat (HTML/CSS/JS puro) integrado à API do Google Gemini.
 // =====================================================================
 //
@@ -29,7 +29,7 @@ const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMERO}`;
 const MODEL_CANDIDATES = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-1.5-flash'];
 
 function buildSystemInstruction(catalogoResumo) {
-  return `Você é o "Corretor Atendente" virtual da MCJ Capital Invest, uma imobiliária especializada em imóveis de alto padrão em São Paulo. Seu tom de voz é sofisticado, cordial, consultivo e discreto — como um corretor experiente que atende clientes exigentes, nunca informal ou apressado.
+  return `Você é o "Corretor Marcio Jorge", o assistente virtual da MCJ Capital Invest, uma imobiliária especializada em imóveis de alto padrão em São Paulo. Seu tom de voz é sofisticado, cordial, consultivo e discreto — como um corretor experiente que atende clientes exigentes, nunca informal ou apressado.
 
 Responda sempre em português do Brasil, em mensagens curtas e claras (isto é um chat, não um e-mail) — no máximo 3 a 5 frases por resposta, a menos que o cliente peça mais detalhes.
 
@@ -52,18 +52,18 @@ Se não souber responder algo com certeza, seja honesto e direcione para o Whats
 
 function buildWidgetHTML() {
   return `
-    <button type="button" class="mcj-chat-fab" id="mcjChatFab" aria-label="Falar com o Corretor Atendente">
-      <img src="assets/chat-icon-corretor.png" alt="Corretor Atendente">
+    <button type="button" class="mcj-chat-fab" id="mcjChatFab" aria-label="Falar com o Corretor Marcio Jorge">
+      <img src="assets/chat-icon-marcio.png" alt="Corretor Marcio Jorge">
       <span class="mcj-chat-fab-dot"></span>
     </button>
 
-    <div class="mcj-chat-window" id="mcjChatWindow" role="dialog" aria-label="Corretor Atendente MCJ Capital Invest">
+    <div class="mcj-chat-window" id="mcjChatWindow" role="dialog" aria-label="Corretor Marcio Jorge — MCJ Capital Invest">
       <div class="mcj-chat-header">
         <div class="mcj-chat-avatar">
-          <img src="assets/chat-icon-corretor.png" alt="Corretor Atendente">
+          <img src="assets/chat-icon-marcio.png" alt="Corretor Marcio Jorge">
         </div>
         <div class="mcj-chat-header-info">
-          <strong>Corretor Atendente — MCJ Capital Invest</strong>
+          <strong>Corretor Marcio Jorge — MCJ Capital Invest</strong>
           <div class="mcj-chat-status"><span class="dot"></span> Online</div>
         </div>
         <button type="button" class="mcj-chat-close" id="mcjChatClose" aria-label="Fechar chat">&times;</button>
@@ -199,7 +199,7 @@ function initChatWidget() {
     fab.classList.add('hidden-while-open');
     if (!welcomed) {
       welcomed = true;
-      addMessage('bot', 'Boa tarde! Sou o Corretor Atendente da MCJ Capital Invest. Está buscando um imóvel para comprar ou para alugar? Posso ajudar a encontrar a opção ideal.');
+      addMessage('bot', 'Boa tarde! Sou o Corretor Marcio Jorge, da MCJ Capital Invest. Está buscando um imóvel para comprar ou para alugar? Posso ajudar a encontrar a opção ideal.');
     }
     input.focus();
   }

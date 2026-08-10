@@ -379,27 +379,30 @@
 <script type="module" src="assets/theme.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-  // Carrossel "Imóveis em Destaque" — efeito de pilha/profundidade (coverflow)
-  // Fluxo estrito para evitar que o loop trave quando os slides são trocados
-  // dinamicamente (dados assíncronos do Supabase): 1) destrói a instância
-  // atual, 2) só então mexe no HTML da .swiper-wrapper, 3) cria a nova
-  // instância depois do HTML já estar no DOM.
+  // Carrossel "Imóveis em Destaque" — grade com slidesPerView fixo por
+  // breakpoint (sem centeredSlides, que conflitava com loop:true na hora de
+  // calcular a largura dos cards e travava o último slide com espaço vazio).
+  // Fluxo estrito: 1) destrói a instância atual, 2) só então mexe no HTML da
+  // .swiper-wrapper, 3) cria a nova instância depois do HTML já estar no DOM.
   let destaquesSwiper;
   const carouselTrackEl = document.getElementById('carouselTrack');
 
   function createDestaquesSwiper() {
     if (carouselTrackEl.children.length === 0) return;
     destaquesSwiper = new Swiper('.destaques-swiper', {
-      effect: 'coverflow',
       grabCursor: true,
-      centeredSlides: true,
+      centeredSlides: false,
       loop: true,
+      loopedSlides: 5,
+      loopAdditionalSlides: 5,
       observer: true,
       observeParents: true,
-      loopAdditionalSlides: 3,
-      slidesPerView: 'auto',
       spaceBetween: 20,
-      coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
+      breakpoints: {
+        320: { slidesPerView: 1, spaceBetween: 15 },
+        768: { slidesPerView: 2, spaceBetween: 20 },
+        1024: { slidesPerView: 3, spaceBetween: 30 },
+      },
       autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
       navigation: { nextEl: '#carNext', prevEl: '#carPrev' },
     });
@@ -408,12 +411,12 @@
   function renderDestaques(cardsArray) {
     // 1) destrói a instância atual antes de tocar no DOM
     if (destaquesSwiper) { destaquesSwiper.destroy(true, true); destaquesSwiper = null; }
-    // Com poucos imóveis (<4), o loop do Swiper não tem slides suficientes pra
+    // Com poucos imóveis (<6), o loop do Swiper não tem slides suficientes pra
     // preencher a tela e sobra um espaço vazio à direita antes de repetir — então
-    // duplicamos os cards até ter pelo menos 4 antes de inicializar.
+    // duplicamos os cards até ter pelo menos 6 antes de inicializar.
     let cards = [...cardsArray];
     if (cards.length > 0) {
-      while (cards.length < 4) cards = cards.concat(cardsArray);
+      while (cards.length < 6) cards = cards.concat(cardsArray);
     }
     // 2) insere os cards (já duplicados se necessário) na .swiper-wrapper
     carouselTrackEl.innerHTML = cards.join('');

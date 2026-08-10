@@ -296,9 +296,9 @@
 <script type="module" src="assets/theme.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-  // Carrossel "Imóveis Similares" — mesmo efeito 3D/coverflow das outras
-  // vitrines do site, com 1 card em destaque no centro, prévia recuada dos
-  // vizinhos, autoplay contínuo (pausado ao passar o mouse) e navegação.
+  // Carrossel "Imóveis Similares" — grade com slidesPerView fixo por
+  // breakpoint (sem centeredSlides, que conflitava com loop:true na hora de
+  // calcular a largura dos cards e travava o último slide com espaço vazio).
   // Fluxo estrito para o loop não travar ao trocar os slides dinamicamente:
   // 1) destrói a instância atual, 2) só então mexe no HTML da .swiper-wrapper,
   // 3) cria a nova instância depois do HTML já estar no DOM.
@@ -308,16 +308,19 @@
   function createSimilaresSwiper() {
     if (similarTrackEl.children.length === 0) return;
     similaresSwiper = new Swiper('.similares-swiper', {
-      effect: 'coverflow',
       grabCursor: true,
-      centeredSlides: true,
+      centeredSlides: false,
       loop: true,
+      loopedSlides: 5,
+      loopAdditionalSlides: 5,
       observer: true,
       observeParents: true,
-      loopAdditionalSlides: 3,
-      slidesPerView: 'auto',
       spaceBetween: 20,
-      coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
+      breakpoints: {
+        320: { slidesPerView: 1, spaceBetween: 15 },
+        768: { slidesPerView: 2, spaceBetween: 20 },
+        1024: { slidesPerView: 3, spaceBetween: 30 },
+      },
       autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
       navigation: { nextEl: '#simNext', prevEl: '#simPrev' },
     });
@@ -326,12 +329,12 @@
   function renderSimilares(cardsArray) {
     // 1) destrói a instância atual antes de tocar no DOM
     if (similaresSwiper) { similaresSwiper.destroy(true, true); similaresSwiper = null; }
-    // Com poucos imóveis similares (<4), o loop do Swiper não tem slides
+    // Com poucos imóveis similares (<6), o loop do Swiper não tem slides
     // suficientes pra preencher a tela e sobra espaço vazio à direita — então
-    // duplicamos os cards até ter pelo menos 4 antes de inicializar.
+    // duplicamos os cards até ter pelo menos 6 antes de inicializar.
     let cards = [...cardsArray];
     if (cards.length > 0) {
-      while (cards.length < 4) cards = cards.concat(cardsArray);
+      while (cards.length < 6) cards = cards.concat(cardsArray);
     }
     // 2) insere os cards (já duplicados se necessário) na .swiper-wrapper
     similarTrackEl.innerHTML = cards.join('');
