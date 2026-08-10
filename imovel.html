@@ -323,9 +323,19 @@
     });
   }
 
-  function renderSimilares(cardsHTML) {
+  function renderSimilares(cardsArray) {
+    // 1) destrói a instância atual antes de tocar no DOM
     if (similaresSwiper) { similaresSwiper.destroy(true, true); similaresSwiper = null; }
-    similarTrackEl.innerHTML = cardsHTML;
+    // Com poucos imóveis similares (<4), o loop do Swiper não tem slides
+    // suficientes pra preencher a tela e sobra espaço vazio à direita — então
+    // duplicamos os cards até ter pelo menos 4 antes de inicializar.
+    let cards = [...cardsArray];
+    if (cards.length > 0) {
+      while (cards.length < 4) cards = cards.concat(cardsArray);
+    }
+    // 2) insere os cards (já duplicados se necessário) na .swiper-wrapper
+    similarTrackEl.innerHTML = cards.join('');
+    // 3) só cria a nova instância depois do HTML já estar no DOM
     createSimilaresSwiper();
   }
   window.renderSimilares = renderSimilares;
@@ -449,7 +459,7 @@
     // Imóveis similares (mesma finalidade, excluindo o atual)
     const similares = (await fetchImoveis({ finalidade: finalidades[0], limit: 6 })).filter(i => i.codigo !== imovel.codigo).slice(0, 3);
     if (similares.length > 0) {
-      window.renderSimilares(similares.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join(''));
+      window.renderSimilares(similares.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`));
     }
   }
 

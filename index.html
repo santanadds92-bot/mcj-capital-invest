@@ -405,9 +405,19 @@
     });
   }
 
-  function renderDestaques(cardsHTML) {
+  function renderDestaques(cardsArray) {
+    // 1) destrói a instância atual antes de tocar no DOM
     if (destaquesSwiper) { destaquesSwiper.destroy(true, true); destaquesSwiper = null; }
-    carouselTrackEl.innerHTML = cardsHTML;
+    // Com poucos imóveis (<4), o loop do Swiper não tem slides suficientes pra
+    // preencher a tela e sobra um espaço vazio à direita antes de repetir — então
+    // duplicamos os cards até ter pelo menos 4 antes de inicializar.
+    let cards = [...cardsArray];
+    if (cards.length > 0) {
+      while (cards.length < 4) cards = cards.concat(cardsArray);
+    }
+    // 2) insere os cards (já duplicados se necessário) na .swiper-wrapper
+    carouselTrackEl.innerHTML = cards.join('');
+    // 3) só cria a nova instância depois do HTML já estar no DOM
     createDestaquesSwiper();
   }
   window.renderDestaques = renderDestaques;
@@ -479,7 +489,7 @@
     }
 
     if (destaques.length > 0) {
-      window.renderDestaques(destaques.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join(''));
+      window.renderDestaques(destaques.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`));
     }
   }
 
