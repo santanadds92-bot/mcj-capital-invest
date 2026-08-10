@@ -1,30 +1,29 @@
-// Alternador de Tema Claro / Escuro — QRV Artigos Táticos
-// Obs: para evitar "flash" do tema errado, cada página já aplica o tema salvo
-// via um pequeno script inline no <head> (antes do CSS carregar). Este arquivo
-// cuida apenas da interação do botão e de manter tudo sincronizado.
+// Alternância de tema (Light / Dark) — MCJ Capital Invest
+// Salva a preferência em localStorage e aplica via classe "light-mode" no <body>.
 
-const THEME_KEY = 'qrv_theme';
+const THEME_KEY = 'mcj_theme';
 
 function getSavedTheme() {
-  return localStorage.getItem(THEME_KEY) || 'light';
+  return localStorage.getItem(THEME_KEY) || 'dark';
 }
 
 function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
+  document.body.classList.toggle('light-mode', theme === 'light');
   document.querySelectorAll('.theme-toggle .theme-icon').forEach(el => {
-    el.textContent = theme === 'light' ? '☀️' : '🌙';
+    el.textContent = theme === 'light' ? '🌙' : '☀️';
   });
   document.querySelectorAll('.theme-toggle').forEach(btn => {
-    btn.setAttribute('aria-label', theme === 'light' ? 'Ativar tema escuro' : 'Ativar tema claro');
-    btn.title = theme === 'light' ? 'Ativar tema escuro' : 'Ativar tema claro';
+    const label = theme === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro';
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
   });
 }
 
 function toggleTheme() {
-  const atual = getSavedTheme();
-  const novo = atual === 'light' ? 'dark' : 'light';
-  localStorage.setItem(THEME_KEY, novo);
-  applyTheme(novo);
+  const current = document.body.classList.contains('light-mode') ? 'light' : 'dark';
+  const next = current === 'light' ? 'dark' : 'light';
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,140 +1,174 @@
 -- ============================================================
--- QRV ARTIGOS TÁTICOS — Setup do Supabase
--- Rode este script inteiro no SQL Editor do seu projeto Supabase.
--- Substitua 'santanadds92@gmail.com' pelo e-mail do admin
--- (o mesmo que você vai usar para logar no admin.html) em TODAS
--- as políticas abaixo antes de rodar.
+-- MCJ Capital Invest — Setup do banco de dados no Supabase
+-- Cole este script inteiro em: Supabase > SQL Editor > New Query
+-- e clique em "Run". Pode rodar tudo de uma vez.
 -- ============================================================
 
--- ---------- 1. Tabela de produtos ----------
-create table if not exists public.produtos (
+-- 1) Tabela de imóveis
+create table if not exists public.imoveis (
   id uuid primary key default gen_random_uuid(),
+  created_at timestamptz default now(),
   codigo text unique not null,
   titulo text not null,
-  categoria text not null,           -- vestuario, calcados, mochilas, insignias, protecao, facas, kits, acessorios, replicas
-  corporacao text,                    -- EB, MB, FAB, PMESP, PM (outros estados), Bombeiros, Civil, Geral
+  finalidade text not null default 'comprar', -- 'comprar' ou 'alugar'
+  tipo text,                                  -- Casa, Apartamento, Comercial, Cobertura...
+  bairro text,
+  cidade text,
+  endereco text,                              -- endereço completo, usado no mapa
+  quartos int default 0,
+  banheiros int default 0,
+  suites int default 0,
+  vagas int default 0,
+  area numeric,
   descricao text,
-  tamanhos text[] default '{}',       -- ex: {P,M,G,GG} ou {38,39,40,41,42}
-  cores text[] default '{}',
-  preco numeric not null,
-  preco_promocional numeric,
-  estoque_status text not null default 'disponivel',  -- disponivel, sob_encomenda, esgotado
-  personalizavel boolean default false,               -- exige nome de guerra / batalhão no pedido
-  fotos text[] default '{}',
-  destaque boolean default false,
-  status text not null default 'ativo',                -- ativo, inativo, arquivado
-  created_at timestamptz default now()
+  valor numeric,
+  valor_condominio numeric,
+  iptu numeric,                                -- valor do IPTU
+  video_url text,                             -- link do YouTube ou Vimeo
+  fotos jsonb not null default '[]'::jsonb,   -- lista de URLs das fotos
+  destaque boolean not null default false,
+  status text not null default 'ativo',       -- 'ativo', 'inativo' ou 'pendente' (anúncio público aguardando aprovação)
+  proprietario_nome text,                     -- preenchido quando o imóvel vem do formulário público "Anunciar"
+  proprietario_telefone text,
+  proprietario_email text
 );
 
--- ---------- 2. Mensagens de contato ----------
+-- 1b) Se a tabela "imoveis" já existia antes (criada em uma execução anterior deste
+--     script), rode as linhas abaixo para adicionar as colunas novas sem perder nada:
+-- alter table public.imoveis add column if not exists iptu numeric;
+-- alter table public.imoveis add column if not exists proprietario_nome text;
+-- alter table public.imoveis add column if not exists proprietario_telefone text;
+-- alter table public.imoveis add column if not exists proprietario_email text;
+
+-- 2) Segurança: habilita RLS (controle de acesso por linha)
+alter table public.imoveis enable row level security;
+
+-- 3) Qualquer visitante do site pode LER imóveis ativos
+drop policy if exists "Leitura pública de imóveis ativos" on public.imoveis;
+create policy "Leitura pública de imóveis ativos"
+  on public.imoveis for select
+  using (status = 'ativo');
+
+-- 4) Só usuário logado (você, admin) pode inserir/editar/excluir
+drop policy if exists "Admin insere imóveis" on public.imoveis;
+create policy "Admin insere imóveis"
+  on public.imoveis for insert
+  to authenticated
+  with check (true);
+
+drop policy if exists "Admin edita imóveis" on public.imoveis;
+create policy "Admin edita imóveis"
+  on public.imoveis for update
+  to authenticated
+  using (true);
+
+drop policy if exists "Admin exclui imóveis" on public.imoveis;
+create policy "Admin exclui imóveis"
+  on public.imoveis for delete
+  to authenticated
+  using (true);
+
+-- também deixa você (admin) ler os inativos no painel
+drop policy if exists "Admin lê todos os imóveis" on public.imoveis;
+create policy "Admin lê todos os imóveis"
+  on public.imoveis for select
+  to authenticated
+  using (true);
+
+-- 5) Bucket de Storage para as fotos dos imóveis
+insert into storage.buckets (id, name, public)
+values ('imoveis-fotos', 'imoveis-fotos', true)
+on conflict (id) do nothing;
+
+-- 6) Qualquer visitante pode VER as fotos (bucket público)
+drop policy if exists "Leitura pública das fotos" on storage.objects;
+create policy "Leitura pública das fotos"
+  on storage.objects for select
+  using (bucket_id = 'imoveis-fotos');
+
+-- 7) Só usuário logado pode enviar/excluir fotos
+drop policy if exists "Admin envia fotos" on storage.objects;
+create policy "Admin envia fotos"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'imoveis-fotos');
+
+drop policy if exists "Admin exclui fotos" on storage.objects;
+create policy "Admin exclui fotos"
+  on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'imoveis-fotos');
+
+-- ============================================================
+-- PARTE 2 — Anúncios públicos ("Anunciar Seu Imóvel") + Fale Conosco
+-- Se você já rodou a Parte 1 antes, pode colar e rodar só o bloco
+-- abaixo (não precisa repetir o que já rodou).
+-- ============================================================
+
+-- 8) Permite que QUALQUER visitante (não logado) envie um imóvel pela página
+--    "Anunciar Seu Imóvel", mas SOMENTE com status 'pendente' — ele fica
+--    invisível na busca pública (que só mostra status = 'ativo') até você
+--    aprovar manualmente no painel admin.
+drop policy if exists "Público envia imóvel para aprovação" on public.imoveis;
+create policy "Público envia imóvel para aprovação"
+  on public.imoveis for insert
+  to anon
+  with check (status = 'pendente');
+
+-- 9) Permite que o visitante envie as fotos do imóvel anunciado (mesmo bucket
+--    já usado pelo admin). O bucket é público para leitura, então as fotos
+--    aparecem no site normalmente depois que o anúncio é aprovado.
+drop policy if exists "Público envia fotos (anúncio)" on storage.objects;
+create policy "Público envia fotos (anúncio)"
+  on storage.objects for insert
+  to anon
+  with check (bucket_id = 'imoveis-fotos');
+
+-- 10) Tabela de mensagens recebidas pelo formulário "Fale Conosco"
 create table if not exists public.mensagens_contato (
   id uuid primary key default gen_random_uuid(),
+  created_at timestamptz default now(),
   nome text not null,
   email text,
   telefone text,
   mensagem text not null,
-  lida boolean default false,
-  created_at timestamptz default now()
+  lida boolean not null default false
 );
 
--- ---------- 3. Solicitações de bordado / personalização ----------
-create table if not exists public.solicitacoes_bordado (
-  id uuid primary key default gen_random_uuid(),
-  nome text not null,
-  telefone text not null,
-  tipo_peca text,           -- camisa, boné, mochila, etc.
-  o_que_bordar text,        -- nome de guerra, tipo sanguíneo, batalhão...
-  observacoes text,
-  status text not null default 'novo',   -- novo, em_andamento, concluido
-  created_at timestamptz default now()
-);
-
--- ---------- 4. Solicitações de revenda ----------
-create table if not exists public.solicitacoes_revenda (
-  id uuid primary key default gen_random_uuid(),
-  nome text not null,
-  telefone text not null,
-  cidade text,
-  tipo_negocio text,
-  observacoes text,
-  status text not null default 'novo',   -- novo, contatado, aprovado, recusado
-  created_at timestamptz default now()
-);
-
--- ---------- RLS ----------
-alter table public.produtos enable row level security;
 alter table public.mensagens_contato enable row level security;
-alter table public.solicitacoes_bordado enable row level security;
-alter table public.solicitacoes_revenda enable row level security;
 
--- Produtos: leitura pública só do que está ativo; escrita só do admin
-create policy "Public read produtos ativos" on public.produtos
-  for select using (status = 'ativo');
+-- Qualquer visitante pode ENVIAR uma mensagem de contato
+drop policy if exists "Público envia mensagem de contato" on public.mensagens_contato;
+create policy "Público envia mensagem de contato"
+  on public.mensagens_contato for insert
+  to anon
+  with check (true);
 
-create policy "Admin full access produtos" on public.produtos
-  for all using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com')
-  with check (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
+-- Só o admin (logado) pode LER, marcar como lida ou excluir mensagens
+drop policy if exists "Admin lê mensagens de contato" on public.mensagens_contato;
+create policy "Admin lê mensagens de contato"
+  on public.mensagens_contato for select
+  to authenticated
+  using (true);
 
--- Mensagens de contato: qualquer visitante pode inserir; só o admin lê/gerencia
-create policy "Anon insert mensagens_contato" on public.mensagens_contato
-  for insert with check (true);
+drop policy if exists "Admin atualiza mensagens de contato" on public.mensagens_contato;
+create policy "Admin atualiza mensagens de contato"
+  on public.mensagens_contato for update
+  to authenticated
+  using (true);
 
-create policy "Admin manage mensagens_contato" on public.mensagens_contato
-  for select using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
+drop policy if exists "Admin exclui mensagens de contato" on public.mensagens_contato;
+create policy "Admin exclui mensagens de contato"
+  on public.mensagens_contato for delete
+  to authenticated
+  using (true);
 
-create policy "Admin update mensagens_contato" on public.mensagens_contato
-  for update using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
-
-create policy "Admin delete mensagens_contato" on public.mensagens_contato
-  for delete using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
-
--- Solicitações de bordado: mesmo padrão
-create policy "Anon insert solicitacoes_bordado" on public.solicitacoes_bordado
-  for insert with check (true);
-
-create policy "Admin manage solicitacoes_bordado" on public.solicitacoes_bordado
-  for select using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
-
-create policy "Admin update solicitacoes_bordado" on public.solicitacoes_bordado
-  for update using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
-
-create policy "Admin delete solicitacoes_bordado" on public.solicitacoes_bordado
-  for delete using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
-
--- Solicitações de revenda: mesmo padrão
-create policy "Anon insert solicitacoes_revenda" on public.solicitacoes_revenda
-  for insert with check (true);
-
-create policy "Admin manage solicitacoes_revenda" on public.solicitacoes_revenda
-  for select using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
-
-create policy "Admin update solicitacoes_revenda" on public.solicitacoes_revenda
-  for update using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
-
-create policy "Admin delete solicitacoes_revenda" on public.solicitacoes_revenda
-  for delete using (auth.jwt() ->> 'email' = 'santanadds92@gmail.com');
-
--- ---------- Storage: bucket público de fotos de produto ----------
-insert into storage.buckets (id, name, public)
-values ('produtos-fotos', 'produtos-fotos', true)
-on conflict (id) do nothing;
-
-create policy "Public read produtos-fotos" on storage.objects
-  for select using (bucket_id = 'produtos-fotos');
-
-create policy "Admin upload produtos-fotos" on storage.objects
-  for insert with check (
-    bucket_id = 'produtos-fotos'
-    and auth.jwt() ->> 'email' = 'santanadds92@gmail.com'
-  );
-
-create policy "Admin delete produtos-fotos" on storage.objects
-  for delete using (
-    bucket_id = 'produtos-fotos'
-    and auth.jwt() ->> 'email' = 'santanadds92@gmail.com'
-  );
-
--- ---------- Criação do usuário admin ----------
--- Crie o usuário manualmente em Authentication > Users no painel do Supabase,
--- usando o mesmo e-mail que você colocou nas políticas acima. Não precisa de
--- tabela extra: a policy já valida direto pelo e-mail do JWT autenticado.
+-- ============================================================
+-- Depois de rodar este script:
+-- 1. Vá em Authentication > Providers > Email e DESLIGUE
+--    "Allow new users to sign up" (assim ninguém além de você
+--    consegue criar conta).
+-- 2. Vá em Authentication > Users > Add User e crie o SEU
+--    usuário admin (e-mail + senha). É esse login que você vai
+--    usar no admin.html.
+-- ============================================================

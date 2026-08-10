@@ -1,55 +1,60 @@
-// Cliente Supabase compartilhado + funções auxiliares — QRV Artigos Táticos
-// Usado por todas as páginas públicas e pelo admin.html (via <script type="module">)
+// Cliente Supabase compartilhado + funções auxiliares
+// Usado por index.html, imovel.html e admin.html (via <script type="module">)
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-// ⚠️ SUBSTITUA pelos dados do SEU projeto Supabase (Project Settings > API).
-// Este projeto precisa ser NOVO e separado do projeto usado na MCJ Capital Invest.
-const SUPABASE_URL = 'https://aixudpelpjyuwpsocikk.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_iSrtlIBmWaNKjSpxLPLo7g_ERGZtJ22';
+const SUPABASE_URL = 'https://zmvxmsvbvuiikxsuxoxl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_OoqjA-L-EBDy6sYcJlRZew_J-f1LHnF';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-export const FOTOS_BUCKET = 'produtos-fotos';
-
-// ⚠️ SUBSTITUA pelo número de WhatsApp da loja (com DDI+DDD, só números).
-export const WHATSAPP_NUMERO = '5511993217675';
+export const FOTOS_BUCKET = 'imoveis-fotos';
 
 // ---------- Formatação ----------
 export function formatBRL(value) {
-  if (value === null || value === undefined || value === '') return 'Consulte o valor';
+  if (value === null || value === undefined || value === '') return 'Consulte valores';
   const num = Number(value);
-  if (Number.isNaN(num) || num === 0) return 'Consulte o valor';
+  if (Number.isNaN(num) || num === 0) return 'Consulte valores';
   return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-export function labelCategoria(cat) {
-  const map = {
-    vestuario: 'Vestuário e Fardamento',
-    calcados: 'Calçados Militares',
-    mochilas: 'Mochilas e Bolsas',
-    insignias: 'Brevês, Insígnias e Bordados',
-    protecao: 'Proteção e Defesa Pessoal',
-    facas: 'Facas e Canivetes',
-    kits: 'Kits Especializados',
-    acessorios: 'Acessórios Táticos',
-    replicas: 'Réplicas Decorativas',
-  };
-  return map[cat] || cat;
+// ---------- Vídeo: transforma link do YouTube/Vimeo em URL de embed ----------
+export function videoEmbedUrl(url) {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    // YouTube: youtu.be/ID  ou  youtube.com/watch?v=ID  ou  youtube.com/embed/ID
+    if (u.hostname.includes('youtu.be')) {
+      const id = u.pathname.replace('/', '');
+      return `https://www.youtube.com/embed/${id}`;
+    }
+    if (u.hostname.includes('youtube.com')) {
+      if (u.pathname.startsWith('/embed/')) return url;
+      const id = u.searchParams.get('v');
+      if (id) return `https://www.youtube.com/embed/${id}`;
+    }
+    // Vimeo: vimeo.com/ID
+    if (u.hostname.includes('vimeo.com')) {
+      const id = u.pathname.split('/').filter(Boolean).pop();
+      return `https://player.vimeo.com/video/${id}`;
+    }
+    return url;
+  } catch {
+    return null;
+  }
 }
 
-export function whatsappLink(produto) {
-  const texto = produto
-    ? `Olá! Tenho interesse no produto *${produto.titulo}* (código ${produto.codigo}) que vi no site da QRV Artigos Táticos.`
-    : 'Olá! Vim pelo site da QRV Artigos Táticos e gostaria de mais informações.';
-  return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(texto)}`;
+// ---------- Mapa: gera URL de embed do Google Maps sem precisar de API key ----------
+export function mapsEmbedUrl(query) {
+  const q = encodeURIComponent(query || 'São Paulo, SP');
+  return `https://www.google.com/maps?q=${q}&output=embed`;
 }
 
 // ---------- Configurações do site (tabela site_config: chave/valor) ----------
-// Usado para guardar a chave da API do Gemini do chat "Recruta QRV" — assim
-// ela é editável direto no Admin (aba de produtos) sem precisar mexer em
-// código nem fazer commit/redeploy. A tabela tem leitura pública (o widget
-// de chat roda em páginas públicas, sem login) e escrita restrita ao admin
-// via RLS — rode supabase-site-config.sql uma vez no SQL Editor para criá-la.
+// Usado para guardar a chave da API do Gemini do "Corretor Atendente" —
+// assim ela é editável direto no Admin, sem precisar mexer em código nem
+// fazer commit/redeploy. Leitura pública (o widget de chat roda em páginas
+// sem login), escrita só autenticado — rode site-config-setup.sql uma vez
+// no Supabase antes de usar.
 export async function getSiteConfig(chave) {
   const { data, error } = await supabase.from('site_config').select('valor').eq('chave', chave).maybeSingle();
   if (error || !data) return '';
@@ -60,40 +65,28 @@ export async function setSiteConfig(chave, valor) {
   return supabase.from('site_config').upsert({ chave, valor }, { onConflict: 'chave' });
 }
 
-// ---------- Busca lista de produtos ativos (com filtros opcionais) ----------
-export async function fetchProdutos({ categoria, corporacao, destaque, limit, precoMax, busca, codigo } = {}) {
-  let query = supabase.from('produtos').select('*').eq('status', 'ativo').order('created_at', { ascending: false });
-  if (categoria) query = query.eq('categoria', categoria);
-  if (corporacao) query = query.eq('corporacao', corporacao);
+// ---------- Busca lista de imóveis ativos (com filtro opcional de finalidade / destaque) ----------
+export async function fetchImoveis({ finalidade, destaque, limit, tipo, bairro, quartosMin, valorMax, codigo } = {}) {
+  let query = supabase.from('imoveis').select('*').eq('status', 'ativo').order('created_at', { ascending: false });
+  // finalidade agora é um array (um imóvel pode ser pra Comprar e Alugar ao
+  // mesmo tempo) — .contains verifica se o valor pedido está na lista.
+  if (finalidade) query = query.contains('finalidade', [finalidade]);
   if (destaque !== undefined) query = query.eq('destaque', destaque);
-  if (precoMax) query = query.lte('preco', precoMax);
+  if (tipo) query = query.eq('tipo', tipo);
+  if (bairro) query = query.eq('bairro', bairro);
+  if (quartosMin) query = query.gte('quartos', quartosMin);
+  if (valorMax) query = query.lte('valor', valorMax);
   if (codigo) query = query.ilike('codigo', `%${codigo}%`);
-  if (busca) query = query.ilike('titulo', `%${busca}%`);
   if (limit) query = query.limit(limit);
   const { data, error } = await query;
   if (error) {
-    console.error('Erro ao buscar produtos:', error.message);
+    console.error('Erro ao buscar imóveis:', error.message);
     return [];
   }
   return data || [];
 }
 
-// ---------- Busca um produto específico pelo código ----------
-export async function fetchProdutoByCodigo(codigo) {
-  const { data, error } = await supabase
-    .from('produtos')
-    .select('*')
-    .eq('codigo', codigo)
-    .eq('status', 'ativo')
-    .maybeSingle();
-  if (error) {
-    console.error('Erro ao buscar produto:', error.message);
-    return null;
-  }
-  return data;
-}
-
-// ---------- Envia fotos para o bucket público (usado no admin) ----------
+// ---------- Envia fotos para o bucket público (usado no admin e no formulário público de anúncio) ----------
 export async function uploadFotos(files) {
   const urls = [];
   for (const file of files) {
@@ -110,22 +103,38 @@ export async function uploadFotos(files) {
   return urls;
 }
 
-// ---------- Formulário "Fale Conosco" ----------
+// ---------- Envia um imóvel público para aprovação (fica com status "pendente", invisível na busca) ----------
+export async function submitImovelParaAprovacao(payload) {
+  const codigo = `PEND-${Date.now().toString(36).toUpperCase()}`;
+  const { error } = await supabase.from('imoveis').insert({
+    ...payload,
+    codigo,
+    status: 'pendente',
+    destaque: false,
+  });
+  if (error) throw error;
+  return codigo;
+}
+
+// ---------- Envia uma mensagem do formulário "Fale Conosco" ----------
 export async function submitMensagemContato({ nome, email, telefone, mensagem }) {
   const { error } = await supabase.from('mensagens_contato').insert({ nome, email, telefone, mensagem });
   if (error) throw error;
 }
 
-// ---------- Formulário de solicitação de bordado/personalização ----------
-export async function submitSolicitacaoBordado({ nome, telefone, tipo_peca, o_que_bordar, observacoes }) {
-  const { error } = await supabase.from('solicitacoes_bordado').insert({ nome, telefone, tipo_peca, o_que_bordar, observacoes });
-  if (error) throw error;
-}
-
-// ---------- Formulário "Seja um Revendedor" ----------
-export async function submitSolicitacaoRevenda({ nome, telefone, cidade, tipo_negocio, observacoes }) {
-  const { error } = await supabase.from('solicitacoes_revenda').insert({ nome, telefone, cidade, tipo_negocio, observacoes });
-  if (error) throw error;
+// ---------- Busca um imóvel específico pelo código ----------
+export async function fetchImovelByCodigo(codigo) {
+  const { data, error } = await supabase
+    .from('imoveis')
+    .select('*')
+    .eq('codigo', codigo)
+    .eq('status', 'ativo')
+    .maybeSingle();
+  if (error) {
+    console.error('Erro ao buscar imóvel:', error.message);
+    return null;
+  }
+  return data;
 }
 
 // ---------- Descrição: converte Markdown (ou texto puro) em HTML, e sanitiza antes de exibir ----------
@@ -134,6 +143,8 @@ function escapeHTML(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Aplica formatação inline de Markdown: **negrito** -> <strong>. O texto já
+// vem escapado antes de chegar aqui, então é seguro inserir a tag.
 function inlineMarkdown(text) {
   return escapeHTML(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 }
@@ -204,6 +215,9 @@ export function markdownToHTML(raw) {
   return htmlParts.join('');
 }
 
+// Registros antigos podem ter sido salvos como HTML puro (vindo do editor rico do
+// admin) — se detectarmos tags reais, mantemos como está. Caso contrário (texto
+// puro ou Markdown vindo da IA/formulário público), convertemos com markdownToHTML.
 export function descricaoToHTML(raw) {
   if (!raw) return '';
   const looksLikeHTML = /<\/?(p|h[1-6]|ul|ol|li|strong|b|em|i|hr|br|span|a)[\s>]/i.test(raw);
@@ -211,6 +225,8 @@ export function descricaoToHTML(raw) {
   return markdownToHTML(raw);
 }
 
+// Sanitiza o HTML da descrição antes de inserir no DOM (protege contra script/HTML malicioso).
+// Usa DOMPurify se estiver carregado na página (via CDN); caso contrário faz um fallback básico.
 export function sanitizeDescricao(html) {
   if (typeof window !== 'undefined' && window.DOMPurify) {
     return window.DOMPurify.sanitize(html, {
@@ -218,74 +234,79 @@ export function sanitizeDescricao(html) {
       ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
     });
   }
+  // fallback simples: remove tags de script/estilo/iframe e atributos on*
   return html
     .replace(/<(script|style|iframe)[\s\S]*?<\/\1>/gi, '')
     .replace(/ on\w+="[^"]*"/gi, '')
     .replace(/ on\w+='[^']*'/gi, '');
 }
 
-// Gera um número "restam em estoque" pseudo-aleatório mas estável por produto,
-// só para efeito visual de urgência na vitrine (não reflete estoque real).
-function estoqueRestante(codigo) {
-  let hash = 0;
-  for (let i = 0; i < (codigo || '').length; i++) hash = (hash * 31 + codigo.charCodeAt(i)) >>> 0;
-  return 2 + (hash % 8); // entre 2 e 9
+// ---------- Metadados (quartos, banheiros etc.) formatados para exibição ----------
+export function metaResumo(imovel) {
+  const parts = [];
+  if (imovel.quartos) parts.push(`${imovel.quartos} Quarto${imovel.quartos > 1 ? 's' : ''}`);
+  if (imovel.banheiros) parts.push(`${imovel.banheiros} Banheiro${imovel.banheiros > 1 ? 's' : ''}`);
+  if (imovel.area) parts.push(`${imovel.area}m²`);
+  return parts;
 }
 
-// ---------- Card HTML reutilizável (grade da loja, destaques) ----------
-export function productCardHTML(produto, opts = {}) {
-  const { showFreteBadge = false, showStock = false, buyLabel = 'Comprar' } = opts;
-  const fotos = Array.isArray(produto.fotos) ? produto.fotos.filter(Boolean) : [];
+// ---------- Card HTML reutilizável (grade da home, destaques, similares) ----------
+// Foto de capa como <img> real (mais simples e estável que background-image/carrossel).
+// Normaliza o campo finalidade pra sempre trabalhar com array, aceitando
+// tanto o formato novo (text[]) quanto imóveis antigos que ainda estejam
+// como texto simples (antes de rodar a migração).
+export function finalidadesArray(imovel) {
+  if (Array.isArray(imovel.finalidade)) return imovel.finalidade.filter(Boolean);
+  if (imovel.finalidade) return [imovel.finalidade];
+  return ['comprar'];
+}
+
+export function propertyCardHTML(imovel) {
+  const fotos = Array.isArray(imovel.fotos) ? imovel.fotos.filter(Boolean) : [];
   const capa = fotos[0] || null;
-  const temPromo = produto.preco_promocional && Number(produto.preco_promocional) < Number(produto.preco);
-  const precoFinal = temPromo ? produto.preco_promocional : produto.preco;
-  const estoqueLabel = { disponivel: 'Disponível', sob_encomenda: 'Sob Encomenda', esgotado: 'Esgotado' }[produto.estoque_status] || '';
-  const esgotado = produto.estoque_status === 'esgotado';
+  const meta = metaResumo(imovel).map(m => `<span>${m}</span>`).join('');
+  const finalidades = finalidadesArray(imovel);
+  const podeComprar = finalidades.includes('comprar');
+  const podeAlugar = finalidades.includes('alugar');
+  const badgesHTML = `<div class="badge-row">${finalidades.map(f => `<span class="badge">${f === 'alugar' ? 'Alugar' : 'Comprar'}</span>`).join('')}</div>`;
+  const local = [imovel.bairro, imovel.cidade].filter(Boolean).join(' · ');
 
   const mediaHTML = capa
-    ? `<img src="${capa}" alt="${produto.titulo}" loading="lazy">`
+    ? `<img src="${capa}" alt="${imovel.titulo}" loading="lazy">`
     : `<div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>`;
 
-  const produtoJSON = JSON.stringify({
-    codigo: produto.codigo,
-    titulo: produto.titulo,
-    preco: produto.preco,
-    preco_promocional: produto.preco_promocional || null,
-    fotos: capa ? [capa] : [],
-  }).replace(/"/g, '&quot;');
-
-  const parcelas = precoFinal >= 20 ? `<span class="installments">ou 3x de ${formatBRL(precoFinal / 3)} sem juros</span>` : '';
-  const stockHTML = showStock && !esgotado ? `<span class="stock-warning">Só restam ${estoqueRestante(produto.codigo)} em estoque!</span>` : '';
+  // Se o imóvel serve pras duas finalidades, mostra os dois valores; senão
+  // mostra só o valor relevante (venda ou aluguel).
+  let priceHTML;
+  if (podeComprar && podeAlugar) {
+    priceHTML = `<div class="property-price">${formatBRL(imovel.valor)}</div><div class="property-price-rent">Aluguel: ${formatBRL(imovel.valor_aluguel)}/mês</div>`;
+  } else if (podeAlugar) {
+    priceHTML = `<div class="property-price">${formatBRL(imovel.valor_aluguel)}<span class="price-suffix">/mês</span></div>`;
+  } else {
+    priceHTML = `<div class="property-price">${formatBRL(imovel.valor)}</div>`;
+  }
 
   return `
-    <article class="product-card" data-cat="${produto.categoria}">
-      <a href="produto.html?codigo=${encodeURIComponent(produto.codigo)}">
-        <div class="product-photo">
-          ${showFreteBadge ? '<span class="badge frete">Frete Grátis</span>' : `<span class="badge">${labelCategoria(produto.categoria)}</span>`}
-          ${produto.destaque && !showFreteBadge ? '<span class="badge op">Destaque</span>' : ''}
-          ${esgotado ? '<span class="badge esgotado">Esgotado</span>' : ''}
+    <article class="property-card" data-op="${finalidades.join(' ')}">
+      <a href="imovel.html?codigo=${encodeURIComponent(imovel.codigo)}">
+        <div class="property-photo">
+          ${badgesHTML}
+          ${imovel.destaque ? '<span class="badge op">Destaque</span>' : ''}
           ${mediaHTML}
         </div>
-        <div class="product-body">
-          <h3>${produto.titulo}</h3>
-          <p class="loc">${produto.corporacao || ''}${estoqueLabel ? ' · ' + estoqueLabel : ''}</p>
-          <div class="product-price">
-            ${temPromo ? `<span class="price-old">${formatBRL(produto.preco)}</span>` : ''}
-            ${formatBRL(precoFinal)}
-          </div>
-          ${parcelas}
-          ${stockHTML}
+        <div class="property-body">
+          <h3>${imovel.titulo}</h3>
+          <p class="loc">${local}</p>
+          <div class="property-meta">${meta}</div>
+          ${priceHTML}
         </div>
       </a>
-      <button type="button" class="btn-add-cart add-to-cart-btn" data-produto="${produtoJSON}" ${esgotado ? 'disabled' : ''}>
-        ${esgotado ? 'Esgotado' : buyLabel}
-      </button>
     </article>
   `;
 }
 
 // ---------- Placeholder de imagem (SVG em data-URI) para os exemplos da galeria ----------
 export function placeholderPhoto(label) {
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'><rect width='100%' height='100%' fill='#1a1c14'/><text x='50%' y='50%' fill='#a3a396' font-size='30' font-family='sans-serif' text-anchor='middle' dominant-baseline='middle'>${label}</text></svg>`;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='1000'><rect width='100%' height='100%' fill='#1b1a17'/><text x='50%' y='50%' fill='#a79d8c' font-size='34' font-family='sans-serif' text-anchor='middle' dominant-baseline='middle'>${label}</text></svg>`;
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }

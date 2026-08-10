@@ -1,15 +1,16 @@
-// Módulo compartilhado de IA (Google Gemini) — usado no painel admin da QRV
-// Artigos Táticos para gerar descrições de produto a partir de um texto bruto.
+// Módulo compartilhado de IA (Google Gemini) — usado tanto no painel admin
+// (admin.js) quanto na página pública "Anunciar Seu Imóvel" (anunciar.html).
 //
 // Por que não existe uma "chave padrão do sistema" embutida aqui: qualquer
 // chave colocada em um arquivo JS servido publicamente pode ser lida por
 // qualquer visitante do site (basta abrir o código-fonte) e usada por
 // terceiros, gerando cobranças na conta do Google de quem é dono da chave.
-// Por isso a chave fica salva somente no navegador de quem for usar o admin
-// (localStorage), nunca é enviada para nenhum servidor além da própria API
-// do Google.
+// Por isso cada pessoa que for gerar cadastros por IA (você no admin, ou um
+// proprietário anunciando um imóvel) cola sua própria chave gratuita, que
+// fica salva somente no navegador dela (localStorage), nunca é enviada para
+// o servidor da MCJ nem para nenhum outro lugar além da própria API do Google.
 
-export const GEMINI_KEY_STORAGE = 'qrv_gemini_api_key';
+export const GEMINI_KEY_STORAGE = 'mcj_gemini_api_key';
 
 export function getGeminiKey() {
   return localStorage.getItem(GEMINI_KEY_STORAGE) || '';
@@ -19,44 +20,59 @@ export function setGeminiKey(key) {
   localStorage.setItem(GEMINI_KEY_STORAGE, key);
 }
 
-export function buildProdutoPrompt(raw) {
-  return `Você é um assistente que transforma informações brutas de produtos (equipamentos e artigos táticos/militares) em dados estruturados para o site da loja QRV Artigos Táticos.
+export function buildImovelPrompt(raw) {
+  return `Você é um assistente que transforma anúncios informais de imóveis de alto padrão (geralmente copiados do WhatsApp) em dados estruturados para o site da imobiliária MCJ Capital Invest.
 
 Analise o texto abaixo e retorne SOMENTE um objeto JSON válido (sem markdown, sem crases, sem texto fora do JSON), com exatamente estas chaves:
 
 {
-  "codigo": string (código/referência do produto, se houver no texto; senão ""),
-  "titulo": string (nome comercial do produto, claro e direto, ex: "Combat Shirt Ripstop Multicam"),
-  "categoria": um destes valores exatamente — "vestuario", "calcados", "mochilas", "insignias", "protecao", "facas", "kits", "acessorios" ou "replicas",
-  "corporacao": string (ex: "Exército Brasileiro", "Marinha do Brasil", "Aeronáutica", "PMESP", "Polícia Militar", "Bombeiros", "Polícia Civil", "Geral" — use "Geral" se não for específico de uma corporação),
-  "tamanhos": array de strings com os tamanhos mencionados (ex: ["P","M","G","GG"] ou ["38","39","40"]; array vazio se não houver),
-  "cores": array de strings com as cores mencionadas (array vazio se não houver),
-  "preco": number (apenas números, sem "R$" ou pontos de milhar),
-  "personalizavel": boolean (true se o produto permite/exige bordado de nome de guerra, tipo sanguíneo ou identificação personalizada),
-  "descricao": string em HTML puro (não Markdown) — siga ESTRITAMENTE as instruções de tom, estilo e estrutura descritas abaixo.
+  "codigo": string (código/referência do imóvel, se houver no texto; senão ""),
+  "titulo": string (título comercial atrativo, ex: "Apartamento Ultra Luxo no Jardins"),
+  "finalidade": array com um ou os dois valores — ["comprar"], ["alugar"] ou ["comprar","alugar"] (o texto pode indicar as duas finalidades ao mesmo tempo, ex: "vende ou aluga"),
+  "tipo": um destes valores exatamente — "Apartamento", "Casa", "Cobertura", "Comercial" ou "Terreno",
+  "bairro": string,
+  "cidade": string (ex: "São Paulo - SP"),
+  "endereco": string (endereço completo se houver; senão bairro + cidade),
+  "quartos": number,
+  "banheiros": number,
+  "suites": number,
+  "vagas": number,
+  "area": number (em m², apenas o número),
+  "valor": number (valor de VENDA, apenas números, sem "R$" ou pontos; 0 se o imóvel for só para alugar),
+  "valor_aluguel": number (valor do ALUGUEL mensal, apenas números; 0 se o imóvel for só para vender),
+  "valor_condominio": number (apenas números, 0 se não informado),
+  "iptu": number (valor do IPTU, apenas números, 0 se não informado),
+  "descricao": string em MARKDOWN (não HTML) — siga ESTRITAMENTE as instruções de tom, estilo e estrutura descritas abaixo.
 }
 
 ============================================================
 INSTRUÇÕES OBRIGATÓRIAS PARA O CAMPO "descricao"
 ============================================================
 
-Tom de voz: técnico, direto e confiável — texto de e-commerce especializado em equipamentos táticos e militares, para um público que entende do assunto (policiais, militares, recrutas, colecionadores, entusiastas). Nunca use tom informal excessivo nem linguagem de marketing genérica; foque em material, funcionalidade, resistência e uso prático/operacional. Reescreva e enriqueça o conteúdo mesmo que o texto original seja curto, sem inventar especificações técnicas que não foram informadas.
+Tom de voz: sofisticado, corporativo, persuasivo — texto de material comercial de uma imobiliária de imóveis de alto padrão/luxo. Nunca use tom informal, nunca copie o texto bruto literalmente: reescreva e enriqueça o conteúdo, mesmo que o texto original seja curto ou telegráfico. A descrição deve ser longa, completa e bem desenvolvida (nunca apenas 1 ou 2 frases soltas), preenchendo com linguagem própria do mercado imobiliário de alto padrão qualquer lacuna de informação que não tenha vindo no texto original (sem inventar números, endereços ou características factuais que não foram informados).
 
-Formate a resposta em HTML puro, usando SOMENTE estas tags: <p>, <h3>, <strong>, <ul>, <li>, <hr>. Nada de markdown (sem "###", sem "**", sem "•"), nada de <html>/<head>/<body>, nada de classes ou estilos inline, nada de texto fora dessas tags.
+Formate a resposta em MARKDOWN simples, seguindo exatamente esta sintaxe (o site converte isso em HTML automaticamente):
+- Use "### Nome do Título" para cada título de seção.
+- Use "---" (três traços sozinhos em uma linha) como linha divisória elegante entre cada grande seção.
+- Use "**palavra**" para aplicar negrito nas características de maior impacto comercial (ex: "**8 andares**", "**1.803m²**", "**localização privilegiada**").
+- Use "•" no início da linha para cada item de lista/tópico.
+- Não use HTML, não use \`\`\` (blocos de código), não use markdown de outros tipos (sem #### de nível 1 "#", sem links, sem tabelas).
 
 Estrutura obrigatória, exatamente nesta ordem:
 
-1. Um único <p> abrindo com o nome do produto em <strong> seguido de um parágrafo introdutório marcante, direto, que já comunica a proposta de valor do equipamento (ex: "<p><strong>Combat Shirt Ripstop Multicam</strong> foi desenvolvida para quem não pode falhar em campo...</p>").
+1. "### Introdução" seguido de um parágrafo impactante de abertura, destacando metragem, localização e o potencial do imóvel (investimento, moradia, uso comercial etc.).
 
-2. <hr> e depois <h3>Construção e Materiais de Alta Resistência</h3> seguido de um <ul> com <li> destacando em <strong> os termos técnicos de maior impacto (ex: "<li><strong>Tecido Ripstop</strong>: resistente a rasgos e cortes, essencial para o uso diário em campo.</li>", também cobrindo Cordura, costuras reforçadas/travadas, tratamento hidrorrepelente, ferragens e fivelas, conforme o que se aplicar ao produto).
+2. "---" e depois "### Estrutura e Funcionalidade" seguido de uma lista de tópicos com "•" detalhando o aproveitamento do espaço, divisão de ambientes/andares, layout e adaptabilidade do imóvel a diferentes usos.
 
-3. <hr> e depois <h3>Ergonomia e Funcionalidade Operacional</h3> seguido de um <ul> com <li> em <strong> sobre caimento, ajuste, mobilidade, bolsos/compartimentos, ventilação, compatibilidade com colete/fardamento — o que fizer sentido para o produto.
+3. "---" e depois "### Diferenciais do Imóvel" seguido de uma lista de tópicos com "•" destacando os pontos fortes, acabamentos, comodidades e visibilidade comercial ou residencial do imóvel.
 
-4. <hr> e depois <h3>Diferenciais do Equipamento</h3> seguido de um <ul> com <li> focados em uso tático, missões, rotina operacional, EDC (everyday carry) e durabilidade a longo prazo.
+4. "---" e depois "### Localização Privilegiada" seguido de um parágrafo sobre a região, vias de acesso e conveniências do entorno (comércio, mobilidade, valorização da área).
 
-Regra adicional: se alguma informação necessária para uma seção não existir no texto original, escreva a seção mesmo assim de forma genérica e coerente para a categoria do produto (sem inventar especificações técnicas específicas, como medidas ou composições exatas, que não foram informadas), nunca omita uma seção da estrutura.
+5. "---" e depois "### Informações Adicionais" seguido de uma lista de tópicos com "•" resumindo, em itens curtos e objetivos: Localização, Área, Finalidade, Valor (e Condomínio/IPTU quando houver). Use exatamente os dados numéricos fornecidos no texto original nesse resumo — não invente valores.
 
-Se alguma informação não estiver no texto, use "" para textos e array vazio para listas nos outros campos do JSON (fora da descrição) — nunca invente dados factuais que não estejam no texto original.
+Regra adicional: se alguma informação necessária para uma seção não existir no texto original, escreva a seção mesmo assim de forma genérica e elegante (sem inventar fatos específicos), nunca omita uma seção da estrutura.
+
+Se alguma informação não estiver no texto, use 0 para números e "" para textos nos outros campos do JSON (fora da descrição) — nunca invente dados factuais que não estejam no texto original.
 
 Texto bruto colado pelo usuário:
 """
@@ -84,7 +100,7 @@ export async function callGemini(apiKey, prompt) {
             generationConfig: {
               responseMimeType: 'application/json',
               temperature: 0.5,
-              maxOutputTokens: 4096,
+              maxOutputTokens: 4096, // dá espaço suficiente para a descrição longa e completa exigida no prompt
             },
           }),
         }
@@ -111,8 +127,8 @@ export async function callGemini(apiKey, prompt) {
   throw lastError || new Error('Nenhum modelo do Gemini respondeu.');
 }
 
-// Une as duas etapas: monta o prompt do produto, chama o Gemini e já devolve o JSON parseado.
-export async function generateProdutoFromText(apiKey, rawText) {
-  const text = await callGemini(apiKey, buildProdutoPrompt(rawText));
+// Une as duas etapas: monta o prompt do imóvel, chama o Gemini e já devolve o JSON parseado.
+export async function generateImovelFromText(apiKey, rawText) {
+  const text = await callGemini(apiKey, buildImovelPrompt(rawText));
   return JSON.parse(text);
 }

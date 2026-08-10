@@ -2,32 +2,29 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<script>(function(){try{var t=localStorage.getItem('qrv_theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
 <link rel="apple-touch-icon" href="assets/favicon-192.png">
 <link rel="shortcut icon" href="assets/favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QRV Artigos Táticos | Equipando você para o combate</title>
+<title>MCJ Capital Invest | Imóveis de Alto Padrão</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 </head>
 <body>
+<script>(function(){try{if(localStorage.getItem('mcj_theme')==='light')document.body.classList.add('light-mode');}catch(e){}})();</script>
 
   <div class="topbar">
     <div class="container">
       <div class="left">
-        <span>&#9993; contato@qrvartigostaticos.com.br</span>
-        <span>&#128205; Av. Santos Dumont, 61 · Cumbica · Guarulhos - SP</span>
+        <span>&#9993; marciocjorge@terra.com.br</span>
+        <span>&#128205; Av. Paulista, 1159 · Conj. 1005 · Bela Vista · São Paulo - SP</span>
       </div>
       <div class="right">
-        <a href="bordados.html">Bordados</a>
-        <a href="revendedor.html">Seja um Revendedor</a>
-        <a href="quem-somos.html">Quem Somos</a>
-        <a href="contato.html">Fale Conosco</a>
+        <a href="anunciar.html">Anuncie Seu Imóvel</a>
         <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema" title="Alternar tema">
           <span class="theme-icon">☀️</span>
         </button>
@@ -37,37 +34,16 @@
 
   <header class="main">
     <div class="container">
-      <div class="header-left">
-        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
-        <a href="index.html" class="mini-logo"><img src="assets/logo.png" alt="QRV Artigos Táticos"></a>
-      </div>
-      <nav class="primary categories-nav inline-cats">
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+      <nav class="primary">
         <ul>
-          <li><a href="produtos.html">Loja QRV</a></li>
-          <li><a href="produtos.html?categoria=vestuario">Equipamentos</a></li>
-          <li><a href="produtos.html?categoria=calcados">Coturnos</a></li>
-          <li><a href="bordados.html">Bordados</a></li>
-          <li><a href="produtos.html?categoria=facas">Cutelaria</a></li>
-          <li><a href="produtos.html?categoria=kits">Kits</a></li>
-          <li><a href="produtos.html?categoria=acessorios">Acessórios</a></li>
+          <li><a href="quem-somos.html" class="active">Quem somos</a></li>
+          <li><a href="comprar.html">Comprar</a></li>
+          <li><a href="alugar.html">Alugar</a></li>
+          <li><a href="anunciar.html">Anunciar</a></li>
+          <li><a href="contato.html">Fale Conosco</a></li>
         </ul>
       </nav>
-      <div class="header-actions">
-        <button type="button" class="header-search-toggle" id="headerSearchToggle" aria-label="Buscar produtos">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="20" height="20"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        </button>
-        <form class="header-search-box" id="headerSearchBox" action="produtos.html" method="get">
-          <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar produtos">
-          <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="16" height="16"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
-        </form>
-        <a href="contato.html" class="account-link" aria-label="Minha conta / Fale conosco">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="21" height="21"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.6-4 5-6 8-6s6.4 2 8 6"/></svg>
-        </a>
-        <a href="cart.html" class="cart-link" aria-label="Carrinho de compras">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="22" height="22"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          <span class="cart-count" id="cartCount">0</span>
-        </a>
-      </div>
     </div>
   </header>
 
@@ -76,396 +52,268 @@
   <div class="mobile-drawer" id="mobileDrawer">
     <button class="drawer-close" id="drawerClose" aria-label="Fechar menu">&times;</button>
     <nav class="drawer-nav">
-      <a href="produtos.html">Todos os Produtos</a>
-      <a href="produtos.html?categoria=acessorios">Acessórios</a>
-      <a href="produtos.html?categoria=calcados">Calçados</a>
-      <a href="produtos.html?categoria=facas">Cutelaria</a>
-      <a href="produtos.html?categoria=mochilas">Mochilas</a>
-      <a href="produtos.html?categoria=protecao">Munição</a>
-      <a href="produtos.html?categoria=vestuario">Vestuário</a>
-      <a href="bordados.html">Bordados</a>
-      <a href="revendedor.html">Seja Revendedor</a>
-      <a href="quem-somos.html">Quem Somos</a>
+      <a href="quem-somos.html">Quem somos</a>
+      <a href="comprar.html">Comprar</a>
+      <a href="alugar.html">Alugar</a>
+      <a href="anunciar.html">Anunciar</a>
       <a href="contato.html">Fale Conosco</a>
     </nav>
   </div>
 
-  <!-- Banner promocional / carrossel automático -->
-  <section class="promo-banner">
-    <div class="promo-slides" id="promoSlides">
-      <div class="promo-slide image-ready active" data-i="0" style="background-image:url('assets/banner-hero-1.jpg');">
-        <a href="produtos.html" class="promo-slide-link" aria-label="Confira nossos artigos táticos"></a>
-      </div>
-      <div class="promo-slide image-ready" data-i="1" style="background-image:url('assets/banner-hero-2.jpg');">
-        <a href="produtos.html?categoria=protecao" class="promo-slide-link" aria-label="Equipamentos de proteção e defesa"></a>
-      </div>
-      <div class="promo-slide image-ready" data-i="2" style="background-image:url('assets/banner-hero-3.jpg');">
-        <a href="bordados.html" class="promo-slide-link" aria-label="Bordado 100% personalizado"></a>
-      </div>
-    </div>
-    <div class="promo-dots" id="promoDots">
-      <span class="active" data-i="0"></span><span data-i="1"></span><span data-i="2"></span>
-    </div>
-  </section>
-
-  <!-- Barra de confiança -->
-  <section class="trust-bar">
+  <section class="hero">
     <div class="container">
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>
-        <div><strong>Frete Grátis</strong><span>Compras acima de R$399,00</span></div>
-      </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-        <div><strong>Parcele sua Compra</strong><span>Parcele em até 3x sem juros</span></div>
-      </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 19v.01"/><path d="M9 9a3 3 0 1 1 4.5 2.6c-.9.5-1.5 1.1-1.5 2.4"/><circle cx="12" cy="12" r="10"/></svg>
-        <div><strong>Tire suas Dúvidas Aqui</strong><span>Fale conosco pelo WhatsApp</span></div>
-      </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
-        <div><strong>Loja 100% Segura</strong><span>Seus dados protegidos</span></div>
+      <div class="mcj-wordmark">MCJ Capital Invest</div>
+      <div class="hero-intro">
+        <span class="hero-eyebrow">Imóveis de Alto Padrão</span>
+        <h1>Abrimos as <em>melhores portas</em> para você</h1>
+        <p class="lead">A elegância se encontra com a exclusividade em cada propriedade. Um portfólio selecionado para clientes exigentes.</p>
       </div>
     </div>
   </section>
 
-  <section class="search-section" style="margin-top:0;padding-top:44px;">
+  <section class="search-section">
     <div class="container">
       <div class="search-panel">
         <div class="search-grid">
           <div class="field">
-            <label>Categoria</label>
-            <select id="searchCategoria">
-              <option value="">Todas</option>
-              <option value="vestuario">Vestuário e Fardamento</option>
-              <option value="calcados">Calçados Militares</option>
-              <option value="mochilas">Mochilas e Bolsas</option>
-              <option value="insignias">Brevês e Insígnias</option>
-              <option value="protecao">Proteção e Defesa</option>
-              <option value="facas">Facas e Canivetes</option>
-              <option value="kits">Kits Especializados</option>
-              <option value="acessorios">Acessórios Táticos</option>
-            </select>
+            <label>Finalidade</label>
+            <select id="searchFinalidade"><option value="">Selecionar...</option><option value="comprar">Comprar</option><option value="alugar">Alugar</option></select>
           </div>
           <div class="field">
-            <label>Corporação</label>
-            <select id="searchCorporacao">
-              <option value="">Todas</option>
-              <option>Exército Brasileiro</option>
-              <option>Marinha do Brasil</option>
-              <option>Aeronáutica</option>
-              <option>PMESP</option>
-              <option>Polícia Militar</option>
-              <option>Bombeiros</option>
-              <option>Geral</option>
-            </select>
+            <label>Tipo de Imóvel</label>
+            <select id="searchTipo"><option value="">Selecionar...</option><option>Casa</option><option>Apartamento</option><option>Comercial</option><option>Cobertura</option></select>
           </div>
           <div class="field">
-            <label>Código do Produto</label>
+            <label>Bairro / Região</label>
+            <select id="searchBairro"><option value="">Selecionar...</option><option>Jardins</option><option>Alphaville</option><option>Riviera de São Lourenço</option><option>Vila Augusta</option></select>
+          </div>
+          <div class="field">
+            <label>Quartos</label>
+            <select id="searchQuartos"><option value="">Selecionar...</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select>
+          </div>
+          <div class="field price-range">
+            <label>Filtrar por Preço</label>
+            <input type="range" id="searchPreco" min="0" max="30000000" value="30000000">
+            <div class="price-values"><span>R$ 0,00</span><span id="searchPrecoLabel">R$ 30.000.000,00</span></div>
+          </div>
+          <div class="field">
+            <label>Código do Imóvel</label>
             <input type="text" id="searchCodigo" placeholder="Insira o código">
-          </div>
-          <div class="field">
-            <label>Buscar por Nome</label>
-            <input type="text" id="searchNome" placeholder="Ex: coturno, brevê...">
           </div>
         </div>
         <div class="search-footer">
-          <button class="btn-gold" id="searchFiltrarBtn">Buscar Produtos</button>
+          <button class="btn-gold" id="searchFiltrarBtn">Filtrar</button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Lançamentos -->
-  <section class="section tight">
+  <section class="section" id="imoveis">
     <div class="container">
       <div class="gold-rule"></div>
-      <h2 class="section-title">Lançamentos</h2>
-      <p class="section-sub">Os itens mais recentes do catálogo da QRV.</p>
+      <h2 class="section-title">Conheça Nossos Imóveis</h2>
+      <p class="section-sub">Cada imóvel é uma obra prima, cuidadosamente selecionada para refletir qualidade e estilo.</p>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="comprar">Comprar</button>
+        <button class="tab-btn" data-tab="alugar">Alugar</button>
+      </div>
 
       <div class="destaques-wrap">
-        <div class="swiper lancamentos-swiper">
-          <div class="swiper-wrapper" id="lancamentosTrack">
-            <div class="swiper-slide example-card">
-              <article class="product-card">
-                <div class="product-photo"><span class="badge">Vestuário</span><img src="assets/produto-camiseta.jpg" alt="Camisa Combat Concept Alpha" loading="lazy"></div>
-                <div class="product-body">
-                  <h3>Camisa Combat Concept Alpha</h3>
-                  <p class="loc">Geral</p>
-                  <div class="product-price">R$130,00</div>
-                  <span class="stock-warning">Só restam 4 em estoque!</span>
-                </div>
-              </article>
-              <button type="button" class="btn-add-cart" onclick="window.location.href='produtos.html'">Comprar</button>
-            </div>
-            <div class="swiper-slide example-card">
-              <article class="product-card">
-                <div class="product-photo"><span class="badge">Vestuário</span><img src="assets/produto-camiseta.jpg" alt="Camisa Combat Concept Ripstop Ferrugem" loading="lazy"></div>
-                <div class="product-body">
-                  <h3>Camisa Combat Concept Ripstop Ferrugem</h3>
-                  <p class="loc">Geral</p>
-                  <div class="product-price">R$130,00</div>
-                  <span class="stock-warning">Só restam 6 em estoque!</span>
-                </div>
-              </article>
-              <button type="button" class="btn-add-cart" onclick="window.location.href='produtos.html'">Comprar</button>
-            </div>
-            <div class="swiper-slide example-card">
-              <article class="product-card">
-                <div class="product-photo"><span class="badge">Mochilas</span><div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div></div>
-                <div class="product-body">
-                  <h3>Mochila Militar Paraquedista 55L</h3>
-                  <p class="loc">Exército Brasileiro</p>
-                  <div class="product-price">R$429,00</div>
-                  <span class="stock-warning">Só restam 3 em estoque!</span>
-                </div>
-              </article>
-              <button type="button" class="btn-add-cart" onclick="window.location.href='produtos.html'">Comprar</button>
-            </div>
-            <div class="swiper-slide example-card">
-              <article class="product-card">
-                <div class="product-photo"><span class="badge">Ins&iacute;gnias</span>
+        <div class="swiper imoveis-swiper">
+          <div class="swiper-wrapper" id="propertyGrid">
+
+            <div class="swiper-slide example-card" data-op="comprar">
+              <article class="property-card">
+                <div class="property-photo"><span class="badge">Venda</span><span class="badge op">Destaque</span>
                   <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
                 </div>
-                <div class="product-body">
-                  <h3>Brevê Metálico Águia — Fixação</h3>
-                  <p class="loc">Aeronáutica</p>
-                  <div class="product-price">R$45,00</div>
-                  <span class="stock-warning">Só restam 8 em estoque!</span>
+                <div class="property-body">
+                  <h3>Mansão Alto Padrão na Riviera</h3>
+                  <p class="loc">Riviera de São Lourenço · 770m²</p>
+                  <div class="property-meta"><span>&#128716; 7 Suítes</span><span>&#128663; Elevador</span></div>
+                  <div class="property-price">R$ 30.000.000,00</div>
                 </div>
               </article>
-              <button type="button" class="btn-add-cart" onclick="window.location.href='produtos.html'">Comprar</button>
+            </div>
+
+            <div class="swiper-slide example-card" data-op="comprar">
+              <article class="property-card">
+                <div class="property-photo">
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Casa Alto Padrão em Alphaville</h3>
+                  <p class="loc">Alphaville Residencial I · 700m²</p>
+                  <div class="property-meta"><span>&#128716; 5 Suítes</span><span>&#127946; Piscina</span></div>
+                  <div class="property-price">R$ 25.000.000,00</div>
+                </div>
+              </article>
+            </div>
+
+            <div class="swiper-slide example-card" data-op="comprar">
+              <article class="property-card">
+                <div class="property-photo"><span class="badge">Venda</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Apartamento Ultra Luxo no Jardins</h3>
+                  <p class="loc">Jardins · 900m² · até 8 vagas</p>
+                  <div class="property-meta"><span>&#128716; Suíte Master</span><span>&#128188; Acab. em Mármore</span></div>
+                  <div class="property-price">R$ 19.000.000,00</div>
+                </div>
+              </article>
+            </div>
+
+            <div class="swiper-slide example-card" data-op="alugar" style="display:none;">
+              <article class="property-card">
+                <div class="property-photo"><span class="badge op">Locação</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Fly Mall Santana</h3>
+                  <p class="loc">Av. Braz Leme · 5.017m² de área comercial</p>
+                  <div class="property-meta"><span>&#128663; 52 Vagas</span><span>&#127970; Localização Estratégica</span></div>
+                  <div class="property-price">Consulte valores</div>
+                </div>
+              </article>
+            </div>
+
+            <div class="swiper-slide example-card" data-op="alugar" style="display:none;">
+              <article class="property-card">
+                <div class="property-photo"><span class="badge op">Locação</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Imóvel Comercial Premium na Penha</h3>
+                  <p class="loc">Localização Estratégica · 412m²</p>
+                  <div class="property-meta"><span>&#127970; Alto Potencial Corporativo</span></div>
+                  <div class="property-price">R$ 125.000,00</div>
+                </div>
+              </article>
+            </div>
+
+            <div class="swiper-slide example-card" data-op="alugar" style="display:none;">
+              <article class="property-card">
+                <div class="property-photo"><span class="badge op">Locação</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Prédio Comercial na Rua Henrique Schaumann</h3>
+                  <p class="loc">1.803m² · 8 andares</p>
+                  <div class="property-meta"><span>&#127970; Localização Estratégica</span></div>
+                  <div class="property-price">R$ 93.000,00</div>
+                </div>
+              </article>
+            </div>
+
+          </div>
+        </div>
+        <div class="carousel-nav">
+          <button class="car-btn" id="imoveisPrev">&#8592;</button>
+          <button class="car-btn" id="imoveisNext">&#8594;</button>
+        </div>
+      </div>
+
+      <div class="center-btn">
+        <a href="comprar.html" class="btn-outline" id="verTodosImoveisBtn">Ver Todos os Imóveis →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="features">
+        <div class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 2l9 4.5v9L12 20l-9-4.5v-9L12 2z"/><path d="M9 12l2 2 4-4"/></svg>
+          <h3>Curadoria Exclusiva</h3>
+          <p>Selecionamos cada propriedade com rigor, garantindo padrão, localização e potencial de valorização.</p>
+        </div>
+        <div class="feature-card accent">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+          <h3>Compre com Segurança</h3>
+          <p>Assessoria completa em cada etapa da negociação, do primeiro contato à assinatura do contrato.</p>
+        </div>
+        <div class="feature-card">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+          <h3>Anuncie Seu Imóvel</h3>
+          <p>Conecte-se a uma carteira de clientes exigentes e conte com nossa equipe para maximizar seu negócio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="gold-rule"></div>
+      <h2 class="section-title">Imóveis em Destaque</h2>
+      <p class="section-sub">Espaços refinados, pensados para quem busca sofisticação e exclusividade.</p>
+
+      <div class="destaques-wrap">
+        <div class="swiper destaques-swiper">
+          <div class="swiper-wrapper" id="carouselTrack">
+            <div class="swiper-slide example-card">
+              <article class="property-card">
+                <div class="property-photo"><span class="badge">Destaque</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Cobertura na Vila Augusta</h3>
+                  <p class="loc">143m² · 4 Dormitórios, 3 Vagas, SPA e Cinema Privativo</p>
+                  <div class="property-price">R$ 1.580.000,00</div>
+                </div>
+              </article>
+            </div>
+            <div class="swiper-slide example-card">
+              <article class="property-card">
+                <div class="property-photo"><span class="badge">Destaque</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Casa em Aldeia da Serra</h3>
+                  <p class="loc">316m² · 4 Suítes, Adega Toscana, Spa e Arquitetura Autoral</p>
+                  <div class="property-price">R$ 4.500.000,00</div>
+                </div>
+              </article>
+            </div>
+            <div class="swiper-slide example-card">
+              <article class="property-card">
+                <div class="property-photo"><span class="badge">Destaque</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Apartamento no Alto de Pinheiros</h3>
+                  <p class="loc">Vista Permanente e Privilegiada</p>
+                  <div class="property-price">R$ 5.000.000,00</div>
+                </div>
+              </article>
+            </div>
+            <div class="swiper-slide example-card">
+              <article class="property-card">
+                <div class="property-photo"><span class="badge">Destaque</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="property-body">
+                  <h3>Apartamento em Pitangueiras</h3>
+                  <p class="loc">Guarujá · 160m² · Portaria Fechada</p>
+                  <div class="property-price">R$ 2.200.000,00</div>
+                </div>
+              </article>
             </div>
           </div>
         </div>
         <div class="carousel-nav">
-          <button class="car-btn" id="lancPrev">&#8592;</button>
-          <button class="car-btn" id="lancNext">&#8594;</button>
-        </div>
-        <div class="swiper-pagination" id="lancPagination"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Banners de categoria -->
-  <section class="section tight">
-    <div class="container">
-      <div class="category-tiles">
-        <a class="category-tile image-ready" href="produtos.html?categoria=mochilas" aria-label="Ver produtos de Mochilas" style="background-image:url('assets/banner-categoria-mochilas.jpg');"><span class="tile-conferir">conferir</span></a>
-        <a class="category-tile image-ready" href="produtos.html?categoria=facas" aria-label="Ver produtos de Cutelaria" style="background-image:url('assets/banner-categoria-cutelaria.jpg');"><span class="tile-conferir">conferir</span></a>
-        <a class="category-tile image-ready" href="produtos.html?categoria=calcados" aria-label="Ver produtos de Calçados" style="background-image:url('assets/banner-categoria-calcados.jpg');"><span class="tile-conferir">conferir</span></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Destaques -->
-  <section class="section">
-    <div class="container">
-      <div class="gold-rule"></div>
-      <h2 class="section-title">Destaques</h2>
-      <p class="section-sub">Seleção dos itens mais procurados da loja.</p>
-
-      <div class="destaques-grid" id="destaquesGrid">
-        <article class="example-card product-card">
-          <a href="produtos.html?categoria=mochilas">
-            <div class="product-photo"><span class="badge frete">Frete Grátis</span><div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div></div>
-            <div class="product-body">
-              <h3>Mochila Tática Assault Camuflado</h3>
-              <p class="loc">Geral · Disponível</p>
-              <div class="product-price">R$420,00</div>
-              <span class="installments">ou 3x de R$140,00 sem juros</span>
-            </div>
-          </a>
-        </article>
-        <article class="example-card product-card">
-          <a href="produtos.html?categoria=mochilas">
-            <div class="product-photo"><span class="badge frete">Frete Grátis</span><div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div></div>
-            <div class="product-body">
-              <h3>Mochila Duster Coyote Invictus</h3>
-              <p class="loc">Geral · Disponível</p>
-              <div class="product-price">R$540,00</div>
-              <span class="installments">ou 3x de R$180,00 sem juros</span>
-            </div>
-          </a>
-        </article>
-        <article class="example-card product-card">
-          <a href="produtos.html?categoria=vestuario">
-            <div class="product-photo"><span class="badge frete">Frete Grátis</span>
-              <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
-            </div>
-            <div class="product-body">
-              <h3>Jaqueta Corta-Vento Impermeável Feminina</h3>
-              <p class="loc">Geral · Disponível</p>
-              <div class="product-price">R$620,00</div>
-              <span class="installments">ou 3x de R$206,67 sem juros</span>
-            </div>
-          </a>
-        </article>
-        <article class="example-card product-card">
-          <a href="produtos.html?categoria=mochilas">
-            <div class="product-photo"><span class="badge frete">Frete Grátis</span><div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div></div>
-            <div class="product-body">
-              <h3>Mochila Assault Urbana Preta Invictus</h3>
-              <p class="loc">Geral · Disponível</p>
-              <div class="product-price">R$470,00</div>
-              <span class="installments">ou 3x de R$156,67 sem juros</span>
-            </div>
-          </a>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- Promoções -->
-  <section class="section tight">
-    <div class="container">
-      <div class="gold-rule"></div>
-      <h2 class="section-title">Promoções</h2>
-      <p class="section-sub">Ofertas por tempo limitado, direto do estoque da QRV.</p>
-
-      <div class="destaques-grid" id="promocoesGrid">
-        <article class="example-card product-card">
-          <a href="produtos.html?categoria=acessorios">
-            <div class="product-photo"><img src="assets/produto-oculos.jpg" alt="Óculos Solar Tático Focus — Verde" loading="lazy"></div>
-            <div class="product-body">
-              <h3>Óculos Solar Tático Focus — Verde</h3>
-              <p class="loc">Geral · Disponível</p>
-              <div class="product-price"><span class="price-old">R$250,00</span>R$180,00</div>
-            </div>
-          </a>
-        </article>
-        <article class="example-card product-card">
-          <a href="produtos.html?categoria=acessorios">
-            <div class="product-photo"><img src="assets/produto-oculos.jpg" alt="Óculos Solar Tático Focus — Coyote" loading="lazy"></div>
-            <div class="product-body">
-              <h3>Óculos Solar Tático Focus — Coyote</h3>
-              <p class="loc">Geral · Disponível</p>
-              <div class="product-price"><span class="price-old">R$250,00</span>R$180,00</div>
-            </div>
-          </a>
-        </article>
-        <article class="example-card product-card">
-          <a href="produtos.html?categoria=acessorios">
-            <div class="product-photo"><img src="assets/produto-oculos.jpg" alt="Óculos Solar Tático Focus — Preto" loading="lazy"></div>
-            <div class="product-body">
-              <h3>Óculos Solar Tático Focus — Preto</h3>
-              <p class="loc">Geral · Disponível</p>
-              <div class="product-price"><span class="price-old">R$250,00</span>R$180,00</div>
-            </div>
-          </a>
-        </article>
-        <article class="example-card product-card">
-          <a href="produtos.html?categoria=vestuario">
-            <div class="product-photo">
-              <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
-            </div>
-            <div class="product-body">
-              <h3>Bermuda Invictus Veterano Woodland</h3>
-              <p class="loc">Geral · Disponível</p>
-              <div class="product-price">R$280,00</div>
-            </div>
-          </a>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section tight">
-    <div class="container">
-      <div class="gold-rule"></div>
-      <h2 class="section-title">Por que comprar na QRV</h2>
-      <div class="features">
-        <div class="feature-card accent">
-          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>
-          <h3>Envio para Todo o Brasil</h3>
-          <p>Compra 100% online com envio rápido e rastreado para qualquer estado.</p>
-        </div>
-        <div class="feature-card">
-          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z"/></svg>
-          <h3>Bordado Personalizado</h3>
-          <p>Nome de guerra, tipo sanguíneo e insígnias bordados sob encomenda.</p>
-        </div>
-        <div class="feature-card">
-          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 3H8a2 2 0 00-2 2v16l6-4 6 4V5a2 2 0 00-2-2z"/></svg>
-          <h3>Seja um Revendedor</h3>
-          <p>Condições especiais para lojistas e revendedores em todo o país.</p>
+          <button class="car-btn" id="carPrev">&#8592;</button>
+          <button class="car-btn" id="carNext">&#8594;</button>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="quote-band">
+  <section class="quote-band" id="quem-somos">
     <div class="container">
-      <p>Equipando você para o combate</p>
-      <a href="produtos.html">Ver Catálogo Completo →</a>
-    </div>
-  </section>
-
-  <!-- Últimas do Blog -->
-  <section class="section tight">
-    <div class="container">
-      <div class="gold-rule"></div>
-      <h2 class="section-title">Últimas do Blog</h2>
-      <p class="section-sub">Dicas, novidades e conteúdo tático direto da QRV.</p>
-
-      <div class="blog-grid">
-        <article class="blog-card">
-          <a href="contato.html" class="blog-card-photo" style="background-image:url('assets/banner-categoria-cutelaria.jpg');"></a>
-          <div class="blog-card-body">
-            <span class="blog-card-date">05 de agosto de 2026</span>
-            <h3><a href="contato.html">Como escolher a faca tática certa para o seu dia a dia</a></h3>
-            <p>Lâmina fixa ou dobrável? Aço inox ou carbono? Te ajudamos a decidir antes da próxima compra.</p>
-          </div>
-        </article>
-        <article class="blog-card">
-          <a href="contato.html" class="blog-card-photo" style="background-image:url('assets/banner-categoria-mochilas.jpg');"></a>
-          <div class="blog-card-body">
-            <span class="blog-card-date">28 de julho de 2026</span>
-            <h3><a href="contato.html">Mochilas táticas: qual litragem escolher para cada missão</a></h3>
-            <p>De um treino de fim de semana a uma operação de vários dias — veja o tamanho ideal pra cada uso.</p>
-          </div>
-        </article>
-        <article class="blog-card">
-          <a href="bordados.html" class="blog-card-photo" style="background-image:url('assets/banner-categoria-calcados.jpg');"></a>
-          <div class="blog-card-body">
-            <span class="blog-card-date">14 de julho de 2026</span>
-            <h3><a href="bordados.html">Bordado personalizado: tudo que você precisa saber antes de pedir</a></h3>
-            <p>Nome de guerra, tipo sanguíneo e insígnias — entenda como funciona o processo na QRV.</p>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="newsletter-band">
-    <div class="container">
-      <div class="newsletter-card">
-        <div class="newsletter-card-text">
-          <h3>Receba Todas<br>as Novidades</h3>
-          <p>Cadastre-se para receber ofertas exclusivas e lançamentos em primeira mão.</p>
-        </div>
-        <form class="newsletter" id="newsletterForm">
-          <input type="email" placeholder="Digite seu e-mail" required>
-          <button type="submit">Inscreva-se</button>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <section class="instagram-band">
-    <div class="container">
-      <div class="ig-handle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
-        Siga-nos no @qrv_artigostaticos
-      </div>
-    </div>
-    <div class="instagram-cta">
-      <img class="instagram-preview" src="assets/instagram-preview.jpg" alt="Perfil @qrv_artigostaticos no Instagram">
-      <div class="instagram-cta-overlay">
-        <h2>Siga Nosso<br>Instagram</h2>
-        <a href="https://instagram.com/qrv_artigostaticos" target="_blank" rel="noopener" class="btn-ig-seguir">Seguir</a>
-      </div>
+      <p>Uma imobiliária que mescla sofisticação e modernidade, oferecendo um portfólio selecionado para clientes exigentes.</p>
+      <a href="comprar.html">Compre agora →</a>
     </div>
   </section>
 
@@ -473,180 +321,227 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-about">
-          <a href="index.html" class="footer-logo-slot"><img src="assets/logo.png" alt="QRV Artigos Táticos" onerror="this.parentElement.innerHTML='<span class=logo>QRV <span>ARTIGOS</span> TÁTICOS</span>';"></a>
-          <p>Equipamentos e artigos táticos para Forças Armadas, Polícia Militar e entusiastas. Enviamos para todo o Brasil.</p>
+          <a href="#" class="footer-logo-slot"><img src="assets/logo.png" alt="MCJ Capital Invest" onerror="this.parentElement.innerHTML='<span class=logo>MCJ <span>CAPITAL</span> INVEST</span>';"></a>
+          <p>Abrimos as melhores portas para você. Imóveis de alto padrão com curadoria exclusiva.</p>
           <div class="newsletter">
-            <input type="email" placeholder="Receba nossas promoções">
+            <input type="email" placeholder="Receba imóveis exclusivos">
             <button>→</button>
           </div>
         </div>
         <div>
           <h4>Menu</h4>
           <ul>
-            <li><a href="produtos.html">Loja</a></li>
-            <li><a href="bordados.html">Bordados</a></li>
-            <li><a href="revendedor.html">Seja Revendedor</a></li>
-            <li><a href="quem-somos.html">Quem Somos</a></li>
+            <li><a href="quem-somos.html">Quem somos</a></li>
+            <li><a href="comprar.html">Comprar</a></li>
+            <li><a href="alugar.html">Alugar</a></li>
+            <li><a href="anunciar.html">Anunciar</a></li>
             <li><a href="contato.html">Fale Conosco</a></li>
           </ul>
         </div>
         <div>
-          <h4>Categorias</h4>
+          <h4>Imóveis</h4>
           <ul>
-            <li><a href="produtos.html?categoria=vestuario">Vestuário e Fardamento</a></li>
-            <li><a href="produtos.html?categoria=calcados">Calçados Militares</a></li>
-            <li><a href="produtos.html?categoria=insignias">Brevês e Insígnias</a></li>
-            <li><a href="produtos.html?categoria=kits">Kits Especializados</a></li>
+            <li><a href="#imoveis">Lançamentos</a></li>
+            <li><a href="alugar.html">Alugar</a></li>
+            <li><a href="comprar.html">Comprar</a></li>
+            <li><a href="anunciar.html">Anunciar Seu Imóvel</a></li>
           </ul>
-        </div>
-        <div>
-          <h4>Formas de Pagamento</h4>
-          <div class="payment-icons">
-            <span class="pay-badge visa">VISA</span>
-            <span class="pay-badge mastercard">Master</span>
-            <span class="pay-badge elo">elo</span>
-            <span class="pay-badge hipercard">Hiper</span>
-            <span class="pay-badge amex">Amex</span>
-            <span class="pay-badge pix">Pix</span>
-            <span class="pay-badge boleto">Boleto</span>
-          </div>
-          <h4 style="margin-top:24px;">Selos de Segurança</h4>
-          <div class="security-badges">
-            <span class="sec-badge protegida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>Loja Protegida</span>
-            <span class="sec-badge ssl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Site Seguro SSL</span>
-          </div>
         </div>
         <div>
           <h4>Atendimento ao Cliente</h4>
           <ul>
-            <li style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px;">Compras via loja online, Direct ou WhatsApp. Dúvidas sobre pedidos, bordados e revenda, fale com a gente.</li>
-            <li><strong>WhatsApp:</strong> (11) 99321-7675</li>
-            <li><strong>E-mail:</strong> contato@qrvartigostaticos.com.br</li>
-            <li><strong>Horário:</strong> Seg. a Qui. 10h-20h30 · Sex. 10h-19h · Sáb. 09h-16h</li>
-            <li><strong>Endereço:</strong> Av. Santos Dumont, 61<br>Cumbica · Guarulhos - SP · CEP 07180-270</li>
+            <li style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px;">Nossa equipe de suporte está aqui para ajudar com qualquer dúvida sobre contratos, locações, vistorias ou suporte ao cliente.</li>
+            <li><strong>E-mail:</strong> marciocjorge@terra.com.br</li>
+            <li><strong>Horário de Atendimento:</strong> Segunda a Sexta-feira, das 09h às 18h (BRT)</li>
+            <li><strong>Endereço:</strong> Av. Paulista, 1159 · Conj. 1005<br>Bela Vista · São Paulo - SP · CEP 01311-200</li>
           </ul>
           <div class="footer-social">
-            <a href="https://wa.me/5511993217675" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12.02 2C6.5 2 2 6.48 2 12c0 1.77.46 3.45 1.28 4.9L2 22l5.25-1.38A9.96 9.96 0 0 0 12.02 22C17.52 22 22 17.52 22 12S17.52 2 12.02 2zm0 18.2c-1.6 0-3.13-.43-4.46-1.24l-.32-.19-3.13.82.84-3.05-.2-.31A8.17 8.17 0 0 1 3.8 12c0-4.54 3.7-8.2 8.22-8.2 4.53 0 8.2 3.66 8.2 8.2 0 4.53-3.68 8.2-8.2 8.2z"/></svg></a>
-            <a href="https://instagram.com/qrv_artigostaticos" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg></a>
-            <a href="mailto:contato@qrvartigostaticos.com.br" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></a>
-            <a href="https://maps.google.com/?q=Av.+Santos+Dumont,+61,+Guarulhos" target="_blank" rel="noopener" aria-label="Localização"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></a>
+            <a href="https://wa.me/5511999990542" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12.02 2C6.5 2 2 6.48 2 12c0 1.77.46 3.45 1.28 4.9L2 22l5.25-1.38A9.96 9.96 0 0 0 12.02 22C17.52 22 22 17.52 22 12S17.52 2 12.02 2zm0 18.2c-1.6 0-3.13-.43-4.46-1.24l-.32-.19-3.13.82.84-3.05-.2-.31A8.17 8.17 0 0 1 3.8 12c0-4.54 3.7-8.2 8.22-8.2 4.53 0 8.2 3.66 8.2 8.2 0 4.53-3.68 8.2-8.2 8.2z"/></svg></a>
+            <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg></a>
+            <a href="mailto:marciocjorge@terra.com.br" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></a>
+            <a href="https://maps.google.com/?q=Av.+Paulista,+1159,+S%C3%A3o+Paulo" target="_blank" rel="noopener" aria-label="Localização"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></a>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 QRV ARTIGOS TÁTICOS, All rights reserved.</span>
+        <span>© 2026 MCJ CAPITAL INVEST, All rights reserved.</span>
         <a href="#">Termos e políticas</a>
       </div>
     </div>
   </footer>
 
-  <a href="https://wa.me/5511993217675" target="_blank" rel="noopener" class="whatsapp-float" aria-label="WhatsApp">
+  <a href="https://wa.me/5511999990542" target="_blank" rel="noopener" class="whatsapp-float" aria-label="WhatsApp">
     <svg viewBox="0 0 32 32" width="26" height="26" fill="#fff"><path d="M16.02 3C9.4 3 4 8.38 4 15c0 2.36.7 4.55 1.9 6.4L4 29l7.8-1.85A11.9 11.9 0 0 0 16.02 27C22.65 27 28 21.62 28 15S22.65 3 16.02 3zm0 21.7c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.63 1.1 1.1-4.5-.25-.4A9.63 9.63 0 0 1 5 15c0-6.07 5-11 11.02-11S27 8.93 27 15s-4.98 9.7-10.98 9.7zm5.98-7.3c-.33-.16-1.94-.96-2.24-1.07-.3-.11-.52-.16-.74.16-.22.33-.85 1.07-1.04 1.29-.19.22-.38.24-.71.08-.33-.16-1.4-.51-2.66-1.63-.98-.87-1.65-1.95-1.84-2.27-.19-.33-.02-.5.14-.66.15-.15.33-.38.5-.57.16-.19.22-.33.33-.55.11-.22.05-.41-.03-.57-.08-.16-.74-1.78-1.01-2.44-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.33-1.14 1.11-1.14 2.71 0 1.6 1.17 3.15 1.33 3.37.16.22 2.3 3.51 5.57 4.92.78.34 1.38.54 1.86.69.78.25 1.49.21 2.05.13.63-.1 1.94-.79 2.21-1.56.27-.77.27-1.43.19-1.56-.08-.14-.3-.22-.63-.38z"/></svg>
   </a>
 
 <script src="assets/site.js"></script>
 <script type="module" src="assets/chatbot.js"></script>
 <script type="module" src="assets/theme.js"></script>
-<script type="module" src="assets/cart.js"></script>
-<script>
-  // Carrossel automático do banner promocional (3 slides)
-  (function () {
-    const slides = document.querySelectorAll('#promoSlides .promo-slide');
-    const dots = document.querySelectorAll('#promoDots span');
-    if (slides.length === 0) return;
-    let atual = 0;
-    function irPara(i) {
-      slides[atual].classList.remove('active');
-      dots[atual]?.classList.remove('active');
-      atual = (i + slides.length) % slides.length;
-      slides[atual].classList.add('active');
-      dots[atual]?.classList.add('active');
-    }
-    let timer = setInterval(() => irPara(atual + 1), 5000);
-    dots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        irPara(Number(dot.dataset.i));
-        clearInterval(timer);
-        timer = setInterval(() => irPara(atual + 1), 5000);
-      });
-    });
-  })();
-</script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-  let lancamentosSwiper;
-  function initLancamentosSwiper() {
-    if (lancamentosSwiper) lancamentosSwiper.destroy(true, true);
-    const slideCount = document.querySelectorAll('#lancamentosTrack .swiper-slide').length;
-    lancamentosSwiper = new Swiper('.lancamentos-swiper', {
+  // Carrossel "Imóveis em Destaque" — grade com slidesPerView fixo por
+  // breakpoint (sem centeredSlides, que conflitava com loop:true na hora de
+  // calcular a largura dos cards e travava o último slide com espaço vazio).
+  // Fluxo estrito: 1) destrói a instância atual, 2) só então mexe no HTML da
+  // .swiper-wrapper, 3) cria a nova instância depois do HTML já estar no DOM.
+  let destaquesSwiper;
+  const carouselTrackEl = document.getElementById('carouselTrack');
+
+  function createDestaquesSwiper() {
+    if (carouselTrackEl.children.length === 0) return;
+    destaquesSwiper = new Swiper('.destaques-swiper', {
       grabCursor: true,
       centeredSlides: false,
-      loop: slideCount > 4,
-      slidesPerView: 1.15,
-      spaceBetween: 22,
+      loop: true,
+      loopedSlides: 5,
+      loopAdditionalSlides: 5,
+      observer: true,
+      observeParents: true,
+      spaceBetween: 20,
       breakpoints: {
-        640: { slidesPerView: 2, spaceBetween: 22 },
-        960: { slidesPerView: 3, spaceBetween: 24 },
-        1200: { slidesPerView: 4, spaceBetween: 26 },
+        320: { slidesPerView: 1, spaceBetween: 15 },
+        768: { slidesPerView: 2, spaceBetween: 20 },
+        1024: { slidesPerView: 3, spaceBetween: 30 },
       },
       autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
-      navigation: { nextEl: '#lancNext', prevEl: '#lancPrev' },
-      pagination: { el: '#lancPagination', clickable: true },
+      navigation: { nextEl: '#carNext', prevEl: '#carPrev' },
     });
   }
-  window.initLancamentosSwiper = initLancamentosSwiper;
-  initLancamentosSwiper();
+
+  function renderDestaques(cardsArray) {
+    // 1) destrói a instância atual antes de tocar no DOM
+    if (destaquesSwiper) { destaquesSwiper.destroy(true, true); destaquesSwiper = null; }
+    // Com poucos imóveis (<6), o loop do Swiper não tem slides suficientes pra
+    // preencher a tela e sobra um espaço vazio à direita antes de repetir — então
+    // duplicamos os cards até ter pelo menos 6 antes de inicializar.
+    let cards = [...cardsArray];
+    if (cards.length > 0) {
+      while (cards.length < 6) cards = cards.concat(cardsArray);
+    }
+    // 2) insere os cards (já duplicados se necessário) na .swiper-wrapper
+    carouselTrackEl.innerHTML = cards.join('');
+    // 3) só cria a nova instância depois do HTML já estar no DOM
+    createDestaquesSwiper();
+  }
+  window.renderDestaques = renderDestaques;
+  createDestaquesSwiper(); // primeira renderização, com os cards de exemplo já presentes no HTML
+
+  // Carrossel "Conheça Nossos Imóveis" — mesmo efeito 3D/coverflow, com 1 card
+  // em destaque no centro, prévia recuada dos vizinhos, autoplay contínuo
+  // (pausado ao passar o mouse) e setas de navegação.
+  const propertyGridEl = document.getElementById('propertyGrid');
+  // Guarda os slides de exemplo (já presentes no HTML) agrupados por finalidade,
+  // para poder alternar entre Comprar/Alugar e voltar a eles se não houver dados reais.
+  const exampleSlidesHTML = {
+    comprar: [...propertyGridEl.querySelectorAll('.swiper-slide[data-op="comprar"]')].map(el => { el.style.display = ''; return el.outerHTML; }),
+    alugar: [...propertyGridEl.querySelectorAll('.swiper-slide[data-op="alugar"]')].map(el => { el.style.display = ''; return el.outerHTML; }),
+  };
+  const realSlidesHTML = { comprar: null, alugar: null }; // preenchido quando os dados reais do Supabase chegarem
+
+  let imoveisSwiper;
+  function createImoveisSwiper() {
+    if (propertyGridEl.children.length === 0) return;
+    imoveisSwiper = new Swiper('.imoveis-swiper', {
+      effect: 'coverflow',
+      grabCursor: true,
+      centeredSlides: true,
+      loop: true,
+      observer: true,
+      observeParents: true,
+      loopAdditionalSlides: 3,
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
+      autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
+      navigation: { nextEl: '#imoveisNext', prevEl: '#imoveisPrev' },
+    });
+  }
+
+  function renderImoveisSwiper(tab) {
+    // 1) destrói a instância atual (se existir) antes de tocar no DOM
+    if (imoveisSwiper) { imoveisSwiper.destroy(true, true); imoveisSwiper = null; }
+    // 2) insere os novos cards dentro da .swiper-wrapper
+    const list = realSlidesHTML[tab] ?? exampleSlidesHTML[tab];
+    propertyGridEl.innerHTML = list && list.length > 0
+      ? list.join('')
+      : '<div class="swiper-slide"><p style="text-align:center;color:var(--text-muted);padding:60px 20px;">Nenhum imóvel cadastrado nesta categoria no momento.</p></div>';
+    // 3) só cria a nova instância depois do HTML já estar no DOM
+    createImoveisSwiper();
+  }
+  window.renderImoveisSwiper = renderImoveisSwiper;
+  window.__imoveisRealSlides = realSlidesHTML;
+  renderImoveisSwiper('comprar');
 </script>
 <script type="module">
-  import { fetchProdutos, productCardHTML } from './assets/supabase-client.js';
+  import { fetchImoveis, propertyCardHTML, finalidadesArray } from './assets/supabase-client.js';
 
-  async function loadLancamentos() {
-    const lancamentos = await fetchProdutos({ limit: 8 });
-    if (lancamentos.length > 0) {
-      const track = document.getElementById('lancamentosTrack');
-      track.querySelectorAll('.example-card').forEach(el => el.remove());
-      track.insertAdjacentHTML('beforeend', lancamentos.map(p => `<div class="swiper-slide">${productCardHTML(p, { showStock: false, buyLabel: 'Comprar' })}</div>`).join(''));
-      window.initLancamentosSwiper();
+  async function loadRealImoveis() {
+    const [todosImoveis, destaques] = await Promise.all([
+      fetchImoveis({}),
+      fetchImoveis({ destaque: true, limit: 8 }),
+    ]);
+
+    if (todosImoveis.length > 0) {
+      const slidesHTML = todosImoveis.map(im => `<div class="swiper-slide" data-op="${finalidadesArray(im).join(' ')}">${propertyCardHTML(im)}</div>`);
+      // um imóvel com as duas finalidades aparece nas duas abas (Comprar e Alugar)
+      window.__imoveisRealSlides.comprar = slidesHTML.filter((_, i) => finalidadesArray(todosImoveis[i]).includes('comprar'));
+      window.__imoveisRealSlides.alugar = slidesHTML.filter((_, i) => finalidadesArray(todosImoveis[i]).includes('alugar'));
+      // reaplica o filtro Comprar/Alugar ativo no momento
+      const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab || 'comprar';
+      window.renderImoveisSwiper(activeTab);
     }
-  }
 
-  async function loadDestaques() {
-    const destaques = await fetchProdutos({ destaque: true, limit: 8 });
     if (destaques.length > 0) {
-      const grid = document.getElementById('destaquesGrid');
-      grid.innerHTML = destaques.map(p => productCardHTML(p, { showFreteBadge: true })).join('');
+      window.renderDestaques(destaques.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`));
     }
   }
 
-  async function loadPromocoes() {
-    const todos = await fetchProdutos({ limit: 30 });
-    const promocoes = todos.filter(p => p.preco_promocional && Number(p.preco_promocional) < Number(p.preco)).slice(0, 4);
-    if (promocoes.length > 0) {
-      const grid = document.getElementById('promocoesGrid');
-      grid.innerHTML = promocoes.map(p => productCardHTML(p)).join('');
-    }
-  }
-
-  loadLancamentos();
-  loadDestaques();
-  loadPromocoes();
+  loadRealImoveis();
 </script>
 <script>
+  // Comprar / Alugar tabs — troca o conjunto de slides do carrossel e reinicia o Swiper
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const verTodosImoveisBtn = document.getElementById('verTodosImoveisBtn');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      window.renderImoveisSwiper(btn.dataset.tab);
+      if (verTodosImoveisBtn) verTodosImoveisBtn.href = btn.dataset.tab === 'alugar' ? 'alugar.html' : 'comprar.html';
+    });
+  });
+
+  // Price range live display
+  const range = document.querySelector('.price-range input[type="range"]');
+  const priceMaxLabel = document.querySelector('.price-values span:last-child');
+  if(range){
+    range.addEventListener('input', () => {
+      const val = Number(range.value).toLocaleString('pt-BR', {minimumFractionDigits:2});
+      priceMaxLabel.textContent = 'R$ ' + val;
+    });
+  }
+
+  // Botão "Filtrar" do painel de busca — monta os parâmetros e leva o
+  // visitante para a página de Comprar ou Alugar já com os filtros aplicados.
   const searchFiltrarBtn = document.getElementById('searchFiltrarBtn');
   if (searchFiltrarBtn) {
     searchFiltrarBtn.addEventListener('click', () => {
-      const categoria = document.getElementById('searchCategoria').value;
-      const corporacao = document.getElementById('searchCorporacao').value;
+      const finalidade = document.getElementById('searchFinalidade').value;
+      const tipo = document.getElementById('searchTipo').value;
+      const bairro = document.getElementById('searchBairro').value;
+      const quartos = document.getElementById('searchQuartos').value;
+      const precoInput = document.getElementById('searchPreco');
       const codigo = document.getElementById('searchCodigo').value.trim();
-      const nome = document.getElementById('searchNome').value.trim();
 
       const params = new URLSearchParams();
-      if (categoria) params.set('categoria', categoria);
-      if (corporacao) params.set('corporacao', corporacao);
+      if (tipo) params.set('tipo', tipo);
+      if (bairro) params.set('bairro', bairro);
+      if (quartos) params.set('quartos', quartos);
+      if (precoInput && Number(precoInput.value) < Number(precoInput.max)) params.set('valor_max', precoInput.value);
       if (codigo) params.set('codigo', codigo);
-      if (nome) params.set('busca', nome);
 
-      window.location.href = `produtos.html?${params.toString()}`;
+      const destino = finalidade === 'alugar' ? 'alugar.html' : 'comprar.html';
+      window.location.href = `${destino}?${params.toString()}`;
     });
   }
 </script>
