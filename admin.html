@@ -9,19 +9,18 @@
 <link rel="shortcut icon" href="assets/favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Painel Administrativo | MCJ Capital Invest</title>
+<title>Painel Administrativo | QRV Artigos Táticos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/admin.css">
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body class="admin-body">
 
   <div class="admin-topbar">
     <div class="container">
-      <a href="index.html" class="logo">MCJ <span>CAPITAL</span> INVEST</a>
+      <a href="index.html" class="logo">QRV <span>ARTIGOS</span> TÁTICOS</a>
       <div class="admin-user" id="adminUserBar" style="display:none;">
         <span>Logado como <strong id="userEmail"></strong></span>
         <button class="btn-sm" id="logoutBtn">Sair</button>
@@ -32,8 +31,8 @@
   <!-- Tela de login -->
   <div class="login-wrap" id="loginWrap">
     <div class="login-card">
-      <h1 class="serif">Painel Administrativo</h1>
-      <p class="sub">Acesso restrito — MCJ Capital Invest</p>
+      <h1 class="stencil">Painel Administrativo</h1>
+      <p class="sub">Acesso restrito — QRV Artigos Táticos</p>
       <div class="login-error" id="loginError"></div>
       <form id="loginForm">
         <div class="field" style="margin-bottom:16px;">
@@ -44,7 +43,7 @@
           <label>Senha</label>
           <input type="password" id="loginPassword" required autocomplete="current-password">
         </div>
-        <button type="submit" class="btn-gold">Entrar</button>
+        <button type="submit" class="btn-gold" style="width:100%;">Entrar</button>
       </form>
     </div>
   </div>
@@ -54,9 +53,10 @@
     <div class="container">
       <div class="admin-header-row">
         <div>
-          <h1 class="serif">Meus Imóveis</h1>
-          <p>Cadastre, edite e gerencie os imóveis exibidos no site.</p>
+          <h1 class="stencil">Meus Produtos</h1>
+          <p>Cadastre, edite e gerencie os produtos exibidos na loja.</p>
         </div>
+        <button type="button" class="btn-gold" id="importCatalogoBtn">Importar Catálogo</button>
       </div>
 
       <div class="ai-key-box">
@@ -70,9 +70,9 @@
       </div>
 
       <div class="ai-key-box">
-        <label for="chatGeminiApiKey">Chave da API do Google Gemini (usada pelo "Corretor Atendente" no site)</label>
+        <label for="chatGeminiApiKey">Chave da API do Google Gemini (usada pelo chat "Recruta QRV" no site)</label>
         <div class="ai-key-row">
-          <input type="password" id="chatGeminiApiKey" placeholder="Cole a chave aqui (ex: AIza...)">
+          <input type="password" id="chatGeminiApiKey" placeholder="Cole a chave aqui (ex: AIza... ou AQ...)">
           <button type="button" class="btn-sm" id="saveChatApiKeyBtn">Salvar</button>
           <span class="ai-key-status" id="chatApiKeyStatus"></span>
         </div>
@@ -80,10 +80,10 @@
       </div>
 
       <div class="admin-tabs">
-        <button class="admin-tab-btn active" id="tabList">Todos os Imóveis</button>
-        <button class="admin-tab-btn" id="tabNew">+ Novo Imóvel</button>
-        <button class="admin-tab-btn" id="tabImport">Importar da Shopify (CSV)</button>
-        <button class="admin-tab-btn" id="tabPending">Anúncios Pendentes <span class="tab-count" id="pendingCount"></span></button>
+        <button class="admin-tab-btn active" id="tabList">Todos os Produtos</button>
+        <button class="admin-tab-btn" id="tabNew">+ Novo Produto</button>
+        <button class="admin-tab-btn" id="tabBordados">Bordados <span class="tab-count" id="bordadosCount"></span></button>
+        <button class="admin-tab-btn" id="tabRevenda">Revenda <span class="tab-count" id="revendaCount"></span></button>
         <button class="admin-tab-btn" id="tabMessages">Mensagens <span class="tab-count" id="messagesCount"></span></button>
       </div>
 
@@ -97,250 +97,168 @@
             <button type="button" class="btn-sm btn-danger" id="bulkExcluirBtn">Excluir</button>
           </div>
         </div>
-        <table class="imoveis-table">
+        <table class="produtos-table">
           <thead>
             <tr>
-              <th class="col-check"><input type="checkbox" id="selectAllImoveis"></th>
+              <th class="col-check"><input type="checkbox" id="selectAllProdutos"></th>
               <th class="sortable" data-sort="codigo">Código <span class="sort-arrow"></span></th>
               <th class="sortable" data-sort="titulo">Título <span class="sort-arrow"></span></th>
-              <th class="sortable" data-sort="finalidade">Finalidade <span class="sort-arrow"></span></th>
-              <th class="sortable" data-sort="valor">Valor <span class="sort-arrow"></span></th>
+              <th class="sortable" data-sort="categoria">Categoria <span class="sort-arrow"></span></th>
+              <th class="sortable" data-sort="preco">Preço <span class="sort-arrow"></span></th>
               <th class="sortable" data-sort="status">Status <span class="sort-arrow"></span></th>
               <th>Ações</th>
             </tr>
           </thead>
-          <tbody id="imoveisTableBody"></tbody>
+          <tbody id="produtosTableBody"></tbody>
         </table>
         <div class="empty-state" id="emptyState" style="display:none;">
-          Nenhum imóvel cadastrado ainda. Clique em <strong>+ Novo Imóvel</strong> para começar.
+          Nenhum produto cadastrado ainda. Clique em <strong>+ Novo Produto</strong> para começar.
         </div>
       </section>
 
       <!-- Formulário -->
       <section class="admin-panel" id="panelForm">
-        <form class="admin-form" id="imovelForm">
-          <h3 class="serif" id="formTitle" style="margin-bottom:24px;">Novo Imóvel</h3>
-
-          <div class="owner-info-box" id="ownerInfoBox" style="display:none;">
-            <strong>Anúncio enviado pelo site — Dados de Contato do Proprietário</strong>
-            <span id="ownerInfoText"></span>
-          </div>
+        <form class="admin-form" id="produtoForm">
+          <h3 class="stencil" id="formTitle" style="margin-bottom:24px;">Novo Produto</h3>
 
           <div class="ai-autofill-box">
-            <label for="rawPropertyData">Colar Informações Brutas do Imóvel (WhatsApp)</label>
-            <textarea id="rawPropertyData" rows="5" placeholder="Cole aqui o texto recebido por WhatsApp: endereço, valor, características, condomínio, IPTU etc."></textarea>
-            <button type="button" class="btn-gold" id="generateAIBtn" style="width:auto;">✨ Gerar Cadastro Automático com IA</button>
-            <p class="ai-hint">A IA preenche os campos abaixo automaticamente a partir do texto colado. Revise tudo antes de salvar.</p>
+            <label for="rawProductData">Preenchimento Automático por IA — cole informações brutas do produto</label>
+            <textarea id="rawProductData" rows="4" placeholder="Ex: Combat shirt ripstop multicam, tamanhos P M G GG, R$189,90, tecido resistente a rasgos, proteção UV50+..."></textarea>
+            <button type="button" class="btn-sm" id="generateAIBtn">Gerar com IA</button>
+            <p class="ai-hint">A IA preenche categoria, corporação, tamanhos, cores, preço, personalização e a descrição completa.</p>
           </div>
 
           <div class="form-grid">
             <div>
-              <label>Código do Imóvel *</label>
-              <input type="text" name="codigo" required placeholder="ex: 0020">
+              <label>Código</label>
+              <input type="text" name="codigo" required>
             </div>
             <div class="span-2">
-              <label>Título *</label>
-              <input type="text" name="titulo" required placeholder="ex: Cobertura Alto Padrão no Jardins">
+              <label>Título</label>
+              <input type="text" name="titulo" required>
+            </div>
+            <div>
+              <label>Categoria</label>
+              <select name="categoria" required>
+                <option value="vestuario">Vestuário e Fardamento</option>
+                <option value="calcados">Calçados Militares</option>
+                <option value="mochilas">Mochilas e Bolsas</option>
+                <option value="insignias">Brevês, Insígnias e Bordados</option>
+                <option value="protecao">Proteção e Defesa Pessoal</option>
+                <option value="facas">Facas e Canivetes</option>
+                <option value="kits">Kits Especializados</option>
+                <option value="acessorios">Acessórios Táticos</option>
+                <option value="replicas">Réplicas Decorativas</option>
+              </select>
+            </div>
+            <div>
+              <label>Corporação</label>
+              <select name="corporacao">
+                <option value="Geral">Geral</option>
+                <option value="Exército Brasileiro">Exército Brasileiro</option>
+                <option value="Marinha do Brasil">Marinha do Brasil</option>
+                <option value="Aeronáutica">Aeronáutica</option>
+                <option value="PMESP">PMESP</option>
+                <option value="Polícia Militar">Polícia Militar (outros estados)</option>
+                <option value="Bombeiros">Bombeiros</option>
+                <option value="Polícia Civil">Polícia Civil</option>
+              </select>
+            </div>
+            <div>
+              <label>Estoque</label>
+              <select name="estoque_status">
+                <option value="disponivel">Disponível</option>
+                <option value="sob_encomenda">Sob Encomenda</option>
+                <option value="esgotado">Esgotado</option>
+              </select>
             </div>
 
             <div>
-              <label>Finalidade</label>
-              <div class="checkbox-row" style="gap:18px;">
-                <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="finalidade" value="comprar" checked> Comprar</label>
-                <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="finalidade" value="alugar"> Alugar</label>
-              </div>
+              <label>Tamanhos (separados por vírgula)</label>
+              <input type="text" name="tamanhos" placeholder="P, M, G, GG">
             </div>
             <div>
-              <label>Tipo de Imóvel</label>
-              <select name="tipo">
-                <option>Apartamento</option>
-                <option>Casa</option>
-                <option>Cobertura</option>
-                <option>Comercial</option>
-                <option>Terreno</option>
-              </select>
+              <label>Cores (separadas por vírgula)</label>
+              <input type="text" name="cores" placeholder="Verde, Preto, Multicam">
+            </div>
+            <div>
+              <label>Preço (R$)</label>
+              <input type="number" step="0.01" name="preco" required>
+            </div>
+            <div>
+              <label>Preço Promocional (R$)</label>
+              <input type="number" step="0.01" name="preco_promocional">
             </div>
             <div>
               <label>Status</label>
               <select name="status">
-                <option value="ativo">Ativo (visível no site)</option>
+                <option value="ativo">Ativo (visível na loja)</option>
                 <option value="inativo">Inativo (oculto)</option>
-                <option value="pendente">Pendente (aguardando aprovação)</option>
                 <option value="arquivado">Arquivado</option>
               </select>
             </div>
-
-            <div>
-              <label>Bairro</label>
-              <input type="text" name="bairro" placeholder="ex: Jardins">
+            <div class="span-3 checkbox-row">
+              <input type="checkbox" id="destaqueCheck" name="destaque">
+              <label for="destaqueCheck" style="margin:0;">Produto em destaque (aparece no carrossel da Home)</label>
             </div>
-            <div>
-              <label>Cidade</label>
-              <input type="text" name="cidade" placeholder="ex: São Paulo - SP">
-            </div>
-            <div>
-              <label>Endereço completo (para o mapa)</label>
-              <input type="text" name="endereco" placeholder="ex: Av. Paulista, 1159, São Paulo - SP">
-            </div>
-
-            <div>
-              <label>Quartos</label>
-              <input type="number" name="quartos" min="0" value="0">
-            </div>
-            <div>
-              <label>Banheiros</label>
-              <input type="number" name="banheiros" min="0" value="0">
-            </div>
-            <div>
-              <label>Suítes</label>
-              <input type="number" name="suites" min="0" value="0">
-            </div>
-            <div>
-              <label>Vagas de Garagem</label>
-              <input type="number" name="vagas" min="0" value="0">
-            </div>
-            <div>
-              <label>Área (m²)</label>
-              <input type="number" name="area" min="0" step="0.01">
-            </div>
-            <div>
-              <label class="checkbox-row" style="margin-top:14px;">
-                <input type="checkbox" name="destaque"> Marcar como destaque na home
-              </label>
-            </div>
-
-            <div>
-              <label>Valor do Imóvel — Venda (R$)</label>
-              <input type="number" name="valor" min="0" step="0.01">
-            </div>
-            <div>
-              <label>Valor do Aluguel — Mensal (R$)</label>
-              <input type="number" name="valor_aluguel" min="0" step="0.01">
-            </div>
-            <div>
-              <label>Valor do Condomínio (R$)</label>
-              <input type="number" name="valor_condominio" min="0" step="0.01">
-            </div>
-            <div>
-              <label>Valor do IPTU (R$)</label>
-              <input type="number" name="iptu" min="0" step="0.01">
-            </div>
-            <div>
-              <label>Link do Vídeo (YouTube ou Vimeo)</label>
-              <input type="url" name="video_url" placeholder="https://youtu.be/...">
-            </div>
-
-            <div class="span-3">
-              <label>Descrição do Imóvel</label>
-              <div class="editor-toolbar">
-                <button type="button" data-cmd="formatBlock" data-value="H2" title="Título">H2</button>
-                <button type="button" data-cmd="formatBlock" data-value="H3" title="Subtítulo">H3</button>
-                <button type="button" data-cmd="formatBlock" data-value="P" title="Parágrafo normal">¶</button>
-                <button type="button" data-cmd="bold" title="Negrito"><strong>N</strong></button>
-                <button type="button" data-cmd="italic" title="Itálico"><em>I</em></button>
-                <button type="button" data-cmd="insertUnorderedList" title="Lista com marcadores">• Lista</button>
-                <button type="button" data-cmd="insertHorizontalRule" title="Linha divisória">— Divisória</button>
-                <button type="button" data-cmd="removeFormat" title="Limpar formatação">Limpar</button>
-              </div>
-              <div
-                class="descricao-imovel editor-input"
-                id="descricaoEditor"
-                contenteditable="true"
-                data-placeholder="Descreva os detalhes, diferenciais e acabamentos do imóvel. Use a barra acima para títulos, negrito, listas e divisórias — a formatação aparece no site exatamente como aqui.">
-              </div>
-              <p style="font-size:.72rem;color:var(--text-muted);margin-top:8px;">
-                Dica: você também pode colar um texto já formatado (ex: copiado do Word ou de outro site) que a formatação é preservada.
-              </p>
+            <div class="span-3 checkbox-row">
+              <input type="checkbox" id="personalizavelCheck" name="personalizavel">
+              <label for="personalizavelCheck" style="margin:0;">Permite personalização (nome de guerra / bordado)</label>
             </div>
           </div>
 
-          <label>Fotos do Imóvel</label>
-          <div class="upload-zone" id="uploadZone">
-            Clique aqui ou arraste as fotos para enviar<br>
-            <span style="font-size:.75rem;opacity:.7;">JPG ou PNG — pode selecionar várias de uma vez</span>
+          <div style="margin-bottom:20px;">
+            <label style="display:block;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-light);margin-bottom:8px;font-family:'Oswald',sans-serif;">Fotos do Produto</label>
+            <div class="upload-zone" id="uploadZone">
+              Clique ou arraste as fotos aqui
+              <input type="file" id="fileInput" accept="image/*" multiple hidden>
+            </div>
+            <div class="upload-progress" id="uploadProgress"></div>
+            <div class="photo-preview-grid" id="photoPreviewGrid"></div>
           </div>
-          <input type="file" id="fileInput" accept="image/*" multiple hidden>
-          <div class="upload-progress" id="uploadProgress"></div>
-          <div class="photo-preview-grid" id="photoPreviewGrid"></div>
 
-          <div class="form-actions" id="pendingActions" style="display:none;">
-            <button type="button" class="btn-ghost" id="rejectImovelBtn">Recusar / Excluir</button>
-            <button type="button" class="btn-gold" id="approveImovelBtn" style="width:auto;">Aprovar e Publicar</button>
+          <div style="margin-bottom:20px;">
+            <label style="display:block;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-light);margin-bottom:8px;font-family:'Oswald',sans-serif;">Descrição do Produto</label>
+            <div class="editor-toolbar">
+              <button type="button" data-cmd="bold"><b>B</b></button>
+              <button type="button" data-cmd="italic"><i>I</i></button>
+              <button type="button" data-cmd="insertUnorderedList">• Lista</button>
+              <button type="button" data-cmd="formatBlock" data-value="H3">Título</button>
+              <button type="button" data-cmd="formatBlock" data-value="P">Parágrafo</button>
+            </div>
+            <div class="editor-input" id="descricaoEditor" contenteditable="true" data-placeholder="Descreva o produto..."></div>
           </div>
 
           <div class="form-actions">
             <button type="button" class="btn-ghost" id="cancelEditBtn">Cancelar</button>
-            <button type="submit" class="btn-gold" style="width:auto;">Salvar Imóvel</button>
+            <button type="submit" class="btn-gold">Salvar Produto</button>
           </div>
         </form>
       </section>
 
-      <!-- Anúncios pendentes de aprovação (enviados pelo site público) -->
-      <section class="admin-panel" id="panelPending">
-        <table class="imoveis-table">
-          <thead>
-            <tr>
-              <th>Título</th>
-              <th>Finalidade</th>
-              <th>Proprietário</th>
-              <th>Telefone</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="pendingTableBody"></tbody>
-        </table>
-        <div class="empty-state" id="pendingEmptyState" style="display:none;">
-          Nenhum anúncio pendente no momento. Assim que alguém enviar um imóvel pela página "Anunciar Seu Imóvel", ele aparece aqui.
-        </div>
+      <!-- Solicitações de Bordado -->
+      <section class="admin-panel" id="panelBordados">
+        <div class="messages-list" id="bordadosList"></div>
+        <div class="empty-state" id="bordadosEmptyState" style="display:none;">Nenhuma solicitação de bordado recebida ainda.</div>
       </section>
 
-      <!-- Mensagens recebidas pelo formulário "Fale Conosco" -->
+      <!-- Solicitações de Revenda -->
+      <section class="admin-panel" id="panelRevenda">
+        <div class="messages-list" id="revendaList"></div>
+        <div class="empty-state" id="revendaEmptyState" style="display:none;">Nenhuma solicitação de revenda recebida ainda.</div>
+      </section>
+
+      <!-- Mensagens -->
       <section class="admin-panel" id="panelMessages">
         <div class="messages-list" id="messagesList"></div>
-        <div class="empty-state" id="messagesEmptyState" style="display:none;">
-          Nenhuma mensagem recebida ainda.
-        </div>
+        <div class="empty-state" id="messagesEmptyState" style="display:none;">Nenhuma mensagem recebida ainda.</div>
       </section>
 
-      <!-- Importação em massa via CSV exportado da Shopify -->
-      <section class="admin-panel" id="panelImport">
-        <div class="import-box">
-          <h3 class="serif" style="margin-bottom:10px;">Importar Imóveis da Shopify (CSV)</h3>
-          <p class="import-hint">
-            Exporte o catálogo de produtos da Shopify em CSV (Produtos → Exportar) e envie o arquivo aqui.
-            O sistema lê as colunas <strong>Title</strong>, <strong>Body (HTML)</strong>, <strong>Variant Price</strong> e
-            <strong>Image Src</strong> automaticamente, agrupando todas as fotos de cada produto. Quartos, suítes,
-            banheiros, vagas e área são detectados quando aparecem no título/descrição — revise antes de publicar.
-          </p>
-
-          <div class="upload-zone" id="csvUploadZone">
-            Clique aqui ou arraste o arquivo .csv da Shopify<br>
-            <span style="font-size:.75rem;opacity:.7;">Exportação padrão de produtos da Shopify (.csv)</span>
-          </div>
-          <input type="file" id="csvFileInput" accept=".csv,text/csv" hidden>
-
-          <div class="import-status" id="importStatus" style="display:none;"></div>
-
-          <div class="import-preview" id="importPreview" style="display:none;">
-            <div class="import-preview-header">
-              <span id="importCount"></span>
-              <label class="checkbox-row">
-                <input type="checkbox" id="importActivateCheck"> Publicar imediatamente (marcar como "Ativo")
-              </label>
-            </div>
-            <div class="import-preview-list" id="importPreviewList"></div>
-            <div class="form-actions">
-              <button type="button" class="btn-ghost" id="importCancelBtn">Cancelar</button>
-              <button type="button" class="btn-gold" id="importConfirmBtn" style="width:auto;">Importar Imóveis</button>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   </main>
 
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" style="display:none;"></div>
 
-  <script type="module" src="assets/admin.js?v=20260808e"></script>
+<script type="module" src="assets/admin.js"></script>
 </body>
 </html>

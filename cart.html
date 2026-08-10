@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{var t=localStorage.getItem('qrv_theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+<link rel="apple-touch-icon" href="assets/favicon-192.png">
+<link rel="shortcut icon" href="assets/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Carrinho | QRV Artigos Táticos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="container">
+      <div class="left">
+        <span>&#9993; contato@qrvartigostaticos.com.br</span>
+        <span>&#128205; Av. Santos Dumont, 61 · Cumbica · Guarulhos - SP</span>
+      </div>
+      <div class="right">
+        <a href="bordados.html">Bordados</a>
+        <a href="revendedor.html">Seja um Revendedor</a>
+        <a href="quem-somos.html">Quem Somos</a>
+        <a href="contato.html">Fale Conosco</a>
+        <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema" title="Alternar tema">
+          <span class="theme-icon">☀️</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <header class="main">
+    <div class="container">
+      <div class="header-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+        <a href="index.html" class="mini-logo"><img src="assets/logo.png" alt="QRV Artigos Táticos"></a>
+      </div>
+      <nav class="primary categories-nav">
+        <ul>
+          <li class="has-mega">
+            <a href="produtos.html">Categorias</a>
+            <div class="mega-menu">
+            <div class="mega-col">
+              <a href="produtos.html?categoria=acessorios">Acessórios</a>
+              <a href="produtos.html?categoria=acessorios">Hidratação</a>
+              <a href="produtos.html?categoria=calcados">Calçados</a>
+              <a href="produtos.html?categoria=vestuario">Vestuário</a>
+            </div>
+            <div class="mega-col">
+              <a href="produtos.html?categoria=protecao">Munição</a>
+              <a href="produtos.html?categoria=mochilas">Mochilas</a>
+              <a href="produtos.html?categoria=acessorios">Lanternas</a>
+              <a href="produtos.html?categoria=facas">Cutelaria</a>
+            </div>
+            <div class="mega-col">
+              <a href="produtos.html?categoria=protecao">Armas</a>
+              <a href="produtos.html?categoria=insignias">Patches</a>
+              <a href="produtos.html?categoria=kits">Camping</a>
+              <a href="produtos.html?categoria=protecao">Coletes</a>
+            </div>
+          </div>
+          </li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button type="button" class="header-search-toggle" id="headerSearchToggle" aria-label="Buscar produtos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="20" height="20"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+        <form class="header-search-box" id="headerSearchBox" action="produtos.html" method="get">
+          <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar produtos">
+          <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="16" height="16"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+        </form>
+        <a href="contato.html" class="account-link" aria-label="Minha conta / Fale conosco">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="21" height="21"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.6-4 5-6 8-6s6.4 2 8 6"/></svg>
+        </a>
+        <a href="cart.html" class="cart-link" aria-label="Carrinho de compras">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="22" height="22"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="mobile-drawer" id="mobileDrawer">
+    <button class="drawer-close" id="drawerClose" aria-label="Fechar menu">&times;</button>
+    <nav class="drawer-nav">
+      <a href="produtos.html">Todos os Produtos</a>
+      <a href="produtos.html?categoria=acessorios">Acessórios</a>
+      <a href="produtos.html?categoria=calcados">Calçados</a>
+      <a href="produtos.html?categoria=facas">Cutelaria</a>
+      <a href="produtos.html?categoria=mochilas">Mochilas</a>
+      <a href="produtos.html?categoria=protecao">Munição</a>
+      <a href="produtos.html?categoria=vestuario">Vestuário</a>
+      <a href="bordados.html">Bordados</a>
+      <a href="revendedor.html">Seja Revendedor</a>
+      <a href="quem-somos.html">Quem Somos</a>
+      <a href="contato.html">Fale Conosco</a>
+    </nav>
+  </div>
+
+  <section class="page-header"><div class="container"></div></section>
+
+  <section class="section tight">
+    <div class="container">
+      <div class="gold-rule"></div>
+      <h1 class="section-title" style="text-align:left;">Meu Carrinho</h1>
+
+      <div id="cartWithItems" class="detail-grid hidden">
+        <div class="detail-main">
+          <table class="cart-table">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Preço</th>
+                <th>Quantidade</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="cartTableBody"></tbody>
+          </table>
+          <a href="produtos.html" class="btn-outline">&larr; Continuar Comprando</a>
+        </div>
+
+        <aside>
+          <div class="cart-summary">
+            <h4>Resumo do Pedido</h4>
+            <div class="cart-summary-row"><span>Subtotal</span><span id="cartSubtotal">R$ 0,00</span></div>
+            <div class="cart-summary-row"><span>Frete</span><span>Calculado no checkout</span></div>
+            <div class="cart-summary-row total"><span>Total</span><span id="cartTotal">R$ 0,00</span></div>
+            <a href="checkout.html" class="btn-gold" style="display:block;text-align:center;text-decoration:none;">Fechar Pedido &rarr;</a>
+          </div>
+        </aside>
+      </div>
+
+      <div id="cartEmpty" class="cart-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <p style="margin-bottom:22px;">Seu carrinho está vazio.</p>
+        <a href="produtos.html" class="btn-gold" style="text-decoration:none;">Ver Produtos</a>
+      </div>
+    </div>
+  </section>
+
+  <footer id="contato-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a href="index.html" class="footer-logo-slot"><img src="assets/logo.png" alt="QRV Artigos Táticos" onerror="this.parentElement.innerHTML='<span class=logo>QRV <span>ARTIGOS</span> TÁTICOS</span>';"></a>
+          <p>Equipamentos e artigos táticos para Forças Armadas, Polícia Militar e entusiastas. Enviamos para todo o Brasil.</p>
+          <div class="payment-icons">
+            <span>Pix</span><span>Cartão</span><span>Boleto</span><span>Mercado Pago</span>
+          </div>
+        </div>
+        <div>
+          <h4>Menu</h4>
+          <ul>
+            <li><a href="produtos.html">Loja</a></li>
+            <li><a href="bordados.html">Bordados</a></li>
+            <li><a href="revendedor.html">Seja Revendedor</a></li>
+            <li><a href="quem-somos.html">Quem Somos</a></li>
+            <li><a href="contato.html">Fale Conosco</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Categorias</h4>
+          <ul>
+            <li><a href="produtos.html?categoria=vestuario">Vestuário e Fardamento</a></li>
+            <li><a href="produtos.html?categoria=calcados">Calçados Militares</a></li>
+            <li><a href="produtos.html?categoria=insignias">Brevês e Insígnias</a></li>
+            <li><a href="produtos.html?categoria=kits">Kits Especializados</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Formas de Pagamento</h4>
+          <div class="payment-icons">
+            <span class="pay-badge visa">VISA</span>
+            <span class="pay-badge mastercard">Master</span>
+            <span class="pay-badge elo">elo</span>
+            <span class="pay-badge hipercard">Hiper</span>
+            <span class="pay-badge amex">Amex</span>
+            <span class="pay-badge pix">Pix</span>
+            <span class="pay-badge boleto">Boleto</span>
+          </div>
+          <h4 style="margin-top:24px;">Selos de Segurança</h4>
+          <div class="security-badges">
+            <span class="sec-badge protegida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>Loja Protegida</span>
+            <span class="sec-badge ssl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Site Seguro SSL</span>
+          </div>
+        </div>
+        <div>
+          <h4>Atendimento ao Cliente</h4>
+          <ul>
+            <li><strong>WhatsApp:</strong> (11) 99321-7675</li>
+            <li><strong>E-mail:</strong> contato@qrvartigostaticos.com.br</li>
+            <li><strong>Endereço:</strong> Av. Santos Dumont, 61<br>Cumbica · Guarulhos - SP · CEP 07180-270</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 QRV ARTIGOS TÁTICOS, All rights reserved.</span>
+        <a href="#">Termos e políticas</a>
+      </div>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/5511993217675" target="_blank" rel="noopener" class="whatsapp-float" aria-label="WhatsApp">
+    <svg viewBox="0 0 32 32" width="26" height="26" fill="#fff"><path d="M16.02 3C9.4 3 4 8.38 4 15c0 2.36.7 4.55 1.9 6.4L4 29l7.8-1.85A11.9 11.9 0 0 0 16.02 27C22.65 27 28 21.62 28 15S22.65 3 16.02 3zm0 21.7c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.63 1.1 1.1-4.5-.25-.4A9.63 9.63 0 0 1 5 15c0-6.07 5-11 11.02-11S27 8.93 27 15s-4.98 9.7-10.98 9.7zm5.98-7.3c-.33-.16-1.94-.96-2.24-1.07-.3-.11-.52-.16-.74.16-.22.33-.85 1.07-1.04 1.29-.19.22-.38.24-.71.08-.33-.16-1.4-.51-2.66-1.63-.98-.87-1.65-1.95-1.84-2.27-.19-.33-.02-.5.14-.66.15-.15.33-.38.5-.57.16-.19.22-.33.33-.55.11-.22.05-.41-.03-.57-.08-.16-.74-1.78-1.01-2.44-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.33-1.14 1.11-1.14 2.71 0 1.6 1.17 3.15 1.33 3.37.16.22 2.3 3.51 5.57 4.92.78.34 1.38.54 1.86.69.78.25 1.49.21 2.05.13.63-.1 1.94-.79 2.21-1.56.27-.77.27-1.43.19-1.56-.08-.14-.3-.22-.63-.38z"/></svg>
+  </a>
+
+<script src="assets/site.js"></script>
+<script type="module" src="assets/chatbot.js"></script>
+<script type="module" src="assets/theme.js"></script>
+<script type="module">
+  import { getCart, removeFromCart, updateQuantidade, getCartTotal } from './assets/cart.js';
+  import { formatBRL } from './assets/supabase-client.js';
+
+  const cartWithItems = document.getElementById('cartWithItems');
+  const cartEmpty = document.getElementById('cartEmpty');
+  const cartTableBody = document.getElementById('cartTableBody');
+  const cartSubtotal = document.getElementById('cartSubtotal');
+  const cartTotal = document.getElementById('cartTotal');
+
+  function renderCart() {
+    const cart = getCart();
+    if (cart.length === 0) {
+      cartWithItems.classList.add('hidden');
+      cartEmpty.style.display = 'block';
+      return;
+    }
+    cartWithItems.classList.remove('hidden');
+    cartEmpty.style.display = 'none';
+
+    cartTableBody.innerHTML = cart.map(item => {
+      const variantes = [item.tamanho ? `Tam: ${item.tamanho}` : '', item.cor ? `Cor: ${item.cor}` : '', item.personalizacao ? `Personalização: ${item.personalizacao}` : '']
+        .filter(Boolean).join(' · ');
+      const mediaHTML = item.foto
+        ? `<img src="${item.foto}" alt="${item.titulo}">`
+        : `<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg></div>`;
+      return `
+        <tr data-key="${item.itemKey}">
+          <td>
+            <div class="cart-item-info">
+              ${mediaHTML}
+              <div>
+                <div class="cart-item-title">${item.titulo}</div>
+                <div class="cart-item-variant">${item.codigo}${variantes ? ' · ' + variantes : ''}</div>
+              </div>
+            </div>
+          </td>
+          <td>${formatBRL(item.preco)}</td>
+          <td>
+            <div class="qty-stepper">
+              <button type="button" class="qty-minus" data-key="${item.itemKey}">-</button>
+              <input type="text" value="${item.quantidade}" data-key="${item.itemKey}" class="qty-input" readonly>
+              <button type="button" class="qty-plus" data-key="${item.itemKey}">+</button>
+            </div>
+          </td>
+          <td>${formatBRL(item.preco * item.quantidade)}</td>
+          <td><button type="button" class="cart-remove-btn" data-key="${item.itemKey}">Remover</button></td>
+        </tr>
+      `;
+    }).join('');
+
+    const total = getCartTotal();
+    cartSubtotal.textContent = formatBRL(total);
+    cartTotal.textContent = formatBRL(total);
+
+    cartTableBody.querySelectorAll('.qty-plus').forEach(btn => btn.addEventListener('click', () => {
+      const item = cart.find(i => i.itemKey === btn.dataset.key);
+      updateQuantidade(btn.dataset.key, (item?.quantidade || 1) + 1);
+      renderCart();
+    }));
+    cartTableBody.querySelectorAll('.qty-minus').forEach(btn => btn.addEventListener('click', () => {
+      const item = cart.find(i => i.itemKey === btn.dataset.key);
+      const nova = (item?.quantidade || 1) - 1;
+      if (nova <= 0) { removeFromCart(btn.dataset.key); } else { updateQuantidade(btn.dataset.key, nova); }
+      renderCart();
+    }));
+    cartTableBody.querySelectorAll('.cart-remove-btn').forEach(btn => btn.addEventListener('click', () => {
+      removeFromCart(btn.dataset.key);
+      renderCart();
+    }));
+  }
+
+  renderCart();
+  window.addEventListener('qrv-cart-updated', renderCart);
+</script>
+</body>
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script>(function(){try{var t=localStorage.getItem('qrv_theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+<link rel="apple-touch-icon" href="assets/favicon-192.png">
+<link rel="shortcut icon" href="assets/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produto | QRV Artigos Táticos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="container">
+      <div class="left">
+        <span>&#9993; contato@qrvartigostaticos.com.br</span>
+        <span>&#128205; Av. Santos Dumont, 61 · Cumbica · Guarulhos - SP</span>
+      </div>
+      <div class="right">
+        <a href="bordados.html">Bordados</a>
+        <a href="revendedor.html">Seja um Revendedor</a>
+        <a href="quem-somos.html">Quem Somos</a>
+        <a href="contato.html">Fale Conosco</a>
+        <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema" title="Alternar tema">
+          <span class="theme-icon">☀️</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <header class="main">
+    <div class="container">
+      <div class="header-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+        <a href="index.html" class="mini-logo"><img src="assets/logo.png" alt="QRV Artigos Táticos"></a>
+      </div>
+      <nav class="primary categories-nav inline-cats">
+        <ul>
+          <li><a href="produtos.html">Loja QRV</a></li>
+          <li><a href="produtos.html?categoria=vestuario">Equipamentos</a></li>
+          <li><a href="produtos.html?categoria=calcados">Coturnos</a></li>
+          <li><a href="bordados.html">Bordados</a></li>
+          <li><a href="produtos.html?categoria=facas">Cutelaria</a></li>
+          <li><a href="produtos.html?categoria=kits">Kits</a></li>
+          <li><a href="produtos.html?categoria=acessorios">Acessórios</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button type="button" class="header-search-toggle" id="headerSearchToggle" aria-label="Buscar produtos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="20" height="20"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+        <form class="header-search-box" id="headerSearchBox" action="produtos.html" method="get">
+          <input type="text" name="busca" placeholder="Pesquisar..." aria-label="Pesquisar produtos">
+          <button type="submit" aria-label="Buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="16" height="16"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+        </form>
+        <a href="contato.html" class="account-link" aria-label="Minha conta / Fale conosco">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="21" height="21"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.6-4 5-6 8-6s6.4 2 8 6"/></svg>
+        </a>
+        <a href="cart.html" class="cart-link" aria-label="Carrinho de compras">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="22" height="22"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Drawer de menu mobile -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="mobile-drawer" id="mobileDrawer">
+    <button class="drawer-close" id="drawerClose" aria-label="Fechar menu">&times;</button>
+    <nav class="drawer-nav">
+      <a href="produtos.html">Todos os Produtos</a>
+      <a href="produtos.html?categoria=acessorios">Acessórios</a>
+      <a href="produtos.html?categoria=calcados">Calçados</a>
+      <a href="produtos.html?categoria=facas">Cutelaria</a>
+      <a href="produtos.html?categoria=mochilas">Mochilas</a>
+      <a href="produtos.html?categoria=protecao">Munição</a>
+      <a href="produtos.html?categoria=vestuario">Vestuário</a>
+      <a href="bordados.html">Bordados</a>
+      <a href="revendedor.html">Seja Revendedor</a>
+      <a href="quem-somos.html">Quem Somos</a>
+      <a href="contato.html">Fale Conosco</a>
+    </nav>
+  </div>
+
+  <section class="section tight" style="padding-top:130px;">
+    <div class="container">
+
+      <div class="breadcrumb" id="detailBreadcrumb"><a href="index.html">Home</a> / <a href="produtos.html" id="breadcrumbCategoria">Loja</a> / <span id="breadcrumbTitulo"></span></div>
+
+      <!-- Galeria estável: foto principal + miniaturas + lightbox -->
+      <div class="pgallery">
+        <div class="pgallery-main" id="pgalleryMain" title="Clique para ampliar">
+          <img id="pgalleryMainImg" src="" alt="Foto do produto">
+        </div>
+        <div class="pgallery-thumbs" id="pgalleryThumbs"></div>
+      </div>
+
+      <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightboxClose" aria-label="Fechar">&times;</button>
+        <div class="lightbox-main"><img id="lightboxImg" src="" alt="Foto ampliada do produto"></div>
+        <div class="lightbox-thumbs" id="lightboxThumbs"></div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-main">
+
+          <div class="detail-code" id="detailCode">Código: QRV-0001</div>
+          <div class="detail-purpose" id="detailPurpose">Categoria: Calçados Militares · Geral</div>
+          <h1 class="detail-title" id="detailTitle">Coturno Tático Couro/Cordura c/ Zíper</h1>
+          <p class="detail-location" id="detailStockLine"><span class="stock-pill disponivel" id="detailStock">Disponível</span></p>
+
+          <div class="variant-group" id="variantTamanhos" style="display:none;">
+            <label>Tamanho</label>
+            <div class="variant-options" id="variantTamanhosOptions"></div>
+          </div>
+          <div class="variant-group" id="variantCores" style="display:none;">
+            <label>Cor</label>
+            <div class="variant-options" id="variantCoresOptions"></div>
+          </div>
+
+          <div class="price-block">
+            <div class="item">
+              <h4>Preço</h4>
+              <div class="value" id="priceValor">R$ 349,90</div>
+              <div class="value old hidden" id="priceOld"></div>
+            </div>
+          </div>
+
+          <div class="product-tabs">
+            <div class="product-tabs-nav">
+              <button type="button" class="tab-btn active" data-tab="descricao">Descrição</button>
+              <button type="button" class="tab-btn" data-tab="info">Informações Adicionais</button>
+              <button type="button" class="tab-btn" data-tab="avaliacoes">Avaliações</button>
+            </div>
+            <div class="product-tab-panel active" id="tabDescricao">
+              <div class="detail-description descricao-produto" id="detailDescription">
+                <p>Coturno tático em couro legítimo com detalhes em cordura, sola de borracha antiderrapante e fechamento em zíper lateral para facilitar o calçar. Texto de exemplo — substitua pela descrição real do produto ao cadastrá-lo.</p>
+              </div>
+            </div>
+            <div class="product-tab-panel" id="tabInfo">
+              <ul class="specs-list" id="specsList">
+                <li><strong>Categoria:</strong> <span id="specCategoria">—</span></li>
+                <li><strong>Corporação:</strong> <span id="specCorporacao">—</span></li>
+                <li><strong>Código:</strong> <span id="specCodigo">—</span></li>
+              </ul>
+            </div>
+            <div class="product-tab-panel" id="tabAvaliacoes">
+              <p style="color:var(--text-muted);">Ainda não há avaliações para este produto. Fale com a gente pelo WhatsApp se tiver dúvidas antes de comprar.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Card de compra / contato -->
+        <aside>
+          <div class="contact-card">
+            <h4>Gostou deste produto?</h4>
+            <p class="sub">Adicione ao carrinho ou fale com a gente</p>
+            <div id="personalizavelBox" class="form-group hidden">
+              <div class="field"><label>Nome de Guerra / Personalização</label><input type="text" id="personalizacaoInput" placeholder="Ex: SILVA / Tipo sanguíneo O+"></div>
+            </div>
+            <div class="form-group">
+              <div class="field">
+                <label>Quantidade</label>
+                <div class="qty-stepper">
+                  <button type="button" id="qtyMinus">-</button>
+                  <input type="text" id="qtyInput" value="1" readonly>
+                  <button type="button" id="qtyPlus">+</button>
+                </div>
+              </div>
+            </div>
+            <button type="button" id="addToCartBtn" class="btn-gold" style="width:100%;margin-bottom:12px;">Adicionar ao Carrinho</button>
+            <a href="#" id="whatsappBuyBtn" target="_blank" rel="noopener" class="btn-whatsapp" style="margin-bottom:18px;">
+              <svg viewBox="0 0 32 32" width="18" height="18" fill="currentColor"><path d="M16.02 3C9.4 3 4 8.38 4 15c0 2.36.7 4.55 1.9 6.4L4 29l7.8-1.85A11.9 11.9 0 0 0 16.02 27C22.65 27 28 21.62 28 15S22.65 3 16.02 3zm0 21.7c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.63 1.1 1.1-4.5-.25-.4A9.63 9.63 0 0 1 5 15c0-6.07 5-11 11.02-11S27 8.93 27 15s-4.98 9.7-10.98 9.7z"/></svg>
+              Tirar Dúvidas via WhatsApp
+            </a>
+
+            <div class="frete-calc">
+              <label for="freteCep">Consulte o frete e o prazo de entrega:</label>
+              <div class="frete-calc-row">
+                <input type="text" id="freteCep" placeholder="Digite seu CEP" maxlength="9">
+                <button type="button" id="freteConsultarBtn">Consultar</button>
+              </div>
+              <div class="frete-result" id="freteResult"></div>
+            </div>
+
+            <div class="payment-icons payment-icons-produto">
+              <span class="pay-badge visa">VISA</span>
+              <span class="pay-badge mastercard">Master</span>
+              <span class="pay-badge elo">elo</span>
+              <span class="pay-badge hipercard">Hiper</span>
+              <span class="pay-badge amex">Amex</span>
+              <span class="pay-badge pix">Pix</span>
+              <span class="pay-badge boleto">Boleto</span>
+            </div>
+
+            <form id="formContatoProduto">
+              <div class="form-group">
+                <div class="field"><label>Nome</label><input type="text" name="nome" placeholder="Nome" required></div>
+              </div>
+              <div class="form-row form-group">
+                <div class="field"><label>E-mail</label><input type="email" name="email" placeholder="E-mail"></div>
+                <div class="field"><label>Telefone</label><input type="tel" name="telefone" placeholder="ex: (11) 99999-0000" required></div>
+              </div>
+              <div class="form-group">
+                <div class="field"><label>Mensagem</label><textarea name="mensagem" id="mensagemProduto">Tenho interesse neste produto, gostaria de mais informações.</textarea></div>
+              </div>
+              <button type="submit" class="btn-gold">Enviar Mensagem</button>
+            </form>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="gold-rule"></div>
+      <h2 class="section-title">Produtos Relacionados</h2>
+
+      <div class="destaques-wrap">
+        <div class="swiper similares-swiper">
+          <div class="swiper-wrapper" id="similarTrack">
+            <div class="swiper-slide example-card">
+              <article class="product-card">
+                <div class="product-photo"><span class="badge">Vestuário</span><img src="assets/produto-camiseta.jpg" alt="Combat Shirt Ripstop UV50+" loading="lazy"></div>
+                <div class="product-body">
+                  <h3>Combat Shirt Ripstop UV50+</h3>
+                  <p class="loc">Geral</p>
+                  <div class="product-price">R$ 189,90</div>
+                </div>
+              </article>
+            </div>
+            <div class="swiper-slide example-card">
+              <article class="product-card">
+                <div class="product-photo"><span class="badge">Mochilas</span><div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div></div>
+                <div class="product-body">
+                  <h3>Mochila Militar Paraquedista 55L</h3>
+                  <p class="loc">Exército Brasileiro</p>
+                  <div class="product-price">R$ 429,00</div>
+                </div>
+              </article>
+            </div>
+            <div class="swiper-slide example-card">
+              <article class="product-card">
+                <div class="product-photo"><span class="badge">Kits</span>
+                  <div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>
+                </div>
+                <div class="product-body">
+                  <h3>Kit Recrutamento PMESP Completo</h3>
+                  <p class="loc">PMESP</p>
+                  <div class="product-price">R$ 890,00</div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-nav">
+          <button class="car-btn" id="simPrev">&#8592;</button>
+          <button class="car-btn" id="simNext">&#8594;</button>
+        </div>
+      </div>
+
+      <div class="center-btn">
+        <a href="produtos.html" class="btn-outline">Ver Todos os Produtos →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer id="contato">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a href="index.html" class="footer-logo-slot"><img src="assets/logo.png" alt="QRV Artigos Táticos" onerror="this.parentElement.innerHTML='<span class=logo>QRV <span>ARTIGOS</span> TÁTICOS</span>';"></a>
+          <p>Equipamentos e artigos táticos para Forças Armadas, Polícia Militar e entusiastas. Enviamos para todo o Brasil.</p>
+          <div class="newsletter">
+            <input type="email" placeholder="Receba nossas promoções">
+            <button>→</button>
+          </div>
+        </div>
+        <div>
+          <h4>Menu</h4>
+          <ul>
+            <li><a href="produtos.html">Loja</a></li>
+            <li><a href="bordados.html">Bordados</a></li>
+            <li><a href="revendedor.html">Seja Revendedor</a></li>
+            <li><a href="quem-somos.html">Quem Somos</a></li>
+            <li><a href="contato.html">Fale Conosco</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Categorias</h4>
+          <ul>
+            <li><a href="produtos.html?categoria=vestuario">Vestuário e Fardamento</a></li>
+            <li><a href="produtos.html?categoria=calcados">Calçados Militares</a></li>
+            <li><a href="produtos.html?categoria=insignias">Brevês e Insígnias</a></li>
+            <li><a href="produtos.html?categoria=kits">Kits Especializados</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Formas de Pagamento</h4>
+          <div class="payment-icons">
+            <span class="pay-badge visa">VISA</span>
+            <span class="pay-badge mastercard">Master</span>
+            <span class="pay-badge elo">elo</span>
+            <span class="pay-badge hipercard">Hiper</span>
+            <span class="pay-badge amex">Amex</span>
+            <span class="pay-badge pix">Pix</span>
+            <span class="pay-badge boleto">Boleto</span>
+          </div>
+          <h4 style="margin-top:24px;">Selos de Segurança</h4>
+          <div class="security-badges">
+            <span class="sec-badge protegida"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>Loja Protegida</span>
+            <span class="sec-badge ssl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Site Seguro SSL</span>
+          </div>
+        </div>
+        <div>
+          <h4>Atendimento ao Cliente</h4>
+          <ul>
+            <li style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px;">Compras via loja online, Direct ou WhatsApp. Dúvidas sobre pedidos, bordados e revenda, fale com a gente.</li>
+            <li><strong>WhatsApp:</strong> (11) 99321-7675</li>
+            <li><strong>E-mail:</strong> contato@qrvartigostaticos.com.br</li>
+            <li><strong>Horário:</strong> Seg. a Qui. 10h-20h30 · Sex. 10h-19h · Sáb. 09h-16h</li>
+            <li><strong>Endereço:</strong> Av. Santos Dumont, 61<br>Cumbica · Guarulhos - SP · CEP 07180-270</li>
+          </ul>
+          <div class="footer-social">
+            <a href="https://wa.me/5511993217675" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12.02 2C6.5 2 2 6.48 2 12c0 1.77.46 3.45 1.28 4.9L2 22l5.25-1.38A9.96 9.96 0 0 0 12.02 22C17.52 22 22 17.52 22 12S17.52 2 12.02 2zm0 18.2c-1.6 0-3.13-.43-4.46-1.24l-.32-.19-3.13.82.84-3.05-.2-.31A8.17 8.17 0 0 1 3.8 12c0-4.54 3.7-8.2 8.22-8.2 4.53 0 8.2 3.66 8.2 8.2 0 4.53-3.68 8.2-8.2 8.2z"/></svg></a>
+            <a href="https://instagram.com/qrv_artigostaticos" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg></a>
+            <a href="mailto:contato@qrvartigostaticos.com.br" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></a>
+            <a href="https://maps.google.com/?q=Av.+Santos+Dumont,+61,+Guarulhos" target="_blank" rel="noopener" aria-label="Localização"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="17" height="17"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 QRV ARTIGOS TÁTICOS, All rights reserved.</span>
+        <a href="#">Termos e políticas</a>
+      </div>
+    </div>
+  </footer>
+
+  <a href="https://wa.me/5511993217675" target="_blank" rel="noopener" class="whatsapp-float" aria-label="WhatsApp">
+    <svg viewBox="0 0 32 32" width="26" height="26" fill="#fff"><path d="M16.02 3C9.4 3 4 8.38 4 15c0 2.36.7 4.55 1.9 6.4L4 29l7.8-1.85A11.9 11.9 0 0 0 16.02 27C22.65 27 28 21.62 28 15S22.65 3 16.02 3zm0 21.7c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.63 1.1 1.1-4.5-.25-.4A9.63 9.63 0 0 1 5 15c0-6.07 5-11 11.02-11S27 8.93 27 15s-4.98 9.7-10.98 9.7zm5.98-7.3c-.33-.16-1.94-.96-2.24-1.07-.3-.11-.52-.16-.74.16-.22.33-.85 1.07-1.04 1.29-.19.22-.38.24-.71.08-.33-.16-1.4-.51-2.66-1.63-.98-.87-1.65-1.95-1.84-2.27-.19-.33-.02-.5.14-.66.15-.15.33-.38.5-.57.16-.19.22-.33.33-.55.11-.22.05-.41-.03-.57-.08-.16-.74-1.78-1.01-2.44-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.33-1.14 1.11-1.14 2.71 0 1.6 1.17 3.15 1.33 3.37.16.22 2.3 3.51 5.57 4.92.78.34 1.38.54 1.86.69.78.25 1.49.21 2.05.13.63-.1 1.94-.79 2.21-1.56.27-.77.27-1.43.19-1.56-.08-.14-.3-.22-.63-.38z"/></svg>
+  </a>
+
+<script src="assets/site.js"></script>
+<script type="module" src="assets/chatbot.js"></script>
+<script type="module" src="assets/theme.js"></script>
+<script type="module" src="assets/cart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  let similaresSwiper;
+  function initSimilaresSwiper() {
+    if (similaresSwiper) similaresSwiper.destroy(true, true);
+    const slideCount = document.querySelectorAll('#similarTrack .swiper-slide').length;
+    similaresSwiper = new Swiper('.similares-swiper', {
+      effect: 'coverflow',
+      grabCursor: true,
+      centeredSlides: true,
+      loop: slideCount > 2,
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
+      autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
+      navigation: { nextEl: '#simNext', prevEl: '#simPrev' },
+    });
+  }
+  window.initSimilaresSwiper = initSimilaresSwiper;
+  initSimilaresSwiper();
+</script>
+<script type="module">
+  import { fetchProdutoByCodigo, fetchProdutos, formatBRL, productCardHTML, descricaoToHTML, sanitizeDescricao, placeholderPhoto, whatsappLink, labelCategoria, submitMensagemContato } from './assets/supabase-client.js';
+  import { addToCart } from './assets/cart.js';
+
+  const params = new URLSearchParams(window.location.search);
+  const codigo = params.get('codigo');
+
+  // ---------- Galeria: principal + miniaturas + lightbox ----------
+  const pgalleryMain = document.getElementById('pgalleryMain');
+  const pgalleryMainImg = document.getElementById('pgalleryMainImg');
+  const pgalleryThumbs = document.getElementById('pgalleryThumbs');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxThumbs = document.getElementById('lightboxThumbs');
+  const lightboxClose = document.getElementById('lightboxClose');
+
+  // ---------- Abas: Descrição / Informações Adicionais / Avaliações ----------
+  document.querySelectorAll('.product-tabs-nav .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.product-tabs-nav .tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.product-tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab' + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1)).classList.add('active');
+    });
+  });
+
+  // ---------- Calculadora de frete por CEP ----------
+  // Estimativa simples (sem integração com transportadora real): usa a faixa
+  // do CEP só pra dar um prazo aproximado. Ajuste depois se conectar a API
+  // real dos Correios ou de uma transportadora.
+  const freteCepInput = document.getElementById('freteCep');
+  const freteResult = document.getElementById('freteResult');
+  if (freteCepInput) {
+    freteCepInput.addEventListener('input', () => {
+      let v = freteCepInput.value.replace(/\D/g, '').slice(0, 8);
+      if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5);
+      freteCepInput.value = v;
+    });
+  }
+  document.getElementById('freteConsultarBtn')?.addEventListener('click', () => {
+    const cep = freteCepInput.value.replace(/\D/g, '');
+    if (cep.length !== 8) {
+      freteResult.textContent = 'Digite um CEP válido (8 dígitos).';
+      freteResult.className = 'frete-result';
+      return;
+    }
+    const regiao = Number(cep[0]);
+    // 0-1 (SP/RJ/ES): mais rápido. 2-4: sudeste/sul. 5+: demais regiões.
+    const prazo = regiao <= 1 ? '2 a 4 dias úteis' : regiao <= 4 ? '4 a 7 dias úteis' : '6 a 12 dias úteis';
+    freteResult.textContent = `Entrega estimada: ${prazo} para o CEP ${freteCepInput.value}.`;
+    freteResult.className = 'frete-result ok';
+  });
+
+  function renderGallery(photos) {
+    let current = 0;
+    function show(idx) {
+      current = idx;
+      pgalleryMainImg.src = photos[idx];
+      lightboxImg.src = photos[idx];
+      pgalleryThumbs.querySelectorAll('img').forEach((t, i) => t.classList.toggle('active', i === idx));
+      lightboxThumbs.querySelectorAll('img').forEach((t, i) => t.classList.toggle('active', i === idx));
+    }
+    const thumbsHTML = photos.map((url, i) => `<img src="${url}" data-idx="${i}" alt="Miniatura ${i + 1}">`).join('');
+    pgalleryThumbs.innerHTML = thumbsHTML;
+    lightboxThumbs.innerHTML = thumbsHTML;
+    pgalleryThumbs.querySelectorAll('img').forEach(t => t.addEventListener('click', () => show(Number(t.dataset.idx))));
+    lightboxThumbs.querySelectorAll('img').forEach(t => t.addEventListener('click', () => show(Number(t.dataset.idx))));
+    show(0);
+  }
+  function openLightbox() { lightbox.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeLightbox() { lightbox.classList.remove('open'); document.body.style.overflow = ''; }
+  pgalleryMain.addEventListener('click', openLightbox);
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+
+  const fotosExemplo = [1, 2, 3, 4].map(n => placeholderPhoto(`Foto ${n} · exemplo`));
+  renderGallery(fotosExemplo);
+
+  let produtoAtual = null;
+
+  function renderVariantOptions(container, options, groupName) {
+    container.innerHTML = options.map((op, i) =>
+      `<button type="button" class="variant-chip ${i === 0 ? 'selected' : ''}" data-group="${groupName}">${op}</button>`
+    ).join('');
+    container.querySelectorAll('.variant-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        container.querySelectorAll('.variant-chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      });
+    });
+  }
+
+  function updateWhatsappLink() {
+    const btn = document.getElementById('whatsappBuyBtn');
+    if (!produtoAtual) return;
+    const tamanho = document.querySelector('#variantTamanhosOptions .variant-chip.selected')?.textContent;
+    const cor = document.querySelector('#variantCoresOptions .variant-chip.selected')?.textContent;
+    const personalizacao = document.getElementById('personalizacaoInput')?.value;
+    let texto = `Olá! Tenho interesse no produto *${produtoAtual.titulo}* (código ${produtoAtual.codigo}) que vi no site da QRV Artigos Táticos.`;
+    if (tamanho) texto += ` Tamanho: ${tamanho}.`;
+    if (cor) texto += ` Cor: ${cor}.`;
+    if (personalizacao) texto += ` Personalização: ${personalizacao}.`;
+    btn.href = `https://wa.me/5511993217675?text=${encodeURIComponent(texto)}`;
+  }
+
+  async function loadProdutoReal() {
+    if (!codigo) return;
+    const produto = await fetchProdutoByCodigo(codigo);
+    if (!produto) return;
+    produtoAtual = produto;
+
+    document.title = `${produto.titulo} | QRV Artigos Táticos`;
+    document.getElementById('detailCode').textContent = `Código: ${produto.codigo}`;
+    document.getElementById('detailPurpose').textContent = `Categoria: ${labelCategoria(produto.categoria)}${produto.corporacao ? ' · ' + produto.corporacao : ''}`;
+    document.getElementById('detailTitle').textContent = produto.titulo;
+    document.getElementById('breadcrumbCategoria').textContent = labelCategoria(produto.categoria);
+    document.getElementById('breadcrumbCategoria').href = `produtos.html?categoria=${encodeURIComponent(produto.categoria)}`;
+    document.getElementById('breadcrumbTitulo').textContent = produto.titulo;
+    document.getElementById('detailDescription').innerHTML = sanitizeDescricao(descricaoToHTML(produto.descricao || ''));
+    document.getElementById('specCategoria').textContent = labelCategoria(produto.categoria);
+    document.getElementById('specCorporacao').textContent = produto.corporacao || 'Geral';
+    document.getElementById('specCodigo').textContent = produto.codigo;
+
+    const stockEl = document.getElementById('detailStock');
+    const stockLabels = { disponivel: 'Disponível', sob_encomenda: 'Sob Encomenda', esgotado: 'Esgotado' };
+    stockEl.textContent = stockLabels[produto.estoque_status] || 'Disponível';
+    stockEl.className = `stock-pill ${produto.estoque_status}`;
+
+    const temPromo = produto.preco_promocional && Number(produto.preco_promocional) < Number(produto.preco);
+    document.getElementById('priceValor').textContent = formatBRL(temPromo ? produto.preco_promocional : produto.preco);
+    const oldEl = document.getElementById('priceOld');
+    if (temPromo) { oldEl.textContent = formatBRL(produto.preco); oldEl.classList.remove('hidden'); }
+    else oldEl.classList.add('hidden');
+
+    if (Array.isArray(produto.tamanhos) && produto.tamanhos.length > 0) {
+      document.getElementById('variantTamanhos').style.display = '';
+      renderVariantOptions(document.getElementById('variantTamanhosOptions'), produto.tamanhos, 'tamanho');
+    }
+    if (Array.isArray(produto.cores) && produto.cores.length > 0) {
+      document.getElementById('variantCores').style.display = '';
+      renderVariantOptions(document.getElementById('variantCoresOptions'), produto.cores, 'cor');
+    }
+    if (produto.personalizavel) {
+      document.getElementById('personalizavelBox').classList.remove('hidden');
+    }
+    document.getElementById('mensagemProduto').value = `Tenho interesse no produto ${produto.titulo} (código ${produto.codigo}).`;
+
+    if (Array.isArray(produto.fotos) && produto.fotos.length > 0) {
+      renderGallery(produto.fotos);
+    }
+
+    updateWhatsappLink();
+    document.querySelectorAll('.variant-chip').forEach(c => c.addEventListener('click', updateWhatsappLink));
+    document.getElementById('personalizacaoInput')?.addEventListener('input', updateWhatsappLink);
+
+    // Produtos relacionados (mesma categoria, excluindo o atual)
+    const relacionados = (await fetchProdutos({ categoria: produto.categoria, limit: 6 })).filter(p => p.codigo !== produto.codigo).slice(0, 3);
+    if (relacionados.length > 0) {
+      const track = document.getElementById('similarTrack');
+      track.innerHTML = relacionados.map(p => `<div class="swiper-slide">${productCardHTML(p)}</div>`).join('');
+      window.initSimilaresSwiper();
+    }
+  }
+
+  // Fallback: sem ?codigo= na URL (ex: link de exemplo), o botão de WhatsApp usa uma mensagem genérica
+  // e o carrinho usa os dados de exemplo já exibidos na página
+  if (!codigo) {
+    document.getElementById('whatsappBuyBtn').href = whatsappLink();
+    produtoAtual = {
+      codigo: document.getElementById('detailCode').textContent.replace('Código: ', ''),
+      titulo: document.getElementById('detailTitle').textContent,
+      preco: 349.90,
+      preco_promocional: null,
+      fotos: [],
+    };
+  }
+
+  // ---------- Seletor de quantidade + Adicionar ao Carrinho ----------
+  const qtyInput = document.getElementById('qtyInput');
+  document.getElementById('qtyMinus').addEventListener('click', () => {
+    qtyInput.value = Math.max(1, Number(qtyInput.value) - 1);
+  });
+  document.getElementById('qtyPlus').addEventListener('click', () => {
+    qtyInput.value = Number(qtyInput.value) + 1;
+  });
+
+  document.getElementById('addToCartBtn').addEventListener('click', () => {
+    if (!produtoAtual) return;
+    const tamanho = document.querySelector('#variantTamanhosOptions .variant-chip.selected')?.textContent || null;
+    const cor = document.querySelector('#variantCoresOptions .variant-chip.selected')?.textContent || null;
+    const personalizacao = document.getElementById('personalizacaoInput')?.value || null;
+    const quantidade = Math.max(1, Number(qtyInput.value) || 1);
+    addToCart(produtoAtual, { quantidade, tamanho, cor, personalizacao });
+
+    const btn = document.getElementById('addToCartBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Adicionado ao Carrinho ✓';
+    setTimeout(() => { btn.textContent = original; }, 1600);
+  });
+
+  document.getElementById('formContatoProduto').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    try {
+      await submitMensagemContato({
+        nome: form.nome.value,
+        email: form.email.value || null,
+        telefone: form.telefone.value,
+        mensagem: form.mensagem.value,
+      });
+      btn.textContent = 'Mensagem enviada ✓';
+      form.reset();
+    } catch (err) {
+      alert('Erro ao enviar: ' + err.message);
+      btn.disabled = false;
+      btn.textContent = 'Enviar Mensagem';
+    }
+  });
+
+  loadProdutoReal();
+</script>
+</body>
+</html>

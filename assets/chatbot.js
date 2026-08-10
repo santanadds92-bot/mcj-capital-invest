@@ -1,84 +1,87 @@
 // =====================================================================
-// Corretor Marcio Jorge — assistente virtual da MCJ Capital Invest
+// Atendente Virtual Tático — "Recruta QRV"
 // Widget de chat (HTML/CSS/JS puro) integrado à API do Google Gemini.
 // =====================================================================
 //
-// IMPORTANTE SOBRE A CHAVE DE API: este é um site 100% estático, sem
-// backend — qualquer chave usada aqui fica visível para quem inspecionar
-// as requisições de rede. Por isso ela NÃO fica escrita neste arquivo:
-// é cadastrada pelo Admin (painel do site → campo "Chave da API do
-// Corretor Atendente"), salva na tabela `site_config` do Supabase (rode
-// site-config-setup.sql uma vez para criar essa tabela) e lida aqui em
-// tempo real. Pra trocar a chave no futuro, basta colar uma nova no
-// Admin e salvar — sem editar código, sem commit, sem redeploy.
+// IMPORTANTE SOBRE A CHAVE DE API (leia antes de publicar):
+// Este é um site 100% estático, sem backend — qualquer chave usada aqui
+// fica visível para QUALQUER visitante que inspecionar as requisições
+// de rede. Isso significa que, em teoria, alguém poderia copiar essa
+// chave e gerar cobranças na sua conta do Google.
 //
-// Para publicar com segurança, no Google AI Studio / Google Cloud Console:
-//   1. Crie uma chave de API dedicada só para este chat.
-//   2. Em "Restrições de API", limite essa chave só à Generative Language API.
-//   3. Em "Restrições de aplicativo" → "Referenciadores HTTP", cadastre o
-//      domínio do site pra chave só funcionar a partir dele.
-//   4. Defina uma cota diária baixa, como trava de segurança.
-
-import { getSiteConfig, fetchImoveis, formatBRL, finalidadesArray } from './supabase-client.js';
+// Por isso a chave NÃO fica mais escrita neste arquivo (evita também o
+// bloqueio de "secret scanning" do GitHub que você viu ao commitar).
+// Ela agora é cadastrada pelo Admin (painel do site → campo "Chave da
+// API do Gemini do Chat"), salva na tabela `site_config` do Supabase
+// (rode supabase-site-config.sql uma vez para criar essa tabela) e lida
+// aqui em tempo real. Pra trocar a chave no futuro, basta colar uma
+// nova no Admin e salvar — sem editar código, sem commit, sem redeploy.
+//
+// Para publicar com segurança, faça isto no Google AI Studio / Google
+// Cloud Console (é rápido, uma vez só):
+//   1. Crie uma chave de API específica só para este chat (não reuse a
+//      mesma chave do admin.html).
+//   2. Em "Restrições de API", limite essa chave só à Generative
+//      Language API.
+//   3. Em "Restrições de aplicativo" → "Referenciadores HTTP", cadastre
+//      o domínio do site (ex: https://qrv-artigos-taticos.vercel.app/*)
+//      pra chave só funcionar quando chamada a partir do seu site.
+//   4. Defina uma cota diária baixa nessa chave, como trava de segurança.
+import { getSiteConfig } from './supabase-client.js';
 
 let GEMINI_API_KEY = '';
 
-const WHATSAPP_NUMERO = '5511999990542';
+const WHATSAPP_NUMERO = '5511993217675'; // (11) 99321-7675
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMERO}`;
 
 const MODEL_CANDIDATES = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-1.5-flash'];
 
-function buildSystemInstruction(catalogoResumo) {
-  return `Você é o "Corretor Marcio Jorge", o assistente virtual da MCJ Capital Invest, uma imobiliária especializada em imóveis de alto padrão em São Paulo. Seu tom de voz é sofisticado, cordial, consultivo e discreto — como um corretor experiente que atende clientes exigentes, nunca informal ou apressado.
+const SYSTEM_INSTRUCTION = `Você é o "Recruta QRV", o atendente virtual da loja QRV Artigos Táticos — um recruta novato, extremamente disciplinado, animado e caricato, no estilo clássico de caserna/filme militar. Você trata o cliente sempre como um superior ("senhor"/"senhora") e responde com entusiasmo exagerado, postura de sentido, mas sempre educado, prestativo e nunca grosseiro.
 
-Responda sempre em português do Brasil, em mensagens curtas e claras (isto é um chat, não um e-mail) — no máximo 3 a 5 frases por resposta, a menos que o cliente peça mais detalhes. Seja direto: nunca deixe uma frase pela metade, prefira uma resposta mais curta e completa a uma resposta longa que arrisque ficar cortada.
+ESTILO DE FALA OBRIGATÓRIO — use com frequência (não em toda frase, mas várias vezes por resposta) expressões como:
+"Sim, senhor!", "Não, senhor!", "Sem novidade, senhor!", "QAP, senhor!", "Na missão, senhor!", "Positivo!", "Afirmativo!", "Pronto para o combate!", "Câmbio!", "À disposição, senhor!".
+Fale como um recruta extremamente disciplinado e vibrante que adora seu trabalho e trata cada dúvida do cliente como uma "missão". Pode usar metáforas leves de caserna (recrutamento, farda, ordem unida, sentido) desde que sem exagero que atrapalhe o entendimento.
 
-Seu objetivo é ajudar visitantes a encontrar o imóvel certo (para comprar ou alugar), tirar dúvidas sobre bairros, condições de pagamento e agendar visitas.
+Responda sempre em português do Brasil, em mensagens curtas e objetivas (isto é um chat, não um e-mail) — no máximo 2 a 4 frases por resposta, a menos que o cliente peça mais detalhes. O tom é divertido e vibrante, mas a informação sempre tem que ser clara e útil — nunca sacrifique a clareza pelo personagem.
 
-=== BASE DE CONHECIMENTO DA IMOBILIÁRIA (use somente estas informações; nunca invente dados que não estejam aqui) ===
-• Endereço: Av. Paulista, 1159 · Conj. 1005 · Bela Vista · São Paulo - SP.
-• Horário de atendimento: Segunda a Sexta-feira, das 09h às 18h (horário de Brasília).
-• Contato: (11) 99999-0542 (WhatsApp) | marciocjorge@terra.com.br
-• Atuação: compra, venda e locação de imóveis de alto padrão (apartamentos, coberturas, casas e imóveis comerciais), principalmente em São Paulo.
+Seu objetivo é ajudar os clientes a escolherem coturnos, mochilas, roupas, cutelaria, lanternas e tirar dúvidas gerais sobre compras.
 
-=== CATÁLOGO ATUAL (imóveis disponíveis agora — use para responder perguntas sobre opções específicas; cada linha começa com o código do imóvel entre colchetes, ex: [MCJ-001]) ===
-${catalogoResumo || 'Nenhum imóvel carregado no momento — oriente o cliente a falar com um corretor humano pelo WhatsApp para conhecer o catálogo atualizado.'}
-
-=== COMO INDICAR IMÓVEIS E LINKS (siga este formato à risca) ===
-Quando o cliente pedir um imóvel específico (ex: "apartamento pra comprar na Vila Augusta"), procure primeiro no CATÁLOGO ATUAL acima.
-• Se encontrar 1 ou poucos imóveis que combinam bem: cite o nome e um resumo curto de cada um, e logo depois inclua o link de cada um no formato exato "imovel.html?codigo=CODIGO" (troque CODIGO pelo código entre colchetes do imóvel, mantendo exatamente esse formato de texto puro, sem markdown, sem parênteses ao redor).
-• Se a busca for ampla (muitos resultados, ou o cliente só descreveu um bairro/tipo sem pedir um imóvel específico): não liste tudo, em vez disso inclua um link pra página de busca já filtrada, no formato "comprar.html?bairro=BAIRRO" (para compra) ou "alugar.html?bairro=BAIRRO" (para aluguel) — troque BAIRRO pelo nome do bairro mencionado (sem acentos ou espaços, use %20 se precisar). Os filtros aceitos nessas páginas são: bairro, tipo, quartos, valor_max, codigo.
-• Se não encontrar nada no catálogo que combine com o pedido, seja honesto: diga que não há esse imóvel disponível no momento e ofereça o link "comprar.html" ou "alugar.html" (sem filtro) para o cliente ver as opções atuais, ou direcione ao WhatsApp.
-Nunca invente um código de imóvel que não esteja no CATÁLOGO ATUAL.
+=== BASE DE CONHECIMENTO DA LOJA (use somente estas informações; nunca invente dados que não estejam aqui) ===
+• Endereço físico: Av. Santos Dumont, 61 - Cumbica, Guarulhos - SP.
+• Horário de atendimento: Segunda a Quinta 10h–20h30 | Sexta 10h–19h | Sábado 09h–16h.
+• Envios: frete e entrega para todo o Brasil.
+• Parcelamento: até 3x sem juros no cartão.
+• Bordados: fazem bordados personalizados sob encomenda (nome de guerra, tipo sanguíneo, insígnias, revenda).
+• Contato direto / WhatsApp: (11) 99321-7675 | e-mail contato@qrvartigostaticos.com.br
+• Catálogo / destaques: jaquetas impermeáveis, camisas combat ripstop, mochilas assault e paraquedista, coturnos em couro/cordura, óculos solares táticos Focus, calçados e cutelaria.
 
 === DIRECIONAMENTO PARA O WHATSAPP ===
-Se o cliente quiser agendar uma visita, negociar condições, fazer uma proposta ou tiver uma dúvida muito específica sobre um imóvel (documentação, negociação de valor, disponibilidade exata), NÃO tente resolver isso sozinho: oriente-o a continuar com um corretor humano e inclua o link direto: ${WHATSAPP_LINK}
+Se o cliente disser que quer fechar uma compra, finalizar um pedido, ou pedir um orçamento de bordado sob encomenda (que exige atendimento manual porque depende de detalhes específicos), NÃO tente resolver isso sozinho: anuncie que vai encaminhar o cliente para o "comando" (a equipe humana) e sempre inclua o link direto na sua resposta: ${WHATSAPP_LINK}
 
-Se não souber responder algo com certeza, seja honesto e direcione para o WhatsApp em vez de chutar uma resposta.`;
-}
+Se não souber responder algo com certeza (preço exato de um item específico, prazo de entrega para um CEP, disponibilidade de estoque de um produto específico), seja honesto ("Sem novidade sobre isso, senhor!") e direcione para o WhatsApp da loja em vez de chutar uma resposta.`;
 
 function buildWidgetHTML() {
   return `
-    <button type="button" class="mcj-chat-fab" id="mcjChatFab" aria-label="Falar com o Corretor Marcio Jorge">
-      <img src="assets/chat-icon-marcio.png" alt="Corretor Marcio Jorge">
-      <span class="mcj-chat-fab-dot"></span>
+    <button type="button" class="qrv-chat-fab" id="qrvChatFab" aria-label="Abrir atendimento tático">
+      <img src="assets/chat-icon-recruta.png" alt="Recruta QRV" class="qrv-chat-fab-avatar">
+      <span class="qrv-chat-fab-dot"></span>
     </button>
 
-    <div class="mcj-chat-window" id="mcjChatWindow" role="dialog" aria-label="Corretor Marcio Jorge — MCJ Capital Invest">
-      <div class="mcj-chat-header">
-        <div class="mcj-chat-avatar">
-          <img src="assets/chat-icon-marcio.png" alt="Corretor Marcio Jorge">
+    <div class="qrv-chat-window" id="qrvChatWindow" role="dialog" aria-label="Atendimento tático QRV">
+      <div class="qrv-chat-header">
+        <div class="qrv-chat-avatar">
+          <img src="assets/chat-icon-recruta.png" alt="Recruta QRV">
         </div>
-        <div class="mcj-chat-header-info">
-          <strong>Corretor Marcio Jorge — MCJ Capital Invest</strong>
-          <div class="mcj-chat-status"><span class="dot"></span> Online</div>
+        <div class="qrv-chat-header-info">
+          <strong>Recruta QRV — Atendimento Tático</strong>
+          <div class="qrv-chat-status"><span class="dot"></span> Online</div>
         </div>
-        <button type="button" class="mcj-chat-close" id="mcjChatClose" aria-label="Fechar chat">&times;</button>
+        <button type="button" class="qrv-chat-close" id="qrvChatClose" aria-label="Fechar chat">&times;</button>
       </div>
-      <div class="mcj-chat-messages" id="mcjChatMessages"></div>
-      <div class="mcj-chat-input-row">
-        <input type="text" id="mcjChatInput" placeholder="Digite sua mensagem..." autocomplete="off" maxlength="500">
-        <button type="button" class="mcj-chat-send" id="mcjChatSend" aria-label="Enviar mensagem">
+      <div class="qrv-chat-messages" id="qrvChatMessages"></div>
+      <div class="qrv-chat-input-row">
+        <input type="text" id="qrvChatInput" placeholder="Digite sua mensagem..." autocomplete="off" maxlength="500">
+        <button type="button" class="qrv-chat-send" id="qrvChatSend" aria-label="Enviar mensagem">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
         </button>
       </div>
@@ -86,46 +89,19 @@ function buildWidgetHTML() {
   `;
 }
 
+// Converte URLs cruas (ex: o link do WhatsApp) em links clicáveis dentro da bolha de mensagem.
 function linkify(text) {
   const escaped = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  // Links absolutos (http/https) — vira <a> normal, abre em nova aba.
-  const withAbsoluteLinks = escaped.replace(/(https?:\/\/[^\s]+)/g, url => {
+  return escaped.replace(/(https?:\/\/[^\s]+)/g, url => {
     const clean = url.replace(/[.,;!?)]+$/, '');
     return `<a href="${clean}" target="_blank" rel="noopener">${clean}</a>`;
   });
-  // Links relativos às páginas do próprio site (imovel.html?codigo=...,
-  // comprar.html?..., alugar.html?...) que o Gemini pode citar ao indicar
-  // um imóvel específico ou uma busca filtrada — viram botões clicáveis
-  // dentro da própria página, sem precisar do domínio completo.
-  return withAbsoluteLinks.replace(
-    /(?<!\/)\b((?:imovel|comprar|alugar)\.html(?:\?[^\s<]*)?)/g,
-    match => `<a href="${match}" class="mcj-chat-link-btn">${match.startsWith('imovel') ? 'Ver imóvel' : 'Ver opções →'}</a>`
-  );
 }
 
-// Monta um resumo curto do catálogo atual pra dar contexto real ao Gemini
-// (evita a IA "alucinar" imóveis que não existem).
-async function buildCatalogoResumo() {
-  try {
-    const imoveis = await fetchImoveis({ limit: 25 });
-    if (!imoveis.length) return '';
-    return imoveis.map(im => {
-      const f = finalidadesArray(im).map(x => x === 'alugar' ? 'Alugar' : 'Comprar').join(' / ');
-      const precos = [];
-      if (finalidadesArray(im).includes('comprar') && im.valor) precos.push(`Venda ${formatBRL(im.valor)}`);
-      if (finalidadesArray(im).includes('alugar') && im.valor_aluguel) precos.push(`Aluguel ${formatBRL(im.valor_aluguel)}/mês`);
-      const local = [im.bairro, im.cidade].filter(Boolean).join(', ');
-      return `• [${im.codigo}] ${im.titulo} — ${f} — ${local} — ${im.quartos || 0} quartos — ${precos.join(' · ')}`;
-    }).join('\n');
-  } catch {
-    return '';
-  }
-}
-
-async function callGeminiChat(history, systemInstruction) {
+async function callGeminiChat(history) {
   let lastError;
   for (const model of MODEL_CANDIDATES) {
     try {
@@ -135,12 +111,9 @@ async function callGeminiChat(history, systemInstruction) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            systemInstruction: { parts: [{ text: systemInstruction }] },
+            systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
             contents: history,
-            // 1024 tokens dá bastante folga pra resposta completa (incluindo
-            // os links de imóveis) sem cortar a frase no meio — antes eram
-            // só 512, insuficiente pra respostas com contexto + link.
-            generationConfig: { temperature: 0.6, maxOutputTokens: 1024 },
+            generationConfig: { temperature: 0.6, maxOutputTokens: 512 },
           }),
         }
       );
@@ -153,18 +126,10 @@ async function callGeminiChat(history, systemInstruction) {
         }
         throw lastError;
       }
-      const candidate = data.candidates?.[0];
-      // Junta o texto de todas as partes da resposta (não só a primeira) —
-      // o Gemini às vezes divide a resposta em mais de uma "part".
-      const text = (candidate?.content?.parts || []).map(p => p.text || '').join('').trim();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) {
         lastError = new Error('A IA não retornou nenhum conteúdo.');
         continue;
-      }
-      // Se a resposta foi cortada por limite de tokens, avisa no console
-      // (não trava o chat, mas ajuda a diagnosticar se voltar a acontecer).
-      if (candidate?.finishReason === 'MAX_TOKENS') {
-        console.warn('Corretor Marcio Jorge: resposta pode ter sido cortada por limite de tokens.');
       }
       return text;
     } catch (err) {
@@ -177,20 +142,19 @@ async function callGeminiChat(history, systemInstruction) {
 function initChatWidget() {
   document.body.insertAdjacentHTML('beforeend', buildWidgetHTML());
 
-  let systemInstruction = buildSystemInstruction('');
+  // Busca a chave salva pelo Admin assim que a página carrega (não bloqueia
+  // a exibição do widget — só precisa estar pronta até o visitante mandar
+  // a primeira mensagem).
   getSiteConfig('chatbot_gemini_key')
     .then(key => { GEMINI_API_KEY = key || ''; })
     .catch(() => { GEMINI_API_KEY = ''; });
-  buildCatalogoResumo()
-    .then(resumo => { systemInstruction = buildSystemInstruction(resumo); })
-    .catch(() => {});
 
-  const fab = document.getElementById('mcjChatFab');
-  const win = document.getElementById('mcjChatWindow');
-  const closeBtn = document.getElementById('mcjChatClose');
-  const messagesEl = document.getElementById('mcjChatMessages');
-  const input = document.getElementById('mcjChatInput');
-  const sendBtn = document.getElementById('mcjChatSend');
+  const fab = document.getElementById('qrvChatFab');
+  const win = document.getElementById('qrvChatWindow');
+  const closeBtn = document.getElementById('qrvChatClose');
+  const messagesEl = document.getElementById('qrvChatMessages');
+  const input = document.getElementById('qrvChatInput');
+  const sendBtn = document.getElementById('qrvChatSend');
 
   let history = [];
   let sending = false;
@@ -202,7 +166,7 @@ function initChatWidget() {
 
   function addMessage(role, text) {
     const bubble = document.createElement('div');
-    bubble.className = `mcj-chat-msg ${role}`;
+    bubble.className = `qrv-chat-msg ${role}`;
     bubble.innerHTML = linkify(text);
     messagesEl.appendChild(bubble);
     scrollToBottom();
@@ -210,15 +174,15 @@ function initChatWidget() {
 
   function showTyping() {
     const typing = document.createElement('div');
-    typing.className = 'mcj-chat-typing';
-    typing.id = 'mcjChatTyping';
+    typing.className = 'qrv-chat-typing';
+    typing.id = 'qrvChatTyping';
     typing.innerHTML = '<span></span><span></span><span></span>';
     messagesEl.appendChild(typing);
     scrollToBottom();
   }
 
   function hideTyping() {
-    document.getElementById('mcjChatTyping')?.remove();
+    document.getElementById('qrvChatTyping')?.remove();
   }
 
   function openChat() {
@@ -226,7 +190,7 @@ function initChatWidget() {
     fab.classList.add('hidden-while-open');
     if (!welcomed) {
       welcomed = true;
-      addMessage('bot', 'Boa tarde! Sou o Corretor Marcio Jorge, da MCJ Capital Invest. Está buscando um imóvel para comprar ou para alugar? Posso ajudar a encontrar a opção ideal.');
+      addMessage('bot', 'QAP! Sou o assistente virtual da QRV Artigos Táticos. Como posso te ajudar na sua missão hoje?');
     }
     input.focus();
   }
@@ -241,12 +205,14 @@ function initChatWidget() {
     if (!text || sending) return;
 
     if (!GEMINI_API_KEY) {
+      // Pode ser que a busca da chave ainda esteja em andamento (rede lenta) —
+      // tenta buscar de novo uma vez antes de desistir.
       GEMINI_API_KEY = await getSiteConfig('chatbot_gemini_key').catch(() => '');
     }
     if (!GEMINI_API_KEY) {
       addMessage('user', text);
       input.value = '';
-      addMessage('error', `No momento o atendimento automático está indisponível (chave da API não configurada). Fale diretamente com um de nossos corretores pelo WhatsApp: ${WHATSAPP_LINK}`);
+      addMessage('error', `Positivo, mas ainda não estou com o rádio conectado (chave da API não configurada). Fala direto com a equipe pelo WhatsApp: ${WHATSAPP_LINK}`);
       return;
     }
 
@@ -258,14 +224,14 @@ function initChatWidget() {
     showTyping();
 
     try {
-      const reply = await callGeminiChat(history, systemInstruction);
+      const reply = await callGeminiChat(history);
       hideTyping();
       addMessage('bot', reply);
       history.push({ role: 'model', parts: [{ text: reply }] });
     } catch (err) {
       hideTyping();
-      addMessage('error', `Não foi possível processar sua mensagem agora. Tente novamente em instantes ou fale diretamente com um corretor: ${WHATSAPP_LINK}`);
-      console.error('Erro no Corretor Atendente:', err);
+      addMessage('error', `Falha na comunicação, câmbio. Tenta de novo em instantes ou fala direto com a equipe: ${WHATSAPP_LINK}`);
+      console.error('Erro no chat QRV:', err);
     } finally {
       sending = false;
       sendBtn.disabled = false;
