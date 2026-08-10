@@ -380,28 +380,38 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
   // Carrossel "Imóveis em Destaque" — efeito de pilha/profundidade (coverflow)
+  // Fluxo estrito para evitar que o loop trave quando os slides são trocados
+  // dinamicamente (dados assíncronos do Supabase): 1) destrói a instância
+  // atual, 2) só então mexe no HTML da .swiper-wrapper, 3) cria a nova
+  // instância depois do HTML já estar no DOM.
   let destaquesSwiper;
-  function initDestaquesSwiper() {
-    if (destaquesSwiper) destaquesSwiper.destroy(true, true);
-    const destaquesSlideCount = document.querySelectorAll('.destaques-swiper .swiper-slide').length;
+  const carouselTrackEl = document.getElementById('carouselTrack');
+
+  function createDestaquesSwiper() {
+    if (carouselTrackEl.children.length === 0) return;
     destaquesSwiper = new Swiper('.destaques-swiper', {
       effect: 'coverflow',
       grabCursor: true,
       centeredSlides: true,
-      loop: destaquesSlideCount > 1,
-      loopAdditionalSlides: destaquesSlideCount,
-      slidesPerView: 'auto',
-      spaceBetween: 20,
+      loop: true,
       observer: true,
       observeParents: true,
-      observeSlideChildren: true,
+      loopAdditionalSlides: 3,
+      slidesPerView: 'auto',
+      spaceBetween: 20,
       coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
       autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
       navigation: { nextEl: '#carNext', prevEl: '#carPrev' },
     });
   }
-  window.initDestaquesSwiper = initDestaquesSwiper;
-  initDestaquesSwiper();
+
+  function renderDestaques(cardsHTML) {
+    if (destaquesSwiper) { destaquesSwiper.destroy(true, true); destaquesSwiper = null; }
+    carouselTrackEl.innerHTML = cardsHTML;
+    createDestaquesSwiper();
+  }
+  window.renderDestaques = renderDestaques;
+  createDestaquesSwiper(); // primeira renderização, com os cards de exemplo já presentes no HTML
 
   // Carrossel "Conheça Nossos Imóveis" — mesmo efeito 3D/coverflow, com 1 card
   // em destaque no centro, prévia recuada dos vizinhos, autoplay contínuo
@@ -416,20 +426,18 @@
   const realSlidesHTML = { comprar: null, alugar: null }; // preenchido quando os dados reais do Supabase chegarem
 
   let imoveisSwiper;
-  function initImoveisSwiper() {
-    if (imoveisSwiper) imoveisSwiper.destroy(true, true);
-    const slideCount = propertyGridEl.querySelectorAll('.swiper-slide').length;
+  function createImoveisSwiper() {
+    if (propertyGridEl.children.length === 0) return;
     imoveisSwiper = new Swiper('.imoveis-swiper', {
       effect: 'coverflow',
       grabCursor: true,
       centeredSlides: true,
-      loop: slideCount > 1,
-      loopAdditionalSlides: slideCount,
-      slidesPerView: 'auto',
-      spaceBetween: 20,
+      loop: true,
       observer: true,
       observeParents: true,
-      observeSlideChildren: true,
+      loopAdditionalSlides: 3,
+      slidesPerView: 'auto',
+      spaceBetween: 20,
       coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
       autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
       navigation: { nextEl: '#imoveisNext', prevEl: '#imoveisPrev' },
@@ -437,11 +445,15 @@
   }
 
   function renderImoveisSwiper(tab) {
+    // 1) destrói a instância atual (se existir) antes de tocar no DOM
+    if (imoveisSwiper) { imoveisSwiper.destroy(true, true); imoveisSwiper = null; }
+    // 2) insere os novos cards dentro da .swiper-wrapper
     const list = realSlidesHTML[tab] ?? exampleSlidesHTML[tab];
     propertyGridEl.innerHTML = list && list.length > 0
       ? list.join('')
       : '<div class="swiper-slide"><p style="text-align:center;color:var(--text-muted);padding:60px 20px;">Nenhum imóvel cadastrado nesta categoria no momento.</p></div>';
-    initImoveisSwiper();
+    // 3) só cria a nova instância depois do HTML já estar no DOM
+    createImoveisSwiper();
   }
   window.renderImoveisSwiper = renderImoveisSwiper;
   window.__imoveisRealSlides = realSlidesHTML;
@@ -467,10 +479,7 @@
     }
 
     if (destaques.length > 0) {
-      const track = document.getElementById('carouselTrack');
-      track.querySelectorAll('.example-card').forEach(el => el.remove());
-      track.insertAdjacentHTML('beforeend', destaques.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join(''));
-      window.initDestaquesSwiper();
+      window.renderDestaques(destaques.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join(''));
     }
   }
 

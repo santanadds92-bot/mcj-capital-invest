@@ -299,31 +299,37 @@
   // Carrossel "Imóveis Similares" — mesmo efeito 3D/coverflow das outras
   // vitrines do site, com 1 card em destaque no centro, prévia recuada dos
   // vizinhos, autoplay contínuo (pausado ao passar o mouse) e navegação.
+  // Fluxo estrito para o loop não travar ao trocar os slides dinamicamente:
+  // 1) destrói a instância atual, 2) só então mexe no HTML da .swiper-wrapper,
+  // 3) cria a nova instância depois do HTML já estar no DOM.
   let similaresSwiper;
-  function initSimilaresSwiper() {
-    if (similaresSwiper) similaresSwiper.destroy(true, true);
-    const slideCount = document.querySelectorAll('#similarTrack .swiper-slide').length;
-    // Loop infinito sempre que houver mais de 1 imóvel — antes só ligava com
-    // mais de 2 slides, então com exatamente 2 imóveis similares o carrossel
-    // chegava no fim e parava em vez de voltar pro primeiro.
+  const similarTrackEl = document.getElementById('similarTrack');
+
+  function createSimilaresSwiper() {
+    if (similarTrackEl.children.length === 0) return;
     similaresSwiper = new Swiper('.similares-swiper', {
       effect: 'coverflow',
       grabCursor: true,
       centeredSlides: true,
-      loop: slideCount > 1,
-      loopAdditionalSlides: slideCount,
-      slidesPerView: 'auto',
-      spaceBetween: 20,
+      loop: true,
       observer: true,
       observeParents: true,
-      observeSlideChildren: true,
+      loopAdditionalSlides: 3,
+      slidesPerView: 'auto',
+      spaceBetween: 20,
       coverflowEffect: { rotate: 0, stretch: 0, depth: 160, modifier: 1.1, slideShadows: false },
       autoplay: { delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true },
       navigation: { nextEl: '#simNext', prevEl: '#simPrev' },
     });
   }
-  window.initSimilaresSwiper = initSimilaresSwiper;
-  initSimilaresSwiper();
+
+  function renderSimilares(cardsHTML) {
+    if (similaresSwiper) { similaresSwiper.destroy(true, true); similaresSwiper = null; }
+    similarTrackEl.innerHTML = cardsHTML;
+    createSimilaresSwiper();
+  }
+  window.renderSimilares = renderSimilares;
+  createSimilaresSwiper(); // primeira renderização, com os cards de exemplo já presentes no HTML
 </script>
 <script type="module">
   import { fetchImovelByCodigo, fetchImoveis, formatBRL, videoEmbedUrl, mapsEmbedUrl, propertyCardHTML, descricaoToHTML, sanitizeDescricao, placeholderPhoto, finalidadesArray } from './assets/supabase-client.js';
@@ -443,9 +449,7 @@
     // Imóveis similares (mesma finalidade, excluindo o atual)
     const similares = (await fetchImoveis({ finalidade: finalidades[0], limit: 6 })).filter(i => i.codigo !== imovel.codigo).slice(0, 3);
     if (similares.length > 0) {
-      const track = document.getElementById('similarTrack');
-      track.innerHTML = similares.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join('');
-      window.initSimilaresSwiper();
+      window.renderSimilares(similares.map(im => `<div class="swiper-slide">${propertyCardHTML(im)}</div>`).join(''));
     }
   }
 
