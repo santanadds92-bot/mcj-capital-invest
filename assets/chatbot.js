@@ -31,7 +31,7 @@ const MODEL_CANDIDATES = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-1.5
 function buildSystemInstruction(catalogoResumo) {
   return `Você é o "Corretor Marcio Jorge", o assistente virtual da MCJ Capital Invest, uma imobiliária especializada em imóveis de alto padrão em São Paulo. Seu tom de voz é sofisticado, cordial, consultivo e discreto — como um corretor experiente que atende clientes exigentes, nunca informal ou apressado.
 
-Responda sempre em português do Brasil, em mensagens curtas e claras (isto é um chat, não um e-mail) — no máximo 3 a 5 frases por resposta, a menos que o cliente peça mais detalhes. Seja direto: nunca deixe uma frase pela metade, prefira uma resposta mais curta e completa a uma resposta longa que arrisque ficar cortada.
+Responda sempre em português do Brasil, em mensagens curtas e claras (isto é um chat, não um e-mail) — prefira no máximo 3 a 5 frases por resposta, a menos que o cliente peça mais detalhes. Regra mais importante que o limite de frases: NUNCA termine uma resposta com uma frase incompleta ou pela metade. Se precisar escolher entre uma resposta mais longa porém completa e uma resposta curta que arrisque ficar cortada, sempre escolha terminar o raciocínio por completo, mesmo que isso exija uma frase a mais.
 
 Seu objetivo é ajudar visitantes a encontrar o imóvel certo (para comprar ou alugar), tirar dúvidas sobre bairros, condições de pagamento e agendar visitas.
 
@@ -125,50 +125,66 @@ async function buildCatalogoResumo() {
   }
 }
 
+async function requestGemini(model, history, systemInstruction, maxOutputTokens) {
+  const resp = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        contents: history,
+        generationConfig: { temperature: 0.6, maxOutputTokens },
+      }),
+    }
+  );
+  const data = await resp.json();
+  if (!resp.ok) {
+    const err = new Error(data.error?.message || `Erro na API do Gemini (modelo ${model})`);
+    err.code = 'API_ERROR';
+    throw err;
+  }
+  const candidate = data.candidates?.[0];
+  // Junta o texto de todas as partes da resposta (não só a primeira) —
+  // o Gemini às vezes divide a resposta em mais de uma "part".
+  const text = (candidate?.content?.parts || []).map(p => p.text || '').join('').trim();
+  return { text, finishReason: candidate?.finishReason };
+}
+
 async function callGeminiChat(history, systemInstruction) {
   let lastError;
   for (const model of MODEL_CANDIDATES) {
     try {
-      const resp = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: systemInstruction }] },
-            contents: history,
-            // 1024 tokens dá bastante folga pra resposta completa (incluindo
-            // os links de imóveis) sem cortar a frase no meio — antes eram
-            // só 512, insuficiente pra respostas com contexto + link.
-            generationConfig: { temperature: 0.6, maxOutputTokens: 1024 },
-          }),
+      // 2048 tokens dá bastante folga pra resposta completa (incluindo os
+      // links de imóveis) sem cortar a frase no meio. Se ainda assim vier
+      // MAX_TOKENS, tenta de novo com o dobro do limite antes de desistir
+      // desse modelo — assim o usuário nunca vê uma frase pela metade.
+      let { text, finishReason } = await requestGemini(model, history, systemInstruction, 2048);
+
+      if (finishReason === 'MAX_TOKENS') {
+        console.warn(`Corretor Marcio Jorge: resposta cortada por limite de tokens (modelo ${model}), tentando novamente com limite maior.`);
+        const retry = await requestGemini(model, history, systemInstruction, 4096);
+        if (retry.text) {
+          text = retry.text;
+          finishReason = retry.finishReason;
+          if (finishReason === 'MAX_TOKENS') {
+            console.warn(`Corretor Marcio Jorge: resposta ainda cortada mesmo com limite maior (modelo ${model}).`);
+          }
         }
-      );
-      const data = await resp.json();
-      if (!resp.ok) {
-        lastError = new Error(data.error?.message || `Erro na API do Gemini (modelo ${model})`);
-        const msg = (data.error?.message || '').toLowerCase();
-        if (msg.includes('not found') || msg.includes('not supported') || msg.includes('no longer available') || msg.includes('deprecated')) {
-          continue;
-        }
-        throw lastError;
       }
-      const candidate = data.candidates?.[0];
-      // Junta o texto de todas as partes da resposta (não só a primeira) —
-      // o Gemini às vezes divide a resposta em mais de uma "part".
-      const text = (candidate?.content?.parts || []).map(p => p.text || '').join('').trim();
+
       if (!text) {
         lastError = new Error('A IA não retornou nenhum conteúdo.');
         continue;
       }
-      // Se a resposta foi cortada por limite de tokens, avisa no console
-      // (não trava o chat, mas ajuda a diagnosticar se voltar a acontecer).
-      if (candidate?.finishReason === 'MAX_TOKENS') {
-        console.warn('Corretor Marcio Jorge: resposta pode ter sido cortada por limite de tokens.');
-      }
       return text;
     } catch (err) {
       lastError = err;
+      const msg = (err.message || '').toLowerCase();
+      if (err.code === 'API_ERROR' && !(msg.includes('not found') || msg.includes('not supported') || msg.includes('no longer available') || msg.includes('deprecated'))) {
+        throw err;
+      }
+      // modelo indisponível/depreciado — tenta o próximo da lista.
     }
   }
   throw lastError || new Error('Nenhum modelo do Gemini respondeu.');
