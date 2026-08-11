@@ -106,7 +106,13 @@ function linkify(text) {
   // dentro da própria página, sem precisar do domínio completo.
   return withAbsoluteLinks.replace(
     /(?<!\/)\b((?:imovel|comprar|alugar)\.html(?:\?[^\s<]*)?)/g,
-    match => `<a href="${match}" class="mcj-chat-link-btn">${match.startsWith('imovel') ? 'Ver imóvel' : 'Ver opções →'}</a>`
+    match => {
+      // Remove pontuação de frase colada no final (vírgula, ponto, etc.) —
+      // sem isso, "...em imovel.html?codigo=0019, além de..." vira um link
+      // com "0019," (vírgula incluída) e o código do imóvel não é encontrado.
+      const clean = match.replace(/[.,;!?)]+$/, '');
+      return `<a href="${clean}" class="mcj-chat-link-btn">${clean.startsWith('imovel') ? 'Ver imóvel' : 'Ver opções →'}</a>`;
+    }
   );
 }
 
