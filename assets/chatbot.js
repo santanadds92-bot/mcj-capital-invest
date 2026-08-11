@@ -41,15 +41,19 @@ Seu objetivo é ajudar visitantes a encontrar o imóvel certo (para comprar ou a
 • Contato: (11) 99999-0542 (WhatsApp) | marciocjorge@terra.com.br
 • Atuação: compra, venda e locação de imóveis de alto padrão (apartamentos, coberturas, casas e imóveis comerciais), principalmente em São Paulo.
 
-=== CATÁLOGO ATUAL (imóveis disponíveis agora — use para responder perguntas sobre opções específicas; cada linha começa com o código do imóvel entre colchetes, ex: [MCJ-001]) ===
-${catalogoResumo || 'Nenhum imóvel carregado no momento — oriente o cliente a falar com um corretor humano pelo WhatsApp para conhecer o catálogo atualizado.'}
+=== CATÁLOGO ATUAL (a ÚNICA fonte de verdade sobre imóveis disponíveis agora; cada linha começa com o código do imóvel entre colchetes, ex: [MCJ-001]) ===
+${catalogoResumo || 'CATÁLOGO VAZIO — nenhum imóvel carregado no momento.'}
+
+=== REGRA ABSOLUTA CONTRA INVENÇÃO DE DADOS ===
+Você NÃO pode, em hipótese alguma, inventar, embelezar, estimar ou "completar" bairro, cidade, rua, metragem, valor, padrão de acabamento ou qualquer outro dado de um imóvel. Use exclusivamente os dados exatos que aparecem na linha do CATÁLOGO ATUAL correspondente ao código citado — copie bairro, cidade e valor literalmente da linha, mesmo que pareçam simples ou "de exemplo". Isso vale mesmo que o cliente peça um imóvel "de alto padrão", "em bairro nobre" ou "na Oscar Freire": você só pode oferecer o que realmente existe no CATÁLOGO ATUAL, ainda que a localização ou o valor não combinem com o que o cliente imaginou. Nunca troque o bairro/cidade real de um imóvel por outro mais "sofisticado" para soar mais alinhado ao seu tom de voz.
+Se o CATÁLOGO ATUAL estiver vazio ou não tiver nada que combine com o pedido, diga isso claramente e direcione para o WhatsApp — nunca invente um imóvel para não decepcionar o cliente.
 
 === COMO INDICAR IMÓVEIS E LINKS (siga este formato à risca) ===
 Quando o cliente pedir um imóvel específico (ex: "apartamento pra comprar na Vila Augusta"), procure primeiro no CATÁLOGO ATUAL acima.
-• Se encontrar 1 ou poucos imóveis que combinam bem: cite o nome e um resumo curto de cada um, e logo depois inclua o link de cada um no formato exato "imovel.html?codigo=CODIGO" (troque CODIGO pelo código entre colchetes do imóvel, mantendo exatamente esse formato de texto puro, sem markdown, sem parênteses ao redor).
+• Se encontrar 1 ou poucos imóveis que combinam bem: cite o nome e os dados (bairro, cidade, valor) exatamente como estão na linha do catálogo, e logo depois inclua o link de cada um no formato exato "imovel.html?codigo=CODIGO" (troque CODIGO pelo código entre colchetes do imóvel, mantendo exatamente esse formato de texto puro, sem markdown, sem parênteses ao redor).
 • Se a busca for ampla (muitos resultados, ou o cliente só descreveu um bairro/tipo sem pedir um imóvel específico): não liste tudo, em vez disso inclua um link pra página de busca já filtrada, no formato "comprar.html?bairro=BAIRRO" (para compra) ou "alugar.html?bairro=BAIRRO" (para aluguel) — troque BAIRRO pelo nome do bairro mencionado (sem acentos ou espaços, use %20 se precisar). Os filtros aceitos nessas páginas são: bairro, tipo, quartos, valor_max, codigo.
 • Se não encontrar nada no catálogo que combine com o pedido, seja honesto: diga que não há esse imóvel disponível no momento e ofereça o link "comprar.html" ou "alugar.html" (sem filtro) para o cliente ver as opções atuais, ou direcione ao WhatsApp.
-Nunca invente um código de imóvel que não esteja no CATÁLOGO ATUAL.
+Nunca invente um código de imóvel que não esteja no CATÁLOGO ATUAL, e nunca associe um código real a uma descrição diferente da que está na linha dele.
 
 === DIRECIONAMENTO PARA O WHATSAPP ===
 Se o cliente quiser agendar uma visita, negociar condições, fazer uma proposta ou tiver uma dúvida muito específica sobre um imóvel (documentação, negociação de valor, disponibilidade exata), NÃO tente resolver isso sozinho: oriente-o a continuar com um corretor humano e inclua o link direto: ${WHATSAPP_LINK}
@@ -134,7 +138,10 @@ async function requestGemini(model, history, systemInstruction, maxOutputTokens)
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: systemInstruction }] },
         contents: history,
-        generationConfig: { temperature: 0.6, maxOutputTokens },
+        // temperature baixa de propósito: isto é um catálogo de imóveis reais,
+        // não texto criativo — queremos que o modelo cite os dados do
+        // CATÁLOGO ATUAL literalmente, sem "embelezar" bairro/valor.
+        generationConfig: { temperature: 0.2, maxOutputTokens },
       }),
     }
   );
@@ -197,7 +204,11 @@ function initChatWidget() {
   getSiteConfig('chatbot_gemini_key')
     .then(key => { GEMINI_API_KEY = key || ''; })
     .catch(() => { GEMINI_API_KEY = ''; });
-  buildCatalogoResumo()
+  // Guarda a promise do catálogo pra poder aguardá-la antes do primeiro
+  // envio — sem isso, se o cliente digitar rápido, a mensagem pode sair
+  // antes do catálogo real carregar, e a IA responde sem saber quais
+  // imóveis existem de verdade (risco de invenção).
+  const catalogoPromise = buildCatalogoResumo()
     .then(resumo => { systemInstruction = buildSystemInstruction(resumo); })
     .catch(() => {});
 
@@ -255,6 +266,8 @@ function initChatWidget() {
   async function sendMessage() {
     const text = input.value.trim();
     if (!text || sending) return;
+
+    await catalogoPromise;
 
     if (!GEMINI_API_KEY) {
       GEMINI_API_KEY = await getSiteConfig('chatbot_gemini_key').catch(() => '');
