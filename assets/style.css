@@ -468,6 +468,7 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
    Swiper/coverflow causava em navegadores mobile. */
 .pgallery{margin-bottom:48px;}
 .pgallery-main{
+  position:relative;
   width:100%;
   aspect-ratio:4/3;
   /* Trava a altura a no máximo 52% da altura da tela (e nunca mais que
@@ -475,19 +476,36 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
      primeira dobra, sem precisar rolar — inclusive em notebooks 1366x768. */
   max-height:min(52vh, 450px) !important;
   border-radius:8px;overflow:hidden;
-  border:1px solid var(--border);
-  background:var(--card-photo-grad);
+  border:none;outline:none;box-shadow:none;
+  background:var(--bg);
   cursor:zoom-in;
 }
 /* object-fit:contain — a foto principal aparece inteira, respeitando a
    proporção original de cada imagem enviada (sem cortar o topo/base de
-   fachadas, por exemplo). O espaço que sobrar nas laterais/topo é
-   preenchido pelo fundo escuro elegante do próprio container. */
-.pgallery-main img{width:100%;height:100%;object-fit:contain !important;display:block;background:var(--card-photo-grad);}
+   fachadas, por exemplo). Em fotos verticais, a sobra nas laterais fica
+   100% transparente — mesmo fundo da página, sem nenhuma "caixa" visível
+   em volta (sem borda, sem contorno, sem fundo cinza). */
+.pgallery-main img{width:100%;height:100%;object-fit:contain !important;display:block;background:transparent;border:none;outline:none;box-shadow:none;}
 
-.pgallery-thumbs-wrap{display:flex;align-items:center;gap:8px;margin-top:14px;}
+/* Setas de navegação — sobrepostas nas laterais da FOTO PRINCIPAL (não mais
+   na fileira de miniaturas), estilo discreto com fundo semi-transparente e
+   ícone dourado, igual à linguagem visual dos carrosséis do site. */
+.pgallery-main-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  z-index:5;
+  width:44px;height:44px;border-radius:50%;
+  border:1px solid rgba(212,175,55,.4);
+  background:rgba(10,9,8,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:#E6C687;cursor:pointer;font-size:1.1rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s ease, background .2s ease, color .2s ease, opacity .2s ease;
+}
+.pgallery-main-nav.prev{left:14px;}
+.pgallery-main-nav.next{right:14px;}
+.pgallery-main-nav:hover{background:#E6C687;color:#141210;border-color:#E6C687;transform:translateY(-50%) scale(1.08);}
+
 .pgallery-thumbs{
-  display:flex;gap:10px;flex:1;min-width:0;
+  display:flex;gap:10px;margin-top:14px;
   overflow-x:auto;scroll-behavior:smooth;padding-bottom:4px;scrollbar-width:none;
 }
 .pgallery-thumbs::-webkit-scrollbar{display:none;}
@@ -498,21 +516,6 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 }
 .pgallery-thumbs img.active{opacity:1;border-color:var(--gold);}
 .pgallery-thumbs img:hover{opacity:1;}
-
-/* Setas de navegação da fileira de miniaturas — mesmo estilo visual dos
-   botões dos carrosséis (.car-btn), só que menores, para caber ao lado da
-   fileira de thumbnails. */
-.pgallery-thumb-nav{
-  flex:0 0 auto;
-  width:34px;height:34px;border-radius:50%;
-  border:1px solid rgba(212,175,55,.4);
-  background:rgba(10,9,8,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  color:#E6C687;cursor:pointer;font-size:.9rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:transform .2s ease, background .2s ease, color .2s ease;
-}
-.pgallery-thumb-nav:hover{background:#E6C687;color:#141210;border-color:#E6C687;transform:scale(1.06);}
-.pgallery-thumb-nav:disabled{opacity:.3;cursor:default;transform:none;background:rgba(10,9,8,.6);color:#E6C687;}
 
 /* Lightbox / zoom em tela cheia */
 .lightbox{
