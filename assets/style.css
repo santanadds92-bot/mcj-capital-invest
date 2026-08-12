@@ -470,7 +470,10 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .pgallery-main{
   width:100%;
   aspect-ratio:4/3;
-  max-height:640px;
+  /* Trava a altura a no máximo 52% da altura da tela (e nunca mais que
+     450px) para que foto principal + miniaturas caibam inteiras na
+     primeira dobra, sem precisar rolar — inclusive em notebooks 1366x768. */
+  max-height:min(52vh, 450px) !important;
   border-radius:8px;overflow:hidden;
   border:1px solid var(--border);
   background:var(--card-photo-grad);
@@ -539,7 +542,11 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 .lightbox-thumbs img.active{opacity:1;border-color:var(--gold);}
 
 @media (max-width:800px){
-  .pgallery-main{aspect-ratio:3/4;}
+  /* No mobile a foto principal é retrato (3:4) e a tela já é naturalmente
+     mais alta que larga — a trava de 52vh/450px é coisa de desktop/notebook
+     (onde o problema de "primeira dobra" acontece); aqui volta ao limite
+     generoso de antes para não cortar a foto por engano. */
+  .pgallery-main{aspect-ratio:3/4;max-height:640px !important;}
   .pgallery-thumbs img{width:72px;height:72px;}
 }
 
