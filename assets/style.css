@@ -617,6 +617,17 @@ footer{background:var(--footer-bg);border-top:1px solid var(--border);padding:cl
    posicionado depois de todas as regras-base (mesma especificidade — quem
    vem depois no arquivo vence) e antes dos breakpoints de mobile abaixo,
    que continuam podendo refinar ainda mais para telas pequenas. */
+/* Redução de escala base — a correção definitiva para notebooks HD (1366x768)
+   combinados com o Zoom de Escala do Windows (normalmente 125%), que faz a
+   área útil real da página ficar ainda menor do que os 768px de altura
+   sugerem. Encolher o font-size do <html> encolhe junto, de forma
+   proporcional, TODOS os valores em rem do site (tipografia, paddings,
+   gaps) — inclusive dentro dos clamp() acima, que passam a partir de um
+   teto 15% menor. */
+@media (min-width:992px) and (max-width:1400px), (min-width:992px) and (max-height:800px){
+  html{font-size:85% !important;}
+}
+
 @media (max-width:1400px){
   .hero{padding:40px 20px;}
   .hero .container{padding-top:24px;padding-bottom:44px;}
@@ -637,18 +648,34 @@ footer{background:var(--footer-bg);border-top:1px solid var(--border);padding:cl
   .btn-gold, .btn-whatsapp{padding:11px 24px;}
   .search-section{margin-top:-90px;padding-bottom:50px;}
 
-  /* Cards de imóveis — mais enxutos */
-  .property-photo{height:210px;}
+  /* Cards de imóveis — mais enxutos, sem a foto sozinha ocupando a tela */
+  .property-photo{height:190px !important;}
+  .property-photo img{object-fit:cover;}
   .property-body{padding:16px;}
   .feature-card{padding:26px 20px;}
 
-  /* Footer mais compacto */
-  footer{padding:36px 0 20px;}
-  .footer-grid{gap:24px;margin-bottom:24px;}
+  /* Footer mais compacto — verticalmente bem mais enxuto */
+  footer{padding:30px 0 20px 0 !important;}
+  .footer-grid{gap:20px;margin-bottom:20px;}
+  .footer-grid h4{font-size:.95rem;}
+  .footer-grid ul a{font-size:.82rem;}
+  .footer-about p{line-height:1.3;}
+  .topbar .left span{line-height:1.3;}
 
   /* Detalhe do imóvel */
   .detail-grid{gap:32px;}
   .contact-card{padding:20px;}
+}
+
+/* Telas com pouca altura (notebooks 1366x768 e similares, sobretudo com
+   Zoom do Windows ativo) — mesmo em largura maior, a altura curta faz a
+   Hero e a caixa de busca comprimirem o resto da página. Comprime pelo
+   eixo vertical especificamente nesses casos. */
+@media (max-height:768px) and (min-width:992px){
+  .page-header{padding-top:40px !important;padding-bottom:30px !important;}
+  .hero .container{padding-top:24px !important;padding-bottom:30px !important;}
+  .search-panel{padding:16px !important;margin-top:15px !important;}
+  .field select, .field input{height:36px !important;font-size:.85rem !important;}
 }
 
 @media (max-width:960px){
