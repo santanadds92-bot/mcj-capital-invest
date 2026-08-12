@@ -629,6 +629,13 @@ footer{background:var(--footer-bg);border-top:1px solid var(--border);padding:cl
 }
 
 @media (max-width:1400px){
+  /* Container mais estreito nessa faixa — mesmo em 1366/1440px de largura de
+     tela, o conteúdo fica recuado das bordas com margens laterais generosas,
+     igual ao visual compacto e centralizado que já existe em Full HD (onde
+     o container de 1200px "sobra" bastante espaço nas laterais). Vale para
+     todas as seções e para o footer, que reaproveitam a mesma .container. */
+  .container{max-width:1080px;width:85%;margin:0 auto;}
+
   .hero{padding:40px 20px;}
   .hero .container{padding-top:24px;padding-bottom:44px;}
   .mcj-wordmark{font-size:clamp(2.6rem, 7.5vw, 5.6rem);top:32px;}
