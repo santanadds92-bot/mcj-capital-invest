@@ -261,28 +261,28 @@
 <script type="module" src="assets/theme.js"></script>
 <script type="module">
   import { uploadFotos, submitImovelParaAprovacao } from './assets/supabase-client.js';
-  import { getGeminiKey, setGeminiKey, generateImovelFromText } from './assets/gemini-ai.js';
 
   // ---------- IA: Preenchimento automático (Google Gemini) ----------
-  // Não há campo visível de chave nesta tela pública — de propósito, para não
-  // expor algo técnico para quem só quer anunciar um imóvel. A chave continua
-  // sendo salva no localStorage do navegador da pessoa (nunca é enviada para a
-  // MCJ); se ainda não houver uma chave salva, pedimos uma única vez de forma
-  // discreta na primeira tentativa de uso do botão de IA.
+  // O preenchimento automático roda através de uma função no servidor
+  // (api/gerar-imovel-ia.js), que guarda a chave da API do Gemini como
+  // variável de ambiente na Vercel. Assim funciona automaticamente para
+  // qualquer visitante, sem pedir nenhuma chave pessoal — a chave nunca
+  // chega ao navegador de quem está anunciando.
   const rawPropertyData = document.getElementById('rawPropertyData');
   const generateAIBtn = document.getElementById('generateAIBtn');
   const anuncioFormEl = document.getElementById('anuncioForm');
 
-  function ensureGeminiKey() {
-    let key = getGeminiKey();
-    if (key) return key;
-    key = prompt('Para usar o preenchimento automático por IA, cole aqui sua chave gratuita da API do Google Gemini (gerada em aistudio.google.com/apikey). Ela fica salva só neste navegador.');
-    if (key && key.trim()) {
-      key = key.trim();
-      setGeminiKey(key);
-      return key;
+  async function generateImovelFromText(rawText) {
+    const resp = await fetch('/api/gerar-imovel-ia', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ raw: rawText }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      throw new Error(data.error || 'Erro ao gerar com IA.');
     }
-    return null;
+    return data;
   }
 
   function applyAIResultToAnuncioForm(d) {
@@ -307,8 +307,6 @@
   }
 
   generateAIBtn.addEventListener('click', async () => {
-    const apiKey = ensureGeminiKey();
-    if (!apiKey) return;
     const raw = rawPropertyData.value.trim();
     if (!raw) {
       alert('Cole as informações do imóvel no campo acima.');
@@ -320,7 +318,7 @@
     generateAIBtn.textContent = 'Gerando com IA...';
 
     try {
-      const parsed = await generateImovelFromText(apiKey, raw);
+      const parsed = await generateImovelFromText(raw);
       applyAIResultToAnuncioForm(parsed);
     } catch (err) {
       alert('Erro ao gerar com IA: ' + err.message);
