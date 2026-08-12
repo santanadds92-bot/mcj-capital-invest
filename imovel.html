@@ -72,7 +72,11 @@
         <div class="pgallery-main" id="pgalleryMain" title="Clique para ampliar">
           <img id="pgalleryMainImg" src="" alt="Foto do imóvel">
         </div>
-        <div class="pgallery-thumbs" id="pgalleryThumbs"></div>
+        <div class="pgallery-thumbs-wrap">
+          <button class="pgallery-thumb-nav" id="pgalleryThumbPrev" aria-label="Miniaturas anteriores" type="button">&#8592;</button>
+          <div class="pgallery-thumbs" id="pgalleryThumbs"></div>
+          <button class="pgallery-thumb-nav" id="pgalleryThumbNext" aria-label="Próximas miniaturas" type="button">&#8594;</button>
+        </div>
       </div>
 
       <div class="lightbox" id="lightbox">
@@ -357,6 +361,12 @@
   const pgalleryMain = document.getElementById('pgalleryMain');
   const pgalleryMainImg = document.getElementById('pgalleryMainImg');
   const pgalleryThumbs = document.getElementById('pgalleryThumbs');
+  const pgalleryThumbPrev = document.getElementById('pgalleryThumbPrev');
+  const pgalleryThumbNext = document.getElementById('pgalleryThumbNext');
+  // Setas da fileira de miniaturas — rolam ~3 fotos por clique (além do
+  // scroll/touch nativo já habilitado via overflow-x:auto no CSS).
+  pgalleryThumbPrev.addEventListener('click', () => pgalleryThumbs.scrollBy({ left: -294, behavior: 'smooth' }));
+  pgalleryThumbNext.addEventListener('click', () => pgalleryThumbs.scrollBy({ left: 294, behavior: 'smooth' }));
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
   const lightboxThumbs = document.getElementById('lightboxThumbs');
