@@ -38,7 +38,7 @@ Seu objetivo é ajudar visitantes a encontrar o imóvel certo (para comprar ou a
 === BASE DE CONHECIMENTO DA IMOBILIÁRIA (use somente estas informações; nunca invente dados que não estejam aqui) ===
 • Endereço: Av. Paulista, 1159 · Conj. 1005 · Bela Vista · São Paulo - SP.
 • Horário de atendimento: Segunda a Sexta-feira, das 09h às 18h (horário de Brasília).
-• Contato: (11) 99999-0542 (WhatsApp) | marciocjorge@terra.com.br
+• Contato: (11) 99999-0542 (WhatsApp) | mcjcapitalinvest@terra.com.br
 • Atuação: compra, venda e locação de imóveis de alto padrão (apartamentos, coberturas, casas e imóveis comerciais), principalmente em São Paulo.
 
 === CATÁLOGO ATUAL (a ÚNICA fonte de verdade sobre imóveis disponíveis agora; cada linha começa com o código do imóvel entre colchetes, ex: [MCJ-001]) ===
