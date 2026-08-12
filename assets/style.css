@@ -402,6 +402,59 @@ nav.primary a:hover, nav.primary a.active{color:var(--gold-light);}
 }
 .similares-swiper .property-card{height:100%;}
 
+/* Showcase bands — "Espaços refinados" / "Qualidade Superior": banners de
+   imagem cheia com overlay escuro à esquerda, título serifado e um botão
+   pill, um de cada lado da faixa de citação (.quote-band). */
+.showcase-band{
+  position:relative;
+  min-height:520px;
+  display:flex;
+  align-items:flex-start;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  overflow:hidden;
+}
+.showcase-band::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(100deg, rgba(6,6,6,.78) 0%, rgba(6,6,6,.4) 42%, rgba(6,6,6,.05) 72%);
+  z-index:1;
+}
+.showcase-band .container{position:relative;z-index:2;width:100%;padding-top:64px;}
+.showcase-content{max-width:420px;}
+.showcase-content h2{
+  font-family:'Cormorant Garamond',serif;font-weight:500;
+  font-size:clamp(2rem, 4vw, 3.6rem);line-height:1.05;
+  color:#fff;margin-bottom:14px;
+}
+.showcase-content p{
+  color:rgba(255,255,255,.85);font-size:clamp(.85rem, 1.1vw, .95rem);
+  line-height:1.65;max-width:340px;margin-bottom:26px;
+}
+.showcase-espacos{background-image:url('showcase-espacos-refinados.jpg');}
+.showcase-qualidade{background-image:url('showcase-qualidade-superior.jpg');}
+.btn-pill{
+  display:inline-block;
+  background:#f3ede1;color:#141210;
+  padding:13px 30px;border-radius:30px;
+  font-size:.8rem;font-weight:600;letter-spacing:.3px;
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.btn-pill:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.35);}
+
+@media (max-width:1400px){
+  .showcase-band{min-height:420px;}
+  .showcase-band .container{padding-top:44px;}
+}
+@media (max-width:768px){
+  .showcase-band{min-height:340px;}
+  .showcase-band .container{padding-top:32px;}
+  .showcase-content h2{font-size:1.9rem;}
+  .showcase-content p{font-size:.85rem;margin-bottom:18px;}
+  .btn-pill{padding:11px 24px;font-size:.75rem;}
+}
+
 /* Sofisticação band */
 .quote-band{
   padding:clamp(60px, 9vw, 120px) 0;text-align:center;
