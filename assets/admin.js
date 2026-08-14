@@ -561,7 +561,7 @@ function sortedImoveis() {
   const mult = dir === 'asc' ? 1 : -1;
   return [...imoveisCache].sort((a, b) => {
     let va = a[field], vb = b[field];
-    if (field === 'valor') { va = Number(va) || 0; vb = Number(vb) || 0; }
+    if (field === 'valor' || field === 'valor_aluguel') { va = Number(va) || 0; vb = Number(vb) || 0; }
     else { va = (va || '').toString().toLowerCase(); vb = (vb || '').toString().toLowerCase(); }
     if (va < vb) return -1 * mult;
     if (va > vb) return 1 * mult;
@@ -587,6 +587,7 @@ function renderImoveisTable() {
       <td class="col-titulo"><input type="text" class="inline-edit" data-id="${im.id}" data-field="titulo" value="${(im.titulo || '').replace(/"/g, '&quot;')}"></td>
       <td class="col-finalidade">${finalidadeLabel(im)}</td>
       <td class="col-valor"><input type="number" step="0.01" class="inline-edit" data-id="${im.id}" data-field="valor" value="${im.valor ?? ''}"></td>
+      <td class="col-valor"><input type="number" step="0.01" class="inline-edit" data-id="${im.id}" data-field="valor_aluguel" value="${im.valor_aluguel ?? ''}"></td>
       <td><span class="status-pill ${im.status}">${im.status}</span></td>
       <td class="actions">
         <button class="btn-sm" data-edit="${im.id}">Editar</button>
@@ -651,7 +652,7 @@ async function saveInlineField(el) {
   const id = el.dataset.id;
   const field = el.dataset.field;
   let value = el.value;
-  if (field === 'valor') value = value === '' ? null : Number(value);
+  if (field === 'valor' || field === 'valor_aluguel') value = value === '' ? null : Number(value);
   if (field === 'codigo' || field === 'titulo') value = value.trim();
 
   const im = imoveisCache.find(i => i.id === id);
@@ -1006,10 +1007,17 @@ async function handleFiles(fileList) {
   renderPhotoPreviews();
 }
 
+// A primeira foto do array (índice 0) é sempre a "foto de capa" — é ela que
+// aparece nos cards do site e como foto principal na página do imóvel
+// (propertyCardHTML / imovel.html usam fotos[0]). Por isso "definir como
+// capa" simplesmente reordena o array, movendo a foto escolhida pro início.
 function renderPhotoPreviews() {
   photoPreviewGrid.innerHTML = currentPhotos.map((url, idx) => `
-    <div class="photo-preview">
+    <div class="photo-preview ${idx === 0 ? 'is-cover' : ''}">
       <img src="${url}" alt="Foto ${idx + 1}">
+      ${idx === 0
+        ? '<span class="cover-badge">Capa</span>'
+        : `<button type="button" class="set-cover" data-idx="${idx}" title="Definir como foto de capa">★</button>`}
       <button type="button" class="remove-photo" data-idx="${idx}">&times;</button>
     </div>
   `).join('');
@@ -1017,6 +1025,14 @@ function renderPhotoPreviews() {
   photoPreviewGrid.querySelectorAll('.remove-photo').forEach(btn => {
     btn.addEventListener('click', () => {
       currentPhotos.splice(Number(btn.dataset.idx), 1);
+      renderPhotoPreviews();
+    });
+  });
+  photoPreviewGrid.querySelectorAll('.set-cover').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = Number(btn.dataset.idx);
+      const [chosen] = currentPhotos.splice(idx, 1);
+      currentPhotos.unshift(chosen);
       renderPhotoPreviews();
     });
   });

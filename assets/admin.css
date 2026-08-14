@@ -198,11 +198,27 @@ td.col-valor .inline-edit{min-width:110px;}
 .upload-zone:hover{border-color:var(--gold);color:var(--gold-light);}
 .photo-preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;margin-bottom:20px;}
 .photo-preview{position:relative;aspect-ratio:1;border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.photo-preview.is-cover{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
 .photo-preview img{width:100%;height:100%;object-fit:cover;}
 .photo-preview .remove-photo{
   position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;
   background:rgba(0,0,0,.7);color:#fff;border:none;cursor:pointer;font-size:.8rem;line-height:1;
 }
+/* Selo "Capa" na primeira foto (é sempre ela que aparece nos cards do site e
+   como foto principal na página do imóvel) + botão de estrela nas demais
+   fotos, para o usuário poder promover qualquer uma a foto de capa. */
+.photo-preview .cover-badge{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(0deg, rgba(0,0,0,.8), rgba(0,0,0,0));
+  color:var(--gold-light);font-size:.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  text-align:center;padding:12px 4px 5px;pointer-events:none;
+}
+.photo-preview .set-cover{
+  position:absolute;bottom:4px;left:4px;width:22px;height:22px;border-radius:50%;
+  background:rgba(0,0,0,.7);color:#fff;border:none;cursor:pointer;font-size:.85rem;line-height:1;
+  display:flex;align-items:center;justify-content:center;transition:color .2s, background .2s;
+}
+.photo-preview .set-cover:hover{color:var(--gold-light);background:rgba(0,0,0,.9);}
 .upload-progress{font-size:.78rem;color:var(--gold-light);margin-bottom:12px;display:none;}
 
 .form-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:8px;}
