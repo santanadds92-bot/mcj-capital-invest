@@ -139,8 +139,16 @@ export async function fetchImovelByCodigo(codigo) {
 
 // ---------- Descrição: converte Markdown (ou texto puro) em HTML, e sanitiza antes de exibir ----------
 
-function escapeHTML(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// Exportada (além de usada internamente abaixo) para que qualquer outro
+// módulo que monte HTML por template literal a partir de dados vindos do
+// banco (que podem ter sido digitados por qualquer visitante, sem login —
+// ex: título de anúncio público, mensagem de contato) escape o texto antes
+// de inserir no DOM. Sem isso, um `titulo` como `<img src=x onerror=...>`
+// executa JavaScript arbitrário assim que o HTML é renderizado (XSS
+// armazenado) — inclusive dentro da sessão autenticada do admin.
+export function escapeHTML(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 // Aplica formatação inline de Markdown: **negrito** -> <strong>. O texto já
@@ -269,10 +277,15 @@ export function propertyCardHTML(imovel) {
   const podeComprar = finalidades.includes('comprar');
   const podeAlugar = finalidades.includes('alugar');
   const badgesHTML = `<div class="badge-row">${finalidades.map(f => `<span class="badge">${f === 'alugar' ? 'Alugar' : 'Comprar'}</span>`).join('')}</div>`;
-  const local = [imovel.bairro, imovel.cidade].filter(Boolean).join(' · ');
+  // titulo/bairro/cidade podem ter sido digitados por qualquer visitante no
+  // formulário público "Anunciar Seu Imóvel" (sem login) — escapamos antes
+  // de montar o card (que roda na Home, Comprar e Alugar) pra impedir XSS
+  // armazenado via um título/bairro malicioso.
+  const tituloSeguro = escapeHTML(imovel.titulo);
+  const local = escapeHTML([imovel.bairro, imovel.cidade].filter(Boolean).join(' · '));
 
   const mediaHTML = capa
-    ? `<img src="${capa}" alt="${imovel.titulo}" loading="lazy">`
+    ? `<img src="${capa}" alt="${tituloSeguro}" loading="lazy">`
     : `<div class="ph-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>Foto em breve</div>`;
 
   // Se o imóvel serve pras duas finalidades, mostra os dois valores; senão
@@ -295,7 +308,7 @@ export function propertyCardHTML(imovel) {
           ${mediaHTML}
         </div>
         <div class="property-body">
-          <h3>${imovel.titulo}</h3>
+          <h3>${tituloSeguro}</h3>
           <p class="loc">${local}</p>
           <div class="property-meta">${meta}</div>
           ${priceHTML}

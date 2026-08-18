@@ -1,4 +1,4 @@
-import { supabase, FOTOS_BUCKET, formatBRL, descricaoToHTML, sanitizeDescricao, finalidadesArray, getSiteConfig, setSiteConfig } from './supabase-client.js';
+import { supabase, FOTOS_BUCKET, formatBRL, descricaoToHTML, sanitizeDescricao, finalidadesArray, escapeHTML } from './supabase-client.js';
 import { getGeminiKey, setGeminiKey, generateImovelFromText } from './gemini-ai.js';
 
 function finalidadeLabel(im) {
@@ -155,43 +155,10 @@ function applyAIResult(d) {
 generateAIBtn.addEventListener('click', generateWithAI);
 refreshApiKeyStatus();
 
-// ---------- Chave do Gemini usada pelo chat público "Corretor Atendente" ----------
-// Ao contrário da chave acima (só neste navegador), esta fica salva na
-// tabela site_config do Supabase e é lida por assets/chatbot.js em
-// qualquer página pública, para qualquer visitante — sem precisar editar
-// código. Requer ter rodado site-config-setup.sql uma vez no projeto.
-const chatGeminiApiKeyInput = document.getElementById('chatGeminiApiKey');
-const saveChatApiKeyBtn = document.getElementById('saveChatApiKeyBtn');
-const chatApiKeyStatus = document.getElementById('chatApiKeyStatus');
-
-async function refreshChatApiKeyStatus() {
-  try {
-    const key = await getSiteConfig('chatbot_gemini_key');
-    chatGeminiApiKeyInput.value = key || '';
-    chatApiKeyStatus.textContent = key ? 'Chave salva ✓' : '';
-  } catch {
-    chatApiKeyStatus.textContent = '';
-  }
-}
-
-if (saveChatApiKeyBtn) {
-  saveChatApiKeyBtn.addEventListener('click', async () => {
-    const key = chatGeminiApiKeyInput.value.trim();
-    if (!key) {
-      showToast('Cole uma chave válida antes de salvar.', true);
-      return;
-    }
-    const { error } = await setSiteConfig('chatbot_gemini_key', key);
-    if (error) {
-      showToast('Erro ao salvar (rode site-config-setup.sql no Supabase se ainda não rodou): ' + error.message, true);
-      return;
-    }
-    chatApiKeyStatus.textContent = 'Chave salva ✓';
-    showToast('Chave do Corretor Atendente salva! Já vale para todos os visitantes do site.');
-  });
-}
-
-refreshChatApiKeyStatus();
+// A chave do Gemini usada pelo chat público "Corretor Atendente" não é mais
+// gerenciada por aqui — ela foi migrada para uma variável de ambiente no
+// servidor (GEMINI_API_KEY na Vercel), lida por api/chat-gemini.js. Ver a
+// caixa correspondente em admin.html para instruções de como trocá-la.
 
 // ---------- Importação em massa via CSV da Shopify ----------
 const csvUploadZone = document.getElementById('csvUploadZone');
@@ -346,8 +313,8 @@ function renderImportPreview() {
         ${item.fotos[0] ? `<img src="${item.fotos[0]}" alt="">` : '<span>Sem foto</span>'}
       </div>
       <div class="import-item-body">
-        <strong>${item.titulo}</strong>
-        <span>${item.codigo} · ${item.tipo} · ${item.fotos.length} foto(s)${item.bairro ? ' · ' + item.bairro : ''}</span>
+        <strong>${escapeHTML(item.titulo)}</strong>
+        <span>${escapeHTML(item.codigo)} · ${escapeHTML(item.tipo)} · ${item.fotos.length} foto(s)${item.bairro ? ' · ' + escapeHTML(item.bairro) : ''}</span>
         <span>${formatBRL(item.valor)}</span>
       </div>
       <button type="button" class="btn-sm import-toggle" data-idx="${idx}">${item._excluded ? 'Incluir' : 'Remover'}</button>
@@ -844,10 +811,10 @@ async function loadPendingImoveis() {
 
   pendingTableBody.innerHTML = data.map(im => `
     <tr>
-      <td>${im.titulo}</td>
+      <td>${escapeHTML(im.titulo)}</td>
       <td>${finalidadeLabel(im)}</td>
-      <td>${im.proprietario_nome || '—'}</td>
-      <td>${im.proprietario_telefone || '—'}</td>
+      <td>${escapeHTML(im.proprietario_nome) || '—'}</td>
+      <td>${escapeHTML(im.proprietario_telefone) || '—'}</td>
       <td class="actions">
         <button class="btn-sm" data-view="${im.id}">Ver Ficha</button>
       </td>
@@ -880,17 +847,20 @@ async function loadMessages() {
   }
   messagesEmptyState.style.display = 'none';
 
+  // nome/email/telefone/mensagem vêm do formulário público "Fale Conosco"
+  // (sem login, sem aprovação) — escapamos tudo antes de renderizar aqui,
+  // já que isso abre assim que o admin clica na aba Mensagens.
   messagesList.innerHTML = data.map(msg => `
     <div class="message-card">
       <div class="message-card-header">
-        <strong>${msg.nome}</strong>
+        <strong>${escapeHTML(msg.nome)}</strong>
         <span>${new Date(msg.created_at).toLocaleString('pt-BR')}</span>
       </div>
       <div class="message-card-contact">
-        ${msg.email ? `<span>${msg.email}</span>` : ''}
-        ${msg.telefone ? `<span>${msg.telefone}</span>` : ''}
+        ${msg.email ? `<span>${escapeHTML(msg.email)}</span>` : ''}
+        ${msg.telefone ? `<span>${escapeHTML(msg.telefone)}</span>` : ''}
       </div>
-      <p>${msg.mensagem}</p>
+      <p>${escapeHTML(msg.mensagem)}</p>
       <button class="btn-sm" data-delete-msg="${msg.id}">Excluir</button>
     </div>
   `).join('');

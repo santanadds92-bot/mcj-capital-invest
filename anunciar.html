@@ -187,6 +187,18 @@
         <div class="upload-progress" id="uploadProgress"></div>
         <div class="photo-preview-grid" id="photoPreviewGrid"></div>
 
+        <!-- Honeypot anti-spam: campo invisível para humanos, mas bots que
+             preenchem todos os campos automaticamente costumam preenchê-lo
+             também. Se vier preenchido, o envio é silenciosamente ignorado. -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="hp_anunciar">Deixe este campo em branco</label>
+          <input type="text" id="hp_anunciar" name="empresa_site" tabindex="-1" autocomplete="off">
+        </div>
+        <label class="consent-row">
+          <input type="checkbox" name="consentimento" required>
+          <span>Concordo com os <a href="termos-de-uso.html" target="_blank">Termos de Uso</a> e com o tratamento dos meus dados pessoais conforme a <a href="politica-de-privacidade.html" target="_blank">Política de Privacidade</a>.</span>
+        </label>
+
         <div class="form-actions">
           <button type="submit" class="btn-gold" style="width:auto;" id="submitBtn">Enviar para Aprovação</button>
         </div>
@@ -247,7 +259,7 @@
       </div>
       <div class="footer-bottom">
         <span>© 2026 MCJ CAPITAL INVEST, All rights reserved.</span>
-        <a href="#">Termos e políticas</a>
+        <a href="politica-de-privacidade.html">Política de Privacidade</a> · <a href="termos-de-uso.html">Termos de Uso</a>
       </div>
     </div>
   </footer>
@@ -261,6 +273,8 @@
 <script type="module" src="assets/theme.js"></script>
 <script type="module">
   import { uploadFotos, submitImovelParaAprovacao } from './assets/supabase-client.js';
+  import { isHoneypotFilled, getCooldownRemaining, markSubmitted } from './assets/antispam.js';
+  const ANUNCIAR_COOLDOWN_KEY = 'mcj_last_anuncio_submit';
 
   // ---------- IA: Preenchimento automático (Google Gemini) ----------
   // O preenchimento automático roda através de uma função no servidor
@@ -371,6 +385,21 @@
 
   anuncioForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // Honeypot: se o campo escondido veio preenchido, é bot — finge sucesso
+    // sem enviar nada de verdade.
+    if (isHoneypotFilled(anuncioForm, 'empresa_site')) {
+      anuncioForm.style.display = 'none';
+      successBox.style.display = 'block';
+      return;
+    }
+
+    const remaining = getCooldownRemaining(ANUNCIAR_COOLDOWN_KEY);
+    if (remaining > 0) {
+      alert(`Você já enviou um anúncio há pouco. Aguarde cerca de ${Math.ceil(remaining / 1000)}s para enviar outro.`);
+      return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando...';
 
@@ -426,6 +455,7 @@
       };
 
       await submitImovelParaAprovacao(payload);
+      markSubmitted(ANUNCIAR_COOLDOWN_KEY);
 
       anuncioForm.style.display = 'none';
       successBox.style.display = 'block';

@@ -70,13 +70,8 @@
       </div>
 
       <div class="ai-key-box">
-        <label for="chatGeminiApiKey">Chave da API do Google Gemini (usada pelo "Corretor Atendente" no site)</label>
-        <div class="ai-key-row">
-          <input type="password" id="chatGeminiApiKey" placeholder="Cole a chave aqui (ex: AIza...)">
-          <button type="button" class="btn-sm" id="saveChatApiKeyBtn">Salvar</button>
-          <span class="ai-key-status" id="chatApiKeyStatus"></span>
-        </div>
-        <p class="ai-key-hint">Diferente da chave acima, esta fica salva no banco de dados e vale para TODOS os visitantes que conversarem com o chat — não precisa mexer em código nem no GitHub. Recomendo gerar uma chave dedicada só para o chat em <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a>.</p>
+        <label>Chave da API do Google Gemini (usada pelo "Corretor Atendente" no site)</label>
+        <p class="ai-key-hint">Agora protegida no servidor — não fica mais salva no banco de dados nem visível a visitantes. É a mesma variável de ambiente <strong>GEMINI_API_KEY</strong> configurada no projeto da Vercel (a mesma usada pelo preenchimento automático da página "Anunciar"). Para trocar a chave, atualize essa variável direto no painel da Vercel (Project Settings → Environment Variables) e faça um redeploy.</p>
       </div>
 
       <div class="admin-tabs">

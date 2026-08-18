@@ -91,6 +91,17 @@
               <div class="form-group">
                 <div class="field"><label>Mensagem *</label><textarea name="mensagem" placeholder="Como podemos ajudar?" required></textarea></div>
               </div>
+              <!-- Honeypot anti-spam: campo invisível para humanos, mas bots que
+                   preenchem todos os campos automaticamente costumam preenchê-lo
+                   também. Se vier preenchido, o envio é silenciosamente ignorado. -->
+              <div class="hp-field" aria-hidden="true">
+                <label for="hp_contato">Deixe este campo em branco</label>
+                <input type="text" id="hp_contato" name="empresa_site" tabindex="-1" autocomplete="off">
+              </div>
+              <label class="consent-row">
+                <input type="checkbox" name="consentimento" required>
+                <span>Concordo com os <a href="termos-de-uso.html" target="_blank">Termos de Uso</a> e com o tratamento dos meus dados pessoais conforme a <a href="politica-de-privacidade.html" target="_blank">Política de Privacidade</a>.</span>
+              </label>
               <button type="submit" class="btn-gold" id="submitBtn">Enviar Mensagem</button>
               <a href="https://wa.me/5511999990542" target="_blank" rel="noopener" class="btn-whatsapp">
                 <svg viewBox="0 0 32 32" width="18" height="18" fill="currentColor"><path d="M16.02 3C9.4 3 4 8.38 4 15c0 2.36.7 4.55 1.9 6.4L4 29l7.8-1.85A11.9 11.9 0 0 0 16.02 27C22.65 27 28 21.62 28 15S22.65 3 16.02 3zm0 21.7c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.63 1.1 1.1-4.5-.25-.4A9.63 9.63 0 0 1 5 15c0-6.07 5-11 11.02-11S27 8.93 27 15s-4.98 9.7-10.98 9.7z"/></svg>
@@ -167,7 +178,7 @@
       </div>
       <div class="footer-bottom">
         <span>© 2026 MCJ CAPITAL INVEST, All rights reserved.</span>
-        <a href="#">Termos e políticas</a>
+        <a href="politica-de-privacidade.html">Política de Privacidade</a> · <a href="termos-de-uso.html">Termos de Uso</a>
       </div>
     </div>
   </footer>
@@ -181,13 +192,34 @@
 <script type="module" src="assets/theme.js"></script>
 <script type="module">
   import { submitMensagemContato } from './assets/supabase-client.js';
+  import { isHoneypotFilled, getCooldownRemaining, markSubmitted } from './assets/antispam.js';
 
   const contatoForm = document.getElementById('contatoForm');
   const submitBtn = document.getElementById('submitBtn');
   const contatoStatus = document.getElementById('contatoStatus');
+  const CONTATO_COOLDOWN_KEY = 'mcj_last_contato_submit';
 
   contatoForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // Honeypot: se o campo escondido veio preenchido, é bot — finge sucesso
+    // sem enviar nada de verdade, sem dar pista de que foi bloqueado.
+    if (isHoneypotFilled(contatoForm, 'empresa_site')) {
+      contatoForm.reset();
+      contatoStatus.style.display = 'block';
+      contatoStatus.style.color = '';
+      contatoStatus.textContent = 'Mensagem enviada! Em breve entraremos em contato.';
+      return;
+    }
+
+    const remaining = getCooldownRemaining(CONTATO_COOLDOWN_KEY);
+    if (remaining > 0) {
+      contatoStatus.style.display = 'block';
+      contatoStatus.style.color = '#e88';
+      contatoStatus.textContent = `Você já enviou uma mensagem há pouco. Aguarde cerca de ${Math.ceil(remaining / 1000)}s para enviar novamente.`;
+      return;
+    }
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando...';
 
@@ -199,8 +231,10 @@
         telefone: fd.get('telefone').trim(),
         mensagem: fd.get('mensagem').trim(),
       });
+      markSubmitted(CONTATO_COOLDOWN_KEY);
       contatoForm.reset();
       contatoStatus.style.display = 'block';
+      contatoStatus.style.color = '';
       contatoStatus.textContent = 'Mensagem enviada! Em breve entraremos em contato.';
     } catch (err) {
       contatoStatus.style.display = 'block';

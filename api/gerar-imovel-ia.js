@@ -120,9 +120,73 @@ async function callGemini(apiKey, prompt) {
   throw lastError || new Error('Nenhum modelo do Gemini respondeu.');
 }
 
+// ---------- Rate limit distribuído (Supabase) com fallback em memória ----------
+// O contador principal fica no banco (tabela public.rate_limits + função
+// check_rate_limit, ver rate-limit-setup.sql), acessado com a
+// SUPABASE_SERVICE_ROLE_KEY — por isso é compartilhado de verdade entre
+// todas as instâncias serverless da Vercel, ao contrário de um Map em
+// memória. Se por qualquer motivo o Supabase não responder (fora do ar,
+// variável de ambiente ainda não configurada etc.), caímos de volta no
+// contador em memória local como rede de segurança, para nunca deixar o
+// endpoint sem NENHUMA proteção.
+const SUPABASE_URL = 'https://zmvxmsvbvuiikxsuxoxl.supabase.co';
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutos
+const RATE_LIMIT_MAX = 8; // no máximo 8 gerações por IP a cada 10 minutos
+
+const rateLimitMap = new Map();
+function isRateLimitedInMemory(ip) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rateLimitMap.set(ip, { windowStart: now, count: 1 });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > RATE_LIMIT_MAX;
+}
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitMap) {
+    if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS) rateLimitMap.delete(ip);
+  }
+}, RATE_LIMIT_WINDOW_MS).unref?.();
+
+async function isRateLimited(bucketKey) {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) return isRateLimitedInMemory(bucketKey);
+
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/check_rate_limit`, {
+      method: 'POST',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        p_bucket_key: bucketKey,
+        p_window_ms: RATE_LIMIT_WINDOW_MS,
+        p_max_requests: RATE_LIMIT_MAX,
+      }),
+    });
+    if (!resp.ok) return isRateLimitedInMemory(bucketKey);
+    return await resp.json();
+  } catch {
+    return isRateLimitedInMemory(bucketKey);
+  }
+}
+
+const MAX_RAW_LENGTH = 6000; // limite generoso para o texto colado, evita payloads gigantes inflando custo/tokens
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Método não permitido.' });
+    return;
+  }
+
+  const ip = (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  if (await isRateLimited(`gerar-imovel-ia:${ip}`)) {
+    res.status(429).json({ error: 'Muitas gerações em pouco tempo. Aguarde alguns minutos e tente novamente.' });
     return;
   }
 
@@ -145,6 +209,10 @@ module.exports = async function handler(req, res) {
   const raw = (body && body.raw ? String(body.raw) : '').trim();
   if (!raw) {
     res.status(400).json({ error: 'Texto do imóvel não informado.' });
+    return;
+  }
+  if (raw.length > MAX_RAW_LENGTH) {
+    res.status(400).json({ error: 'Texto muito longo. Cole um resumo mais curto do imóvel.' });
     return;
   }
 

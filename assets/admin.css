@@ -69,7 +69,7 @@
 .message-card-header strong{font-size:1rem;color:var(--gold-light);}
 .message-card-header span{font-size:.72rem;color:var(--text-muted);}
 .message-card-contact{display:flex;gap:16px;font-size:.8rem;color:var(--text-muted);margin-bottom:10px;flex-wrap:wrap;}
-.message-card p{font-size:.88rem;line-height:1.6;margin-bottom:12px;}
+.message-card p{font-size:.88rem;line-height:1.6;margin-bottom:12px;white-space:pre-wrap;}
 
 /* Property list table */
 .imoveis-table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);border-radius:6px;overflow:hidden;}

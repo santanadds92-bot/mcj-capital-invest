@@ -3,30 +3,19 @@
 // Widget de chat (HTML/CSS/JS puro) integrado à API do Google Gemini.
 // =====================================================================
 //
-// IMPORTANTE SOBRE A CHAVE DE API: este é um site 100% estático, sem
-// backend — qualquer chave usada aqui fica visível para quem inspecionar
-// as requisições de rede. Por isso ela NÃO fica escrita neste arquivo:
-// é cadastrada pelo Admin (painel do site → campo "Chave da API do
-// Corretor Atendente"), salva na tabela `site_config` do Supabase (rode
-// site-config-setup.sql uma vez para criar essa tabela) e lida aqui em
-// tempo real. Pra trocar a chave no futuro, basta colar uma nova no
-// Admin e salvar — sem editar código, sem commit, sem redeploy.
-//
-// Para publicar com segurança, no Google AI Studio / Google Cloud Console:
-//   1. Crie uma chave de API dedicada só para este chat.
-//   2. Em "Restrições de API", limite essa chave só à Generative Language API.
-//   3. Em "Restrições de aplicativo" → "Referenciadores HTTP", cadastre o
-//      domínio do site pra chave só funcionar a partir dele.
-//   4. Defina uma cota diária baixa, como trava de segurança.
+// SOBRE A CHAVE DE API: as mensagens são processadas por uma função
+// serverless (api/chat-gemini.js), que guarda a chave do Gemini em uma
+// variável de ambiente no servidor (GEMINI_API_KEY, a mesma já usada pelo
+// preenchimento automático em api/gerar-imovel-ia.js). O navegador do
+// visitante nunca tem acesso à chave — só ao texto final da resposta.
+// (Esquema anterior guardava a chave em site_config no Supabase com
+// leitura pública, o que permitia que qualquer visitante a extraísse via
+// API REST; esse endpoint substitui aquele esquema por completo.)
 
-import { getSiteConfig, fetchImoveis, formatBRL, finalidadesArray } from './supabase-client.js';
-
-let GEMINI_API_KEY = '';
+import { fetchImoveis, formatBRL, finalidadesArray } from './supabase-client.js';
 
 const WHATSAPP_NUMERO = '5511999990542';
 const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMERO}`;
-
-const MODEL_CANDIDATES = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-1.5-flash'];
 
 function buildSystemInstruction(catalogoResumo) {
   return `Você é o "Corretor Marcio Jorge", o assistente virtual da MCJ Capital Invest, uma imobiliária especializada em imóveis de alto padrão em São Paulo. Seu tom de voz é sofisticado, cordial, consultivo e discreto — como um corretor experiente que atende clientes exigentes, nunca informal ou apressado.
@@ -135,81 +124,26 @@ async function buildCatalogoResumo() {
   }
 }
 
-async function requestGemini(model, history, systemInstruction, maxOutputTokens) {
-  const resp = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        contents: history,
-        // temperature baixa de propósito: isto é um catálogo de imóveis reais,
-        // não texto criativo — queremos que o modelo cite os dados do
-        // CATÁLOGO ATUAL literalmente, sem "embelezar" bairro/valor.
-        generationConfig: { temperature: 0.2, maxOutputTokens },
-      }),
-    }
-  );
+// A escolha de modelo, retry em caso de MAX_TOKENS e a chamada real à API
+// do Gemini agora acontecem inteiramente no servidor (api/chat-gemini.js) —
+// aqui só enviamos o histórico da conversa e recebemos o texto pronto.
+async function callGeminiChat(history, systemInstruction) {
+  const resp = await fetch('/api/chat-gemini', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ history, systemInstruction }),
+  });
   const data = await resp.json();
   if (!resp.ok) {
-    const err = new Error(data.error?.message || `Erro na API do Gemini (modelo ${model})`);
-    err.code = 'API_ERROR';
-    throw err;
+    throw new Error(data.error || 'Erro ao processar a mensagem.');
   }
-  const candidate = data.candidates?.[0];
-  // Junta o texto de todas as partes da resposta (não só a primeira) —
-  // o Gemini às vezes divide a resposta em mais de uma "part".
-  const text = (candidate?.content?.parts || []).map(p => p.text || '').join('').trim();
-  return { text, finishReason: candidate?.finishReason };
-}
-
-async function callGeminiChat(history, systemInstruction) {
-  let lastError;
-  for (const model of MODEL_CANDIDATES) {
-    try {
-      // 2048 tokens dá bastante folga pra resposta completa (incluindo os
-      // links de imóveis) sem cortar a frase no meio. Se ainda assim vier
-      // MAX_TOKENS, tenta de novo com o dobro do limite antes de desistir
-      // desse modelo — assim o usuário nunca vê uma frase pela metade.
-      let { text, finishReason } = await requestGemini(model, history, systemInstruction, 2048);
-
-      if (finishReason === 'MAX_TOKENS') {
-        console.warn(`Corretor Marcio Jorge: resposta cortada por limite de tokens (modelo ${model}), tentando novamente com limite maior.`);
-        const retry = await requestGemini(model, history, systemInstruction, 4096);
-        if (retry.text) {
-          text = retry.text;
-          finishReason = retry.finishReason;
-          if (finishReason === 'MAX_TOKENS') {
-            console.warn(`Corretor Marcio Jorge: resposta ainda cortada mesmo com limite maior (modelo ${model}).`);
-          }
-        }
-      }
-
-      if (!text) {
-        lastError = new Error('A IA não retornou nenhum conteúdo.');
-        continue;
-      }
-      return text;
-    } catch (err) {
-      lastError = err;
-      const msg = (err.message || '').toLowerCase();
-      if (err.code === 'API_ERROR' && !(msg.includes('not found') || msg.includes('not supported') || msg.includes('no longer available') || msg.includes('deprecated'))) {
-        throw err;
-      }
-      // modelo indisponível/depreciado — tenta o próximo da lista.
-    }
-  }
-  throw lastError || new Error('Nenhum modelo do Gemini respondeu.');
+  return data.text;
 }
 
 function initChatWidget() {
   document.body.insertAdjacentHTML('beforeend', buildWidgetHTML());
 
   let systemInstruction = buildSystemInstruction('');
-  getSiteConfig('chatbot_gemini_key')
-    .then(key => { GEMINI_API_KEY = key || ''; })
-    .catch(() => { GEMINI_API_KEY = ''; });
   // Guarda a promise do catálogo pra poder aguardá-la antes do primeiro
   // envio — sem isso, se o cliente digitar rápido, a mensagem pode sair
   // antes do catálogo real carregar, e a IA responde sem saber quais
@@ -274,16 +208,6 @@ function initChatWidget() {
     if (!text || sending) return;
 
     await catalogoPromise;
-
-    if (!GEMINI_API_KEY) {
-      GEMINI_API_KEY = await getSiteConfig('chatbot_gemini_key').catch(() => '');
-    }
-    if (!GEMINI_API_KEY) {
-      addMessage('user', text);
-      input.value = '';
-      addMessage('error', `No momento o atendimento automático está indisponível (chave da API não configurada). Fale diretamente com um de nossos corretores pelo WhatsApp: ${WHATSAPP_LINK}`);
-      return;
-    }
 
     addMessage('user', text);
     history.push({ role: 'user', parts: [{ text }] });
